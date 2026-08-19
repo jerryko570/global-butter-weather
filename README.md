@@ -1,6 +1,8 @@
 # global-butter-weather
 
-날씨 서비스 프로젝트 🌤️
+`butter-weather-shop`의 해외 확장판 — 다국가 대응 편집샵 🌤️
+
+프로젝트 기준 문서는 [CLAUDE.md](CLAUDE.md)를 본다.
 
 ## 협업 규칙
 
