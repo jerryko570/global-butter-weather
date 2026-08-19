@@ -1,8 +1,9 @@
 name: Slack PR Notification
 
-# PR이 열리거나 리뷰 요청/머지/닫힐 때 Slack으로 알림을 보낸다.
+# PR이 열리거나 리뷰 요청/머지/닫힐 때 Slack #pr-알림 채널로 알림을 보낸다.
 # 사전 준비: 레포 Settings → Secrets and variables → Actions 에
-#   SLACK_WEBHOOK_URL 시크릿(= Slack Incoming Webhook URL)을 등록해야 동작한다.
+#   SLACK_WEBHOOK_PR 시크릿(= #pr-알림 채널의 Incoming Webhook URL)을 등록해야 동작한다.
+#   (배포 알림은 #배포-알림 채널용 SLACK_WEBHOOK_DEPLOY 시크릿을 별도로 쓴다.)
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, review_requested, closed]
@@ -13,7 +14,7 @@ jobs:
     steps:
       - name: Compose and send Slack message
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_PR }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
@@ -24,7 +25,7 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           if [ -z "$SLACK_WEBHOOK_URL" ]; then
-            echo "SLACK_WEBHOOK_URL 시크릿이 없어 알림을 건너뜁니다."
+            echo "SLACK_WEBHOOK_PR 시크릿이 없어 알림을 건너뜁니다."
             exit 0
           fi
 
