@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@import './styles/theme.css';
+
+/* .dark 클래스 토글로 dark: 유틸리티 동작 (OS 설정이 아닌 수동 토글) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  background-color: var(--color-cloud);
+  color: var(--color-ink);
+}
