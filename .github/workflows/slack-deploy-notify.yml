@@ -1,0 +1,80 @@
+name: Slack Deploy Notification
+
+# GitHub 릴리스가 발행되면 Slack #deploy-live 채널로 배포 알림을 보낸다.
+# 버전은 릴리스 태그(예: v1.0.0)를 그대로 쓰고, 릴리스 노트를 그대로 실어
+# 비개발자도 "무엇이 배포됐는지"를 알 수 있게 한다.
+#
+# 사전 준비: 레포 Settings → Secrets and variables → Actions 에
+#   SLACK_WEBHOOK_DEPLOY 시크릿(= #deploy-live 채널의 Incoming Webhook URL)을 등록해야 동작한다.
+#
+# 배포 방법:
+#   gh release create v1.0.0 --title "v1.0.0" --notes "장바구니 기능 오픈"
+#   (프리릴리스는 --prerelease → "상용 배포"가 아닌 것으로 표시된다)
+#
+# 이 워크플로우는 default 브랜치(main)의 버전이 실행된다.
+# 웹훅 연결만 따로 확인하고 싶으면 Actions 탭에서 "Run workflow"로 수동 실행할 수 있다.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '테스트로 알릴 버전 태그'
+        required: true
+        default: 'v0.0.0-test'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compose and send Slack message
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DEPLOY }}
+          VERSION: ${{ github.event.release.tag_name || inputs.tag }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+          RELEASE_URL: ${{ github.event.release.html_url || format('https://github.com/{0}/releases', github.repository) }}
+          AUTHOR: ${{ github.event.release.author.login || github.actor }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+          IS_TEST: ${{ github.event_name == 'workflow_dispatch' }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_DEPLOY 시크릿이 없어 알림을 건너뜁니다."
+            exit 0
+          fi
+
+          if [ "$IS_TEST" = "true" ]; then
+            HEADER="🧰 배포 알림 테스트"
+          elif [ "$PRERELEASE" = "true" ]; then
+            HEADER="🧪 프리릴리스 배포 (상용 아님)"
+          else
+            HEADER="🚀 상용 배포 완료"
+          fi
+
+          # 릴리스 노트를 그대로 싣는다. HTML 주석·빈 줄은 걷어내고 길이만 자른다.
+          NOTES=$(printf '%s\n' "$RELEASE_BODY" \
+            | tr -d '\r' \
+            | sed -e 's/<!--.*-->//' -e '/^[[:space:]]*$/d' \
+            | sed -n '1,20p' \
+            | cut -c1-400 \
+            | iconv -c -f UTF-8 -t UTF-8)
+
+          if [ -n "$NOTES" ]; then
+            BODY_BLOCK=$(printf '%s\n' "$NOTES" | sed 's/^/> /')
+          else
+            BODY_BLOCK="> _릴리스 노트가 비어 있습니다 — 릴리스 본문에 무엇을 배포했는지 적어주세요._"
+          fi
+
+          TITLE_LINE="*${HEADER}*  <${RELEASE_URL}|${VERSION}>"
+          if [ -n "$RELEASE_NAME" ] && [ "$RELEASE_NAME" != "$VERSION" ]; then
+            TITLE_LINE="${TITLE_LINE} — ${RELEASE_NAME}"
+          fi
+
+          TEXT="${TITLE_LINE}"$'\n'"📦 ${REPO} · 👤 ${AUTHOR}"$'\n\n'"*📋 이번 배포에 담긴 것*"$'\n'"${BODY_BLOCK}"
+
+          # 릴리스 제목/본문을 셸에 직접 넣지 않고 jq로 안전하게 JSON 구성 (인젝션 방지)
+          PAYLOAD=$(jq -n --arg text "$TEXT" '{text: $text}')
+
+          curl -sS -X POST -H 'Content-type: application/json' \
+            --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
