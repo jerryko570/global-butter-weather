@@ -56,6 +56,7 @@ jobs:
           NOTES=$(printf '%s\n' "$RELEASE_BODY" \
             | tr -d '\r' \
             | sed -e 's/<!--.*-->//' -e '/^[[:space:]]*$/d' \
+            | sed -e 's/\*\*\([^*]*\)\*\*/*\1*/g' \
             | sed -n '1,20p' \
             | cut -c1-400 \
             | iconv -c -f UTF-8 -t UTF-8)
