@@ -1,9 +1,11 @@
 name: Slack PR Notification
 
-# PR이 열리거나 리뷰 요청/머지/닫힐 때 Slack #pr-알림 채널로 알림을 보낸다.
+# PR이 열리거나 리뷰 요청/머지/닫힐 때 Slack #dev-pr 채널로 알림을 보낸다.
+# 오픈·머지 시에는 PR 본문의 "## 📋 작업 내용" 섹션을 함께 실어서
+# 비개발자도 "무엇이 반영됐는지"를 알 수 있게 한다.
 # 사전 준비: 레포 Settings → Secrets and variables → Actions 에
-#   SLACK_WEBHOOK_PR 시크릿(= #pr-알림 채널의 Incoming Webhook URL)을 등록해야 동작한다.
-#   (배포 알림은 #배포-알림 채널용 SLACK_WEBHOOK_DEPLOY 시크릿을 별도로 쓴다.)
+#   SLACK_WEBHOOK_PR 시크릿(= #dev-pr 채널의 Incoming Webhook URL)을 등록해야 동작한다.
+#   (배포 알림은 #deploy-live 채널용 SLACK_WEBHOOK_DEPLOY 시크릿을 쓴다 → slack-deploy-notify.yml)
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, review_requested, closed]
@@ -16,6 +18,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_PR }}
           PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -29,18 +32,56 @@ jobs:
             exit 0
           fi
 
+          # 이벤트별 헤더. 요약은 "무슨 일이 반영됐는지"가 궁금한 시점에만 싣는다.
+          #  → 리뷰 요청·단순 닫힘엔 붙이지 않아 채널이 길어지지 않게 한다.
+          WITH_SUMMARY=false
           case "$ACTION" in
-            opened)            HEADER="🆕 새 PR" ;;
-            reopened)          HEADER="🔁 PR 재오픈" ;;
-            ready_for_review)  HEADER="👀 리뷰 대기" ;;
+            opened)            HEADER="🆕 새 PR"; WITH_SUMMARY=true ;;
+            reopened)          HEADER="🔁 PR 재오픈"; WITH_SUMMARY=true ;;
+            ready_for_review)  HEADER="👀 리뷰 대기"; WITH_SUMMARY=true ;;
             review_requested)  HEADER="🙋 리뷰 요청 → @${REVIEWER}" ;;
             closed)
-              if [ "$MERGED" = "true" ]; then HEADER="✅ PR 머지됨"; else HEADER="🚫 PR 닫힘"; fi ;;
+              if [ "$MERGED" = "true" ]; then
+                HEADER="✅ PR 머지됨"
+                WITH_SUMMARY=true
+              else
+                HEADER="🚫 PR 닫힘"
+              fi ;;
             *)                 HEADER="PR 업데이트" ;;
           esac
 
-          # PR 제목/작성자를 셸에 직접 넣지 않고 jq로 안전하게 JSON 구성 (인젝션 방지)
+          # PR 본문에서 "## 📋 작업 내용" 섹션만 뽑는다 (다음 "## " 헤딩 전까지).
+          SUMMARY=""
+          if [ "$WITH_SUMMARY" = "true" ]; then
+            SUMMARY=$(printf '%s\n' "$PR_BODY" \
+              | tr -d '\r' \
+              | awk '
+                  # state 0: 섹션 이전 / 1: 섹션 안 / 2: 섹션 끝
+                  /^## / {
+                    if (state == 1) { state = 2 }
+                    else if (state == 0 && $0 ~ /작업 내용/) { state = 1 }
+                    next
+                  }
+                  state == 1 { print }
+                ' \
+              | sed -e 's/<!--.*-->//' -e '/^[[:space:]]*$/d' \
+              | sed -n '1,12p' \
+              | cut -c1-400 \
+              | iconv -c -f UTF-8 -t UTF-8)
+          fi
+
           TEXT="*${HEADER}*  <${PR_URL}|#${PR_NUMBER} ${PR_TITLE}>"$'\n'"📦 ${REPO} · 👤 ${PR_AUTHOR}"
+
+          if [ "$WITH_SUMMARY" = "true" ]; then
+            if [ -n "$SUMMARY" ]; then
+              BODY_BLOCK=$(printf '%s\n' "$SUMMARY" | sed 's/^/> /')
+            else
+              BODY_BLOCK="> _요약 없음 — PR 본문의 \`## 📋 작업 내용\`을 채우면 여기에 표시됩니다._"
+            fi
+            TEXT="${TEXT}"$'\n\n'"*📋 무엇이 바뀌었나*"$'\n'"${BODY_BLOCK}"
+          fi
+
+          # PR 제목/본문을 셸에 직접 넣지 않고 jq로 안전하게 JSON 구성 (인젝션 방지)
           PAYLOAD=$(jq -n --arg text "$TEXT" '{text: $text}')
 
           curl -sS -X POST -H 'Content-type: application/json' \
