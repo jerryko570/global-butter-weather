@@ -65,6 +65,7 @@ jobs:
                   state == 1 { print }
                 ' \
               | sed -e 's/<!--.*-->//' -e '/^[[:space:]]*$/d' \
+              | sed -e 's/\*\*\([^*]*\)\*\*/*\1*/g' \
               | sed -n '1,12p' \
               | cut -c1-400 \
               | iconv -c -f UTF-8 -t UTF-8)
