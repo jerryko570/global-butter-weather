@@ -24,15 +24,22 @@ esac
 
 PR_TITLE="[${EMOJI}${LABEL}/${ISSUE_NUMBER}] ${TITLE}"
 
+# ClickUp URL이 있을 때만 해당 섹션을 넣는다.
+if [ -n "$CLICKUP_URL" ]; then
+  CLICKUP_SECTION="
+## 🔗 ClickUp
+${CLICKUP_URL}
+"
+else
+  CLICKUP_SECTION=""
+fi
+
 PR_BODY="## 📋 작업 내용
 ${DESCRIPTION}
 
 ## 🔗 관련 이슈
 close #${ISSUE_NUMBER}
-
-## 🔗 ClickUp
-${CLICKUP_URL}
-
+${CLICKUP_SECTION}
 ## ✅ 체크리스트
 - [x] ${CHECKLIST}
 - [ ] 로컬에서 테스트 완료

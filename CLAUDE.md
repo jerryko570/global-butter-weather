@@ -140,3 +140,38 @@ with check ( (auth.jwt() ->> 'email') = 'ADMIN_EMAIL_HERE' );
 - RLS는 대충 넘기지 말 것. 쓰기는 반드시 관리자 이메일로 제한.
 - 가격은 원 단위 정수로 다룬다.
 - 커밋 컨벤션: ✨ Feature / ♻️ Refactor / 🐛 Fix / 🎨 Style / 📝 Docs / ⚙️ Chore
+
+## Git · PR 규칙
+
+**`main`은 보호됨** — 직접 push 금지. 반드시 브랜치 → PR → 리뷰 승인 1개 → 머지.
+
+### 브랜치 네이밍
+- `feature/작업내용` · `fix/버그내용` · `chore/설정내용` · `refactor/대상`
+- 작업 시작 전 항상 `git pull`로 최신 상태에서 브랜치를 판다.
+
+### PR 규칙 (`pr.sh` 기준)
+PR은 `./pr.sh` 헬퍼로 표준 형식으로 올린다.
+
+```bash
+# Usage: ./pr.sh <이슈번호> <서브번호> "<제목>" <타입> "<설명>" "<체크리스트>" "<ClickUp URL>"
+./pr.sh 1 1 "GitHub 라벨 구성 추가" chore "라벨 6종 생성" "Tailwind @theme 연동" ""
+```
+
+- **타입 → 이모지/라벨** (레포에 동일 이름 라벨이 미리 생성돼 있어야 함):
+  | 타입 | 이모지 | 라벨 |
+  |------|--------|------|
+  | `feat` | ✨ | ✨Feature |
+  | `fix` | 🐛 | 🐛Fix |
+  | `refactor` | ♻️ | ♻️Refactor |
+  | `chore` | ⚙️ | ⚙️Chore |
+  | `assets` | 🖼️ | 🖼️Assets |
+  | `style` | 🎨 | 🎨Style |
+- **PR 제목 형식**: `[이모지+라벨/이슈번호] 제목` → 예: `[✨Feature/1] 상품 목록 페이지`
+- **PR 본문**: 작업 내용 / 관련 이슈(`close #N`) / ClickUp(선택) / 체크리스트(로컬 테스트·console.log 제거·타입 에러 없음)
+- ClickUp을 안 쓰면 마지막 인자는 빈 문자열 `""`로 둔다.
+- `pr.sh`를 안 쓸 땐 `.github/pull_request_template.md` 형식을 그대로 따른다.
+
+### 머지 규칙
+- 상대방 **리뷰 승인 1개** 후 머지 (`main` 보호 규칙).
+- 새 커밋을 올리면 기존 승인은 자동 무효화(dismiss stale) → 재승인 필요.
+- force push·브랜치 삭제는 `main`에서 금지.
