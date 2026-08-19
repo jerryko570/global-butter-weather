@@ -16,7 +16,8 @@ module.exports = {
     'type-enum': [
       2,
       'always',
-      ['chore', 'feat', 'refactor', 'fix', 'docs', 'style', 'test'],
+      // pr.sh의 타입 매핑과 동일하게 유지할 것 (assets 누락으로 🖼️ 커밋이 막혔던 이력 있음)
+      ['chore', 'feat', 'refactor', 'fix', 'docs', 'style', 'assets', 'test'],
     ],
   },
 }
