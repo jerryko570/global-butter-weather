@@ -1,0 +1,26 @@
+# 줄바꿈 정규화 — 저장소에는 항상 LF로 보관하고, 작업 트리에도 LF로 내린다.
+# (윈도우에서 clone할 때 CRLF로 바뀌는 것을 막는다)
+* text=auto eol=lf
+
+# 셸 스크립트와 git 훅은 CRLF가 되는 순간 실행 자체가 깨진다.
+#   bash: ./pr.sh: /bin/bash^M: bad interpreter: No such file or directory
+# 위 규칙에 이미 포함되지만, 깨지면 원인 찾기가 어려운 파일들이라 명시해 둔다.
+*.sh        text eol=lf
+.husky/*    text eol=lf
+
+# 바이너리 — 줄바꿈 변환·diff 금지
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.avif binary
+*.ico  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.pdf   binary
+
+# 자동 생성 파일 — diff 노이즈를 줄이고 언어 통계에서 제외한다
+package-lock.json linguist-generated=true
