@@ -1,0 +1,10 @@
+# 자동 생성 파일 — prettier가 건드리면 npm install이 매번 되돌려 놓는다.
+# (짧은 배열을 한 줄로 접는 등 580줄가량이 바뀌고, 다음 install에서 원복된다)
+package-lock.json
+
+# 빌드 산출물
+.next/
+out/
+build/
+coverage/
+node_modules/
