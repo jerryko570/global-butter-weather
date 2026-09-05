@@ -2,7 +2,8 @@
      scope: FE/Component FE/Page FE/Style FE/State FE/A11y
             BE/API BE/Data BE/Auth BE/Payment
             Infra/Build Infra/CI Infra/Deploy Infra/Repo
-            Docs/Brand Docs/Plan
+            Design/Brand Design/System Design/Asset Design/Flow
+            Docs/Plan Docs/Dev
      한 PR은 하나의 scope에. 두 개에 걸치면 대개 PR이 너무 큰 것입니다.
      ./pr.sh 로 만들면 자동으로 붙습니다. CLAUDE.md 「PR scope prefix」 참조. -->
 

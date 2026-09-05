@@ -10,7 +10,8 @@
 #   FE/Component  FE/Page  FE/Style  FE/State  FE/A11y
 #   BE/API        BE/Data  BE/Auth   BE/Payment
 #   Infra/Build   Infra/CI Infra/Deploy  Infra/Repo
-#   Docs/Brand    Docs/Plan
+#   Design/Brand  Design/System  Design/Asset  Design/Flow
+#   Docs/Plan     Docs/Dev
 #
 # 옵션:
 #   --changes  "<바꾼 것>"      개발자가 읽는 칸. 줄바꿈은 \n 으로.
@@ -72,7 +73,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-VALID_SCOPES="FE/Component FE/Page FE/Style FE/State FE/A11y BE/API BE/Data BE/Auth BE/Payment Infra/Build Infra/CI Infra/Deploy Infra/Repo Docs/Brand Docs/Plan"
+VALID_SCOPES="FE/Component FE/Page FE/Style FE/State FE/A11y BE/API BE/Data BE/Auth BE/Payment Infra/Build Infra/CI Infra/Deploy Infra/Repo Design/Brand Design/System Design/Asset Design/Flow Docs/Plan Docs/Dev"
 
 if [ -n "$SCOPE" ]; then
   case " $VALID_SCOPES " in

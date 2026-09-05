@@ -198,25 +198,31 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 
 부수 효과가 하나 더 있다. 본문에서 개발 용어를 놓쳐도 **prefix만으로 무슨 작업인지 짐작이 된다.**
 
-| 대분류    | 2뎁스       | 무엇                                  |
-| --------- | ----------- | ------------------------------------- |
-| **FE**    | `Component` | 재사용하는 UI 조각                    |
-|           | `Page`      | route·화면                            |
-|           | `Style`     | CSS·token·design system               |
-|           | `State`     | 클라이언트 상태 (zustand·react-query) |
-|           | `A11y`      | 접근성                                |
-| **BE**    | `API`       | route handler·server action           |
-|           | `Data`      | 스키마·마이그레이션·쿼리              |
-|           | `Auth`      | 인증·권한·RLS                         |
-|           | `Payment`   | 결제                                  |
-| **Infra** | `Build`     | next config·bundler·의존성            |
-|           | `CI`        | GitHub Actions                        |
-|           | `Deploy`    | Vercel·도메인·릴리스                  |
-|           | `Repo`      | git 설정·컨벤션·lint·문서 도구        |
-| **Docs**  | `Brand`     | 브랜드 문서                           |
-|           | `Plan`      | 로드맵·계획                           |
+| 대분류     | 2뎁스       | 무엇                                                        |
+| ---------- | ----------- | ----------------------------------------------------------- |
+| **FE**     | `Component` | 재사용하는 UI 조각                                          |
+|            | `Page`      | route·화면                                                  |
+|            | `Style`     | CSS·token·design system                                     |
+|            | `State`     | 클라이언트 상태 (zustand·react-query)                       |
+|            | `A11y`      | 접근성                                                      |
+| **BE**     | `API`       | route handler·server action                                 |
+|            | `Data`      | 스키마·마이그레이션·쿼리                                    |
+|            | `Auth`      | 인증·권한·RLS                                               |
+|            | `Payment`   | 결제                                                        |
+| **Infra**  | `Build`     | next config·bundler·의존성                                  |
+|            | `CI`        | GitHub Actions                                              |
+|            | `Deploy`    | Vercel·도메인·릴리스                                        |
+|            | `Repo`      | git 설정·컨벤션·lint·문서 도구                              |
+| **Design** | `Brand`     | 브랜드 정의·레퍼런스·감각 기준 (foundation.md, references/) |
+|            | `System`    | 색·타이포·간격 **규칙을 정하는 것**                         |
+|            | `Asset`     | 로고·아이콘·이미지 파일                                     |
+|            | `Flow`      | 화면 설계·IA·사용자 흐름                                    |
+| **Docs**   | `Plan`      | 로드맵·계획                                                 |
+|            | `Dev`       | 개발 컨벤션·기술 문서                                       |
 
 `./pr.sh`가 **`--scope`를 필수로 받고 위 목록에 없으면 거부한다.** 오타로 분류가 흩어지는 것을 막는다.
+
+> **`Design/System`과 `FE/Style`은 겹치지 않는다.** 앞은 규칙을 **정하는** 것이고 뒤는 그 규칙을 **코드로 옮기는** 것이다. 이 프로젝트에서는 그 둘을 다른 사람이 판단한다 — 1절의 역할 분담(감각 / 그것을 실체로 만드는 쪽)이 그대로 분류에 들어와 있다.
 
 **한 PR은 하나의 scope에 들어가야 한다.** 두 scope에 걸치면 대개 PR이 너무 큰 것이고, 쪼개면 리뷰가 쉬워진다.
 
