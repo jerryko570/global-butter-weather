@@ -19,5 +19,10 @@ module.exports = {
       // pr.sh의 타입 매핑과 동일하게 유지할 것 (assets 누락으로 🖼️ 커밋이 막혔던 이력 있음)
       ['chore', 'feat', 'refactor', 'fix', 'docs', 'style', 'assets', 'test'],
     ],
+    // 제목 대소문자 검사를 끈다.
+    // 기본값은 대문자로 시작하는 제목을 막는데, 한국어 제목에 PR·UI·API·CSS 같은
+    // 약어를 앞에 두면 매번 걸린다. 우리 제목은 대부분 한국어라 이 검사가
+    // 잡아주는 것이 없고 막는 것만 있다.
+    'subject-case': [0],
   },
 }

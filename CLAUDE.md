@@ -97,8 +97,10 @@ Conventional Commits + **gitmoji 접두사 선택 가능** (husky `commit-msg` �
 feat: 상품 목록 추가          ← 이모지 없이도 통과
 ```
 
-허용 타입 7종: `feat` `fix` `refactor` `chore` `style` `docs` `assets` `test`
+허용 타입 8종: `feat` `fix` `refactor` `chore` `style` `docs` `assets` `test`
 ※ 이모지 뒤에 **공백 필수**, 타입은 **소문자**.
+
+제목 대소문자는 검사하지 않는다(`subject-case` 해제). 한국어 제목에 `PR`·`UI`·`API` 같은 약어를 앞에 둘 수 있다.
 
 ### PR 생성 — `./pr.sh`
 
