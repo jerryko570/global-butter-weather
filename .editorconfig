@@ -1,0 +1,20 @@
+# EditorConfig — 에디터가 파일을 쓰는 순간의 기본값.
+# https://editorconfig.org
+#
+# .gitattributes는 git이 파일을 넣고 꺼낼 때를, prettier·eslint는 커밋 직전을
+# 통제한다. 하지만 에디터가 새 파일을 처음 만드는 순간은 둘 다 관여하지 않는다.
+# 그 틈을 메운다. (윈도우에서 CRLF로 새 파일이 생기는 것을 막는 것이 주 목적)
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# 마크다운은 줄 끝 공백 두 개가 줄바꿈이다. 지우면 문서가 깨진다.
+[*.md]
+trim_trailing_whitespace = false
