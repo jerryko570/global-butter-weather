@@ -59,12 +59,12 @@ Claude Code가 매 작업마다 참고하는 기준 문서. **코드가 바뀌�
 
 ```
 src/app/globals.css        # Tailwind v4 진입점 + 다크모드 variant
-src/app/styles/theme.css   # 브랜드 디자인 토큰
+src/app/styles/theme.css   # 브랜드 design token
 ```
 
-`app/layout.tsx`·`page.tsx`가 없어서 `npm run dev`를 띄워도 볼 화면이 없고, `npx next build`는 `/404` 라우트 하나만 생성한다. **앱 뼈대 세우기가 첫 개발 작업이다.**
+`app/layout.tsx`·`page.tsx`가 없어서 `npm run dev`를 띄워도 볼 화면이 없고, `npx next build`는 `/404` route 하나만 생성한다. **app shell 세우기가 첫 개발 작업이다.**
 
-레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅, commitlint, GitHub 템플릿·워크플로우, `pr.sh`, 디자인 토큰.
+레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅, commitlint, GitHub template·workflow, `pr.sh`, design token.
 
 ### 정리 대상 (알고는 있되 지나가며 건드리지 말 것)
 
@@ -98,7 +98,7 @@ DB 작업이 필요해지면 순서는 이렇다.
 
 ## 4. 디자인 시스템 (`src/app/styles/theme.css` 실측)
 
-| 토큰                           | 값                    | 용도                                           |
+| token                          | 값                    | 용도                                           |
 | ------------------------------ | --------------------- | ---------------------------------------------- |
 | `--butter`                     | `#f5c842`             | 브랜드 메인 (light `#fdf3c0` / dark `#d4a800`) |
 | `--sky`                        | `#a8d8ea`             | 브랜드 서브                                    |
@@ -107,9 +107,9 @@ DB 작업이 필요해지면 순서는 이렇다.
 | `--ink-muted` / `--ink-subtle` | `#6b6b6b` / `#c4c4c4` | 보조 · 비활성                                  |
 
 - **다크모드는 `.dark` 클래스 수동 토글**이다 (OS 설정 자동 추종 아님). `@custom-variant dark`로 정의돼 있다.
-- 브랜드 액센트(butter·sky)는 다크에서도 그대로 유지하고, 의미 토큰과 grayscale만 반전한다.
+- 브랜드 액센트(butter·sky)는 다크에서도 그대로 유지하고, 의미 token과 grayscale만 반전한다.
 - Tailwind 유틸로 노출돼 있다 — `bg-butter`, `text-ink`, `bg-cloud`, `text-ink-muted` 등.
-- 레이아웃 토큰: `--container-max: 1280px`, `--header-height: 64px`
+- layout token: `--container-max: 1280px`, `--header-height: 64px`
 
 ## 5. Git · PR 규칙
 
@@ -119,6 +119,25 @@ DB 작업이 필요해지면 순서는 이렇다.
 
 `feature/작업내용` · `fix/버그내용` · `chore/설정내용` · `refactor/대상` · `docs/문서`
 작업 시작 전 항상 `git pull`.
+
+### 개발 용어는 영문으로 ★
+
+**개발 요소를 가리키는 말은 어디서든 영문 그대로 쓴다.** 코드·주석·커밋 메시지·PR 제목과 본문·문서 전부 해당한다.
+
+이유는 하나다 — **검색에 걸려야 한다.** `header`로 찾았을 때 컴포넌트 파일, 그 주석, 그걸 만든 PR, 로드맵의 story가 한 번에 나와야 나중에 그 컴포넌트를 다룰 수 있다. 「헤더」로 적어두면 그 연결이 끊긴다.
+
+|                   |                                                                                                                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **영문으로 쓴다** | 코드에 있거나 있을 이름 — `header` `footer` `layout` `container` `button` `modal` `component` `route` `token` `font` `template` `build` `lint` `commit` `branch` `merge` `story` `hook` |
+| **한국어로 둔다** | 브랜드·감각 어휘 — 틀·알맹이, 경계, 온기, 하루. 코드에서 찾을 일이 없고 이 말들이 곧 브랜드의 판단이다                                                                                  |
+
+가르는 기준: **누군가 이 단어로 코드를 찾을 것 같으면 영문.**
+
+```
+✅ header에 구분선을 넣지 않았습니다
+✅ 이 layout은 5-8절의 「틀」에 해당한다
+❌ 헤더에 구분선을 넣지 않았습니다
+```
 
 ### 커밋 메시지
 
@@ -205,6 +224,6 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 
 ## 8. 다음 작업 후보
 
-1. **앱 뼈대** — `src/app/layout.tsx` + `page.tsx`, 폰트·`globals.css` 연결. 화면이 떠야 나머지가 가능하다.
+1. **app shell** — `src/app/layout.tsx` + `page.tsx`, font·`globals.css` 연결. 화면이 떠야 나머지가 가능하다.
 2. **Supabase 연결** — 프로젝트 생성 → `.env.local` → `lib/supabase` (client/server 분리) → `next.config.ts` 호스트 교체
 3. **제품 정의 확정** — 시장·통화·결제 수단을 정하고 이 문서 1절을 갱신

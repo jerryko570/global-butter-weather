@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
         hostname: 'ljjpgsmufioeixspkrpw.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
-      // 임시 플레이스홀더 이미지 (레이아웃 확인용 — 실제 촬영컷으로 교체 예정)
+      // 임시 플레이스홀더 이미지 (layout 확인용 — 실제 촬영컷으로 교체 예정)
       {
         protocol: 'https',
         hostname: 'picsum.photos',
