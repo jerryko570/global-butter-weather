@@ -157,6 +157,37 @@ close #${CLOSE_ISSUE}
 "
 fi
 
+# component 이름은 첫 글자를 대문자로 쓴다 (PascalCase).
+# React가 소문자 JSX 태그를 DOM 요소로, 대문자를 component로 구분하기 때문에
+# 관례가 아니라 문법 제약이다. PR 글에서도 같은 이름으로 불러야 검색이 이어진다.
+#
+# src/components 에 실제로 있는 이름만 검사한다.
+# <header> 같은 HTML 요소와 --header-height, app-shell-header 같은 붙은 말은 뺀다.
+COMPONENT_DIR="src/components"
+if [ -d "$COMPONENT_DIR" ]; then
+  CHECK_TEXT=$(printf '%s\n%s' "$TITLE" "$PR_BODY" | sed 's/<[^>]*>//g')
+  BAD=""
+  for f in $(find "$COMPONENT_DIR" -name '*.tsx' 2>/dev/null); do
+    NAME=$(basename "$f" .tsx)
+    case "$NAME" in [A-Z]*) ;; *) continue ;; esac
+    LOWER=$(printf '%s' "$NAME" | tr '[:upper:]' '[:lower:]')
+    if printf '%s' "$CHECK_TEXT" | grep -qE "(^|[^A-Za-z0-9_/.-])${LOWER}([^A-Za-z0-9_/.-]|$)"; then
+      BAD="${BAD}  ${LOWER} → ${NAME}
+"
+    fi
+  done
+  if [ -n "$BAD" ]; then
+    echo "component 이름은 첫 글자를 대문자로 씁니다."
+    echo ""
+    printf '%s' "$BAD"
+    echo ""
+    echo "  React는 소문자 JSX 태그를 DOM 요소로, 대문자를 component로 봅니다."
+    echo "  같은 이름으로 불러야 코드와 PR이 검색으로 이어집니다."
+    echo "  HTML 요소를 말하려면 <header>처럼 꺾쇠를 붙이세요."
+    exit 1
+  fi
+fi
+
 GH_LABEL="${EMOJI}${LABEL}"
 
 ARGS=(--title "${PR_TITLE}" --body "${PR_BODY}" --assignee "@me" --label "${GH_LABEL}")

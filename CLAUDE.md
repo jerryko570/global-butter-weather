@@ -139,6 +139,21 @@ DB 작업이 필요해지면 순서는 이렇다.
 ❌ 헤더에 구분선을 넣지 않았습니다
 ```
 
+#### component 이름은 PascalCase
+
+**component 이름은 첫 글자를 대문자로 쓴다.** 코드에서도, PR 제목·본문에서도, 문서에서도 같다.
+
+```
+✅ 전역 Header 자리 잡기        ✅ ProductList에 빈 상태 추가
+❌ 전역 header 자리 잡기        ❌ productList에 빈 상태 추가
+```
+
+이건 취향이 아니라 **문법 제약이다.** React는 소문자 JSX 태그를 DOM 요소로, 대문자를 component로 구분한다. `<header>`와 `<Header>`는 서로 다른 것이다. 글에서 소문자로 부르면 그 둘이 섞여 무엇을 가리키는지 알 수 없게 되고, 위의 「개발 용어는 영문으로」가 노리던 검색 연결도 끊긴다.
+
+**HTML 요소를 말할 때는 꺾쇠를 붙인다** — `<header>`. 그러면 component가 아니라 요소를 가리킨다는 게 드러난다.
+
+`./pr.sh`가 `src/components`에 실제로 있는 이름을 소문자로 쓴 PR을 **거부한다.** `<header>` 같은 요소와 `--header-height`·`app-shell-header`처럼 붙어 있는 말은 검사에서 뺀다.
+
 ### 커밋 메시지
 
 Conventional Commits + **gitmoji 접두사 선택 가능** (husky `commit-msg` 훅이 검사).

@@ -17,6 +17,7 @@
      파일 이름이나 용어를 나열하지 말고, 무엇이 달라졌는지 사람 말로 쓰세요.
 
      개발 요소는 영문으로: header, layout, container, token, component ...
+     component 이름은 첫 글자 대문자로: Header, ProductList (React 문법 제약)
      검색에 걸려야 하기 때문입니다. CLAUDE.md 「개발 용어는 영문으로」 참조. -->
 
 ## 🔧 바꾼 것
