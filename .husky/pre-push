@@ -1,0 +1,28 @@
+# main으로 직접 push하는 것을 막는다.
+#
+# 이 저장소는 GitHub 무료 플랜의 private이라 브랜치 보호를 쓸 수 없다.
+# (rulesets API가 "Upgrade to GitHub Pro or make this repository public"을 준다)
+# 즉 서버가 막아주지 않는다. 그래서 각자 컴퓨터에서 막는다.
+# husky 훅이라 npm install 한 사람 모두에게 적용된다.
+#
+# 이 훅이 막지 못하는 것: 승인 없는 PR 머지. 그건 GitHub에서만 막을 수 있다.
+
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main)
+      echo ""
+      echo "  ✋ main으로 직접 push할 수 없습니다."
+      echo ""
+      echo "     브랜치 → PR → 리뷰 승인 → 머지 순서로 가주세요."
+      echo "       git switch -c feature/작업내용"
+      echo "       ./pr.sh <type> \"<제목>\" \"<작업 내용>\" --scope <SCOPE>"
+      echo ""
+      echo "     서버 보호가 없어 이 훅이 유일한 방어선입니다."
+      echo "     --no-verify로 우회할 수 있지만, 그러면 막을 방법이 없습니다."
+      echo ""
+      exit 1
+      ;;
+  esac
+done
+
+exit 0
