@@ -3,8 +3,14 @@
 # PR을 표준 형식으로 생성한다. 제목 넘버링과 리뷰어 지정은 자동이다.
 #
 # Usage:
-#   ./pr.sh <type> "<title>" "<작업 내용>" [옵션]
+#   ./pr.sh <type> "<title>" "<작업 내용>" --scope <SCOPE> [옵션]
 #   ./pr.sh <type> "<title>" -f <본문파일>        # 본문 전체를 파일로 넘길 때
+#
+# --scope 는 필수다. 작업이 어느 영역인지 제목에 박아 리뷰할 때 맥락을 먼저 준다.
+#   FE/Component  FE/Page  FE/Style  FE/State  FE/A11y
+#   BE/API        BE/Data  BE/Auth   BE/Payment
+#   Infra/Build   Infra/CI Infra/Deploy  Infra/Repo
+#   Docs/Brand    Docs/Plan
 #
 # 옵션:
 #   --changes  "<바꾼 것>"      개발자가 읽는 칸. 줄바꿈은 \n 으로.
@@ -43,6 +49,7 @@ ROADMAP=""
 CLOSE_ISSUE=""
 ASSIGN_REVIEWER=true
 DRY_RUN=false
+SCOPE=""
 
 # 세 번째 인자가 옵션이 아니면 작업 내용으로 받는다.
 if [ -n "$1" ] && [ "${1#-}" = "$1" ]; then
@@ -56,6 +63,7 @@ while [ $# -gt 0 ]; do
     --changes)     CHANGES=$2; shift 2 ;;
     --review)      REVIEW=$2; shift 2 ;;
     --screen)      SCREEN=$2; shift 2 ;;
+    --scope)       SCOPE=$2; shift 2 ;;
     --roadmap)     ROADMAP=$2; shift 2 ;;
     --issue)       CLOSE_ISSUE=$2; shift 2 ;;
     --no-reviewer) ASSIGN_REVIEWER=false; shift ;;
@@ -64,10 +72,25 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ -z "$TYPE" ] || [ -z "$TITLE" ]; then
-  echo "사용법: ./pr.sh <type> \"<title>\" \"<작업 내용>\" [--changes ...] [--review ...] [--screen ...] [--roadmap ...] [--issue ...]"
+VALID_SCOPES="FE/Component FE/Page FE/Style FE/State FE/A11y BE/API BE/Data BE/Auth BE/Payment Infra/Build Infra/CI Infra/Deploy Infra/Repo Docs/Brand Docs/Plan"
+
+if [ -n "$SCOPE" ]; then
+  case " $VALID_SCOPES " in
+    *" $SCOPE "*) ;;
+    *)
+      echo "알 수 없는 scope: $SCOPE"
+      echo "쓸 수 있는 값:"
+      for v in $VALID_SCOPES; do echo "  $v"; done
+      exit 1 ;;
+  esac
+fi
+
+if [ -z "$TYPE" ] || [ -z "$TITLE" ] || [ -z "$SCOPE" ]; then
+  echo "사용법: ./pr.sh <type> \"<title>\" \"<작업 내용>\" --scope <SCOPE> [--changes ...] [--review ...] [--screen ...] [--roadmap ...] [--issue ...]"
   echo "       ./pr.sh <type> \"<title>\" -f <본문파일>"
-  echo "  type: feat | fix | refactor | chore | assets | style | docs | test"
+  echo "  type:  feat | fix | refactor | chore | assets | style | docs | test"
+  echo "  scope: $VALID_SCOPES" | tr " " "
+" | sed "s/^  scope:/  scope:/"
   exit 1
 fi
 
@@ -94,7 +117,7 @@ else
   NUM=$((LAST_PR + 1))
 fi
 
-PR_TITLE="[${EMOJI} ${LABEL}/${NUM}] ${TITLE}"
+PR_TITLE="[${EMOJI} ${LABEL}/${NUM}][${SCOPE}] ${TITLE}"
 
 if [ -n "$BODY_FILE" ]; then
   if [ ! -f "$BODY_FILE" ]; then

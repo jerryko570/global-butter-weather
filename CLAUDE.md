@@ -156,7 +156,7 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 ### PR 생성 — `./pr.sh`
 
 ```bash
-./pr.sh <type> "<제목>" "<작업 내용>" [옵션]
+./pr.sh <type> "<제목>" "<작업 내용>" --scope <SCOPE> [옵션]
 ./pr.sh <type> "<제목>" -f <본문파일>        # 본문이 길 때
 ```
 
@@ -184,6 +184,41 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 | `assets`   | 🖼️     | 🖼️Assets   |
 | `docs`     | 📝     | 📝Docs     |
 | `test`     | 🧪     | 🧪Test     |
+
+### PR scope prefix ★
+
+제목에 **작업 영역**을 박는다. 형식은 `[<이모지> <라벨>/<번호>][<scope>] <제목>`.
+
+```
+[✨ Feature/19][FE/Component] 전역 header 자리 잡기
+[⚙️ Chore/15][Infra/Repo] editorconfig 추가
+```
+
+**왜 두 겹인가.** 앞 칸은 _어떤 종류의 변경인지_(feat·fix·chore), 뒤 칸은 *어느 영역인지*를 답한다. 둘은 다른 질문이라 하나로 합칠 수 없다. 리뷰어는 목록을 훑으며 **영역을 먼저 보고** 머릿속 맥락을 바꾼다 — FE를 보다가 BE로 넘어가는 것과 계속 FE를 보는 것은 전혀 다른 일이다.
+
+부수 효과가 하나 더 있다. 본문에서 개발 용어를 놓쳐도 **prefix만으로 무슨 작업인지 짐작이 된다.**
+
+| 대분류    | 2뎁스       | 무엇                                  |
+| --------- | ----------- | ------------------------------------- |
+| **FE**    | `Component` | 재사용하는 UI 조각                    |
+|           | `Page`      | route·화면                            |
+|           | `Style`     | CSS·token·design system               |
+|           | `State`     | 클라이언트 상태 (zustand·react-query) |
+|           | `A11y`      | 접근성                                |
+| **BE**    | `API`       | route handler·server action           |
+|           | `Data`      | 스키마·마이그레이션·쿼리              |
+|           | `Auth`      | 인증·권한·RLS                         |
+|           | `Payment`   | 결제                                  |
+| **Infra** | `Build`     | next config·bundler·의존성            |
+|           | `CI`        | GitHub Actions                        |
+|           | `Deploy`    | Vercel·도메인·릴리스                  |
+|           | `Repo`      | git 설정·컨벤션·lint·문서 도구        |
+| **Docs**  | `Brand`     | 브랜드 문서                           |
+|           | `Plan`      | 로드맵·계획                           |
+
+`./pr.sh`가 **`--scope`를 필수로 받고 위 목록에 없으면 거부한다.** 오타로 분류가 흩어지는 것을 막는다.
+
+**한 PR은 하나의 scope에 들어가야 한다.** 두 scope에 걸치면 대개 PR이 너무 큰 것이고, 쪼개면 리뷰가 쉬워진다.
 
 ### PR 본문의 네 칸
 

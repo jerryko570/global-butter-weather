@@ -1,3 +1,11 @@
+<!-- 제목은 [<이모지> <라벨>/<번호>][<scope>] 형식입니다.
+     scope: FE/Component FE/Page FE/Style FE/State FE/A11y
+            BE/API BE/Data BE/Auth BE/Payment
+            Infra/Build Infra/CI Infra/Deploy Infra/Repo
+            Docs/Brand Docs/Plan
+     한 PR은 하나의 scope에. 두 개에 걸치면 대개 PR이 너무 큰 것입니다.
+     ./pr.sh 로 만들면 자동으로 붙습니다. CLAUDE.md 「PR scope prefix」 참조. -->
+
 <!-- 로드맵 위치. 해당 없으면 이 줄을 지우세요. docs/plan/roadmap.md -->
 
 > 🗺️ M0 · I0.1 · E0.1.1
