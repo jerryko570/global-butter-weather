@@ -46,10 +46,12 @@
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | 유오(uo) — 과거 | [@uo\_\_\_official](https://www.instagram.com/uo___official/) · [@uu.uooo](https://www.instagram.com/uu.uooo/) · [스토어](https://smartstore.naver.com/uuuooo) | 좋음. 강한 유사성을 느끼고 실제 구매까지 함                  |
 | colorcolour     | [룩북](https://thecolorcolour.com/product/list_lookbook.html?cate_no=44) · [소개](https://thecolorcolour.com/shopinfo/company.html)                            | **좋음.** 지금 가장 꽂힌 것. 색감·레이어드·믹스매치의 타이밍 |
+| sunlovetour     | [sunlovetour.com](https://sunlovetour.com/)                                                                                                                    | 좋음. 톤다운 팔레트, 컬렉션 전체를 성좌처럼 흩뿌린 첫 화면   |
+| karactor        | [karactor.co.kr](https://karactor.co.kr/)                                                                                                                      | 좋음. 홈 텍스트가 세 단어. 무채색 베이스에 포인트 하나       |
 | REE-COLLECT     | [reecollect.com](https://reecollect.com/)                                                                                                                      | 좋음. 최근 여기서 가방을 삼                                  |
 
 > 링크는 언젠가 사라진다. 중요한 화면은 캡처해서 파일로 넣어둘 것 — 유오의 좋았던 조합은 이미 품절로 사라져 인스타에만 남았다.
 >
-> ⚠️ 스마트스토어는 브라우저 안전 설정에 막혀 열리지 않는다. 그 쪽 상품은 캐처를 받아야 한다.
+> ⚠️ 스마트스토어는 브라우저 안전 설정에 막혀 열리지 않는다. 그 쪽 상품은 캡처를 받아야 한다.
 >
 > ⚙️ 이 저장소는 **공개(public)** 다. 다른 가게의 상품 사진을 올리고 있다는 점을 알고 쓸 것.
