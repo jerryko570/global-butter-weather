@@ -11,8 +11,15 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
-      {/* 배경·본문색은 globals.css에서 --cloud / --ink로 잡는다.
-          틀은 조용해야 하므로 여기서 색을 더 얹지 않는다 (foundation.md 5-8절). */}
+      <head>
+        {/* Pretendard 동적 서브셋. unicode-range로 쪼개져 있어 브라우저가 실제로
+            쓰인 글자의 조각만 받는다. next/font/local은 unicode-range를 지원하지
+            않아 쓸 수 없다. 자세한 사정은 public/fonts/pretendard/README.md */}
+        {/* eslint-disable-next-line @next/next/no-css-tags -- 위 사유로 의도한 것 */}
+        <link rel="stylesheet" href="/fonts/pretendard/pretendard.css" />
+      </head>
+      {/* 배경·본문색·서체는 globals.css에서 토큰으로 잡는다.
+          틀은 조용해야 하므로 여기서 더 얹지 않는다 (foundation.md 5-8절). */}
       <body className="min-h-dvh antialiased">{children}</body>
     </html>
   )

@@ -2,6 +2,9 @@
 # (짧은 배열을 한 줄로 접는 등 580줄가량이 바뀌고, 다음 install에서 원복된다)
 package-lock.json
 
+# 외부에서 그대로 가져온 파일 — 포맷을 바꾸면 갱신할 때 diff가 지저분해진다
+public/fonts/
+
 # 빌드 산출물
 .next/
 out/

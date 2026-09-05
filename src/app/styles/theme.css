@@ -25,6 +25,11 @@
   --gray-900: #171717;
   --gray-950: #0a0a0a;
 
+  /* 타이포 — 본문·UI는 ｢틀｣이므로 조용한 것으로 (foundation.md 5-8절) */
+  --sans:
+    'Pretendard Variable', Pretendard, system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+
   /* 레이아웃 */
   --container-max: 1280px;
   --header-height: 64px;
@@ -60,6 +65,9 @@
 
 /* Tailwind v4 — 토큰을 유틸리티로 노출 (bg-gray-100, text-ink, bg-butter 등) */
 @theme inline {
+  /* 타이포 */
+  --font-sans: var(--sans);
+
   /* 브랜드 */
   --color-butter: var(--butter);
   --color-butter-light: var(--butter-light);
