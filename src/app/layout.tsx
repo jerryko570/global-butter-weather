@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Header from '@/components/Header'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -18,9 +19,12 @@ export default function RootLayout({
         {/* eslint-disable-next-line @next/next/no-css-tags -- 위 사유로 의도한 것 */}
         <link rel="stylesheet" href="/fonts/pretendard/pretendard.css" />
       </head>
-      {/* 배경·본문색·서체는 globals.css에서 토큰으로 잡는다.
+      {/* 배경·본문색·font는 globals.css에서 token으로 잡는다.
           틀은 조용해야 하므로 여기서 더 얹지 않는다 (foundation.md 5-8절). */}
-      <body className="min-h-dvh antialiased">{children}</body>
+      <body className="flex min-h-dvh flex-col antialiased">
+        <Header />
+        {children}
+      </body>
     </html>
   )
 }
