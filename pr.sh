@@ -3,8 +3,15 @@
 # PR을 표준 형식으로 생성한다. 제목 넘버링과 리뷰어 지정은 자동이다.
 #
 # Usage:
-#   ./pr.sh <type> "<title>" "<작업 내용>" [옵션]
+#   ./pr.sh <type> "<title>" "<작업 내용>" --scope <SCOPE> [옵션]
 #   ./pr.sh <type> "<title>" -f <본문파일>        # 본문 전체를 파일로 넘길 때
+#
+# --scope 는 필수다. 작업이 어느 영역인지 제목에 박아 리뷰할 때 맥락을 먼저 준다.
+#   FE/Component  FE/Page  FE/Style  FE/State  FE/A11y
+#   BE/API        BE/Data  BE/Auth   BE/Payment
+#   Infra/Build   Infra/CI Infra/Deploy  Infra/Repo
+#   Design/Brand  Design/System  Design/Asset  Design/Flow
+#   Docs/Plan     Docs/Dev
 #
 # 옵션:
 #   --changes  "<바꾼 것>"      개발자가 읽는 칸. 줄바꿈은 \n 으로.
@@ -43,6 +50,7 @@ ROADMAP=""
 CLOSE_ISSUE=""
 ASSIGN_REVIEWER=true
 DRY_RUN=false
+SCOPE=""
 
 # 세 번째 인자가 옵션이 아니면 작업 내용으로 받는다.
 if [ -n "$1" ] && [ "${1#-}" = "$1" ]; then
@@ -56,6 +64,7 @@ while [ $# -gt 0 ]; do
     --changes)     CHANGES=$2; shift 2 ;;
     --review)      REVIEW=$2; shift 2 ;;
     --screen)      SCREEN=$2; shift 2 ;;
+    --scope)       SCOPE=$2; shift 2 ;;
     --roadmap)     ROADMAP=$2; shift 2 ;;
     --issue)       CLOSE_ISSUE=$2; shift 2 ;;
     --no-reviewer) ASSIGN_REVIEWER=false; shift ;;
@@ -64,10 +73,25 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-if [ -z "$TYPE" ] || [ -z "$TITLE" ]; then
-  echo "사용법: ./pr.sh <type> \"<title>\" \"<작업 내용>\" [--changes ...] [--review ...] [--screen ...] [--roadmap ...] [--issue ...]"
+VALID_SCOPES="FE/Component FE/Page FE/Style FE/State FE/A11y BE/API BE/Data BE/Auth BE/Payment Infra/Build Infra/CI Infra/Deploy Infra/Repo Design/Brand Design/System Design/Asset Design/Flow Docs/Plan Docs/Dev"
+
+if [ -n "$SCOPE" ]; then
+  case " $VALID_SCOPES " in
+    *" $SCOPE "*) ;;
+    *)
+      echo "알 수 없는 scope: $SCOPE"
+      echo "쓸 수 있는 값:"
+      for v in $VALID_SCOPES; do echo "  $v"; done
+      exit 1 ;;
+  esac
+fi
+
+if [ -z "$TYPE" ] || [ -z "$TITLE" ] || [ -z "$SCOPE" ]; then
+  echo "사용법: ./pr.sh <type> \"<title>\" \"<작업 내용>\" --scope <SCOPE> [--changes ...] [--review ...] [--screen ...] [--roadmap ...] [--issue ...]"
   echo "       ./pr.sh <type> \"<title>\" -f <본문파일>"
-  echo "  type: feat | fix | refactor | chore | assets | style | docs | test"
+  echo "  type:  feat | fix | refactor | chore | assets | style | docs | test"
+  echo "  scope: $VALID_SCOPES" | tr " " "
+" | sed "s/^  scope:/  scope:/"
   exit 1
 fi
 
@@ -94,7 +118,7 @@ else
   NUM=$((LAST_PR + 1))
 fi
 
-PR_TITLE="[${EMOJI} ${LABEL}/${NUM}] ${TITLE}"
+PR_TITLE="[${EMOJI} ${LABEL}/${NUM}][${SCOPE}] ${TITLE}"
 
 if [ -n "$BODY_FILE" ]; then
   if [ ! -f "$BODY_FILE" ]; then
@@ -131,6 +155,37 @@ ${SCREEN}
   [ -n "$CLOSE_ISSUE" ] && PR_BODY="${PR_BODY}
 close #${CLOSE_ISSUE}
 "
+fi
+
+# component 이름은 첫 글자를 대문자로 쓴다 (PascalCase).
+# React가 소문자 JSX 태그를 DOM 요소로, 대문자를 component로 구분하기 때문에
+# 관례가 아니라 문법 제약이다. PR 글에서도 같은 이름으로 불러야 검색이 이어진다.
+#
+# src/components 에 실제로 있는 이름만 검사한다.
+# <header> 같은 HTML 요소와 --header-height, app-shell-header 같은 붙은 말은 뺀다.
+COMPONENT_DIR="src/components"
+if [ -d "$COMPONENT_DIR" ]; then
+  CHECK_TEXT=$(printf '%s\n%s' "$TITLE" "$PR_BODY" | sed 's/<[^>]*>//g')
+  BAD=""
+  for f in $(find "$COMPONENT_DIR" -name '*.tsx' 2>/dev/null); do
+    NAME=$(basename "$f" .tsx)
+    case "$NAME" in [A-Z]*) ;; *) continue ;; esac
+    LOWER=$(printf '%s' "$NAME" | tr '[:upper:]' '[:lower:]')
+    if printf '%s' "$CHECK_TEXT" | grep -qE "(^|[^A-Za-z0-9_/.-])${LOWER}([^A-Za-z0-9_/.-]|$)"; then
+      BAD="${BAD}  ${LOWER} → ${NAME}
+"
+    fi
+  done
+  if [ -n "$BAD" ]; then
+    echo "component 이름은 첫 글자를 대문자로 씁니다."
+    echo ""
+    printf '%s' "$BAD"
+    echo ""
+    echo "  React는 소문자 JSX 태그를 DOM 요소로, 대문자를 component로 봅니다."
+    echo "  같은 이름으로 불러야 코드와 PR이 검색으로 이어집니다."
+    echo "  HTML 요소를 말하려면 <header>처럼 꺾쇠를 붙이세요."
+    exit 1
+  fi
 fi
 
 GH_LABEL="${EMOJI}${LABEL}"
