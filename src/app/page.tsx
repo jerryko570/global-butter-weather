@@ -3,7 +3,7 @@
 // 지금은 5-8절 「틀과 알맹이」만 지킨다 — 틀은 조용하게, 액센트는 한 화면에 하나만.
 export default function Home() {
   return (
-    <main className="flex min-h-dvh items-center px-6">
+    <main className="mx-auto flex w-full max-w-(--container-max) flex-1 items-center px-6">
       <div>
         <h1 className="text-ink text-2xl font-medium tracking-tight">
           버터웨더
