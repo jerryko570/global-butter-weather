@@ -19,7 +19,7 @@
 
 **화면이 하나도 없다.** `src/`에 CSS 두 개뿐이고 `layout.tsx`·`page.tsx`가 없다. `next build`는 `/404`만 만든다. Supabase 프로젝트 없음, `.env.local` 없음, Vercel 미연결.
 
-있는 것: 툴링(eslint·prettier·husky·commitlint), PR·Slack 워크플로우, `.gitattributes`·`.prettierignore`, 디자인 토큰, 브랜드 문서.
+있는 것: 툴링(eslint·prettier·husky·commitlint), PR·Slack 워크플로우, `.gitattributes`·`.prettierignore`, design token, 브랜드 문서.
 
 ## 로드맵을 묶는 제약
 
@@ -80,16 +80,16 @@
 > 목표: `npm run dev`에 화면이 뜨고, 배포된 URL이 존재한다.
 > 여기서 만드는 것은 **틀**이다. 알맹이(물건·그래픽)는 아직 없어도 된다.
 
-### I0.1 앱 셸
+### I0.1 app shell
 
 |            | 에픽 / 스토리                 | 내용                                                                              |
 | ---------- | ----------------------------- | --------------------------------------------------------------------------------- |
-| **E0.1.1** | 루트 레이아웃                 |                                                                                   |
+| **E0.1.1** | 루트 layout                   |                                                                                   |
 | S          | `feature/app-shell-layout`    | `app/layout.tsx` + `page.tsx`. `globals.css`·`theme.css` 연결. 화면이 뜨는 최소본 |
-| S          | `feature/app-shell-font`      | 폰트 선택과 로딩(`next/font`). 본문 타이포는 **틀**이므로 조용한 것으로           |
-| **E0.1.2** | 뼈대 구조                     |                                                                                   |
-| S          | `feature/app-shell-header`    | 헤더 (`--header-height: 64px`). 로고 자리 = 곰이 놓일 **얼굴 자리**               |
-| S          | `feature/app-shell-container` | 컨테이너·여백 규약 (`--container-max: 1280px`)                                    |
+| S          | `feature/app-shell-font`      | font 선택과 로딩(`next/font`). 본문 타이포는 **틀**이므로 조용한 것으로           |
+| **E0.1.2** | app shell 구조                |                                                                                   |
+| S          | `feature/app-shell-header`    | header (`--header-height: 64px`). 로고 자리 = 곰이 놓일 **얼굴 자리**             |
+| S          | `feature/app-shell-container` | container·여백 규약 (`--container-max: 1280px`)                                   |
 
 ### I0.2 디자인 시스템 최소본
 
@@ -97,10 +97,10 @@
 
 |            | 에픽 / 스토리              | 내용                                                           |
 | ---------- | -------------------------- | -------------------------------------------------------------- |
-| **E0.2.1** | 토큰 사용 규약             |                                                                |
+| **E0.2.1** | token 사용 규약            |                                                                |
 | S          | `docs/design-tokens-usage` | 배경은 `--cloud`, butter는 액센트. 무엇을 어디에 쓰는지 문서화 |
 | S          | `feature/dark-mode-toggle` | `.dark` 수동 토글 (OS 자동 추종 아님)                          |
-| **E0.2.2** | 기본 컴포넌트              |                                                                |
+| **E0.2.2** | 기본 component             |                                                                |
 | S          | `feature/ui-button`        | `cva` 기반. variant가 틀/알맹이 구분을 반영                    |
 | S          | `feature/ui-typography`    | 제목·본문 스케일                                               |
 

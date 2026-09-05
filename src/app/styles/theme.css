@@ -6,7 +6,7 @@
   --butter-dark: #d4a800;
   --sky: #a8d8ea;
 
-  /* 의미 토큰 (라이트) */
+  /* 의미 token (라이트) */
   --cloud: #f7f7f7; /* 배경 */
   --ink: #1a1a1a; /* 본문 텍스트 */
   --ink-muted: #6b6b6b; /* 보조 텍스트 */
@@ -30,7 +30,7 @@
     'Pretendard Variable', Pretendard, system-ui, -apple-system, 'Segoe UI',
     sans-serif;
 
-  /* 레이아웃 */
+  /* layout */
   --container-max: 1280px;
   --header-height: 64px;
 
@@ -40,10 +40,10 @@
   --duration-normal: 250ms;
 }
 
-/* 다크모드 — .dark 클래스가 붙으면 의미 토큰·grayscale이 반전된다.
+/* 다크모드 — .dark 클래스가 붙으면 의미 token·grayscale이 반전된다.
    브랜드 액센트(butter/sky)는 다크에서도 유지. */
 .dark {
-  /* 의미 토큰 (다크) */
+  /* 의미 token (다크) */
   --cloud: #121212; /* 배경 */
   --ink: #f7f7f7; /* 본문 텍스트 */
   --ink-muted: #a3a3a3; /* 보조 텍스트 */
@@ -63,7 +63,7 @@
   --gray-950: #fafafa;
 }
 
-/* Tailwind v4 — 토큰을 유틸리티로 노출 (bg-gray-100, text-ink, bg-butter 등) */
+/* Tailwind v4 — token을 유틸리티로 노출 (bg-gray-100, text-ink, bg-butter 등) */
 @theme inline {
   /* 타이포 */
   --font-sans: var(--sans);
@@ -74,7 +74,7 @@
   --color-butter-dark: var(--butter-dark);
   --color-sky: var(--sky);
 
-  /* 의미 토큰 */
+  /* 의미 token */
   --color-cloud: var(--cloud);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);

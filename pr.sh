@@ -17,7 +17,7 @@
 #
 # 예)
 #   ./pr.sh feat "상품 목록 페이지" "상품을 목록으로 볼 수 있게 했습니다." \
-#     --changes "- ProductList 컴포넌트 추가\n- /products 라우트 추가" \
+#     --changes "- ProductList component 추가\n- /products route 추가" \
 #     --review "카드 간격이 브랜드 문서 5-8절 여백 규칙에 맞는지" \
 #     --roadmap "M2 · I2.3"
 #
