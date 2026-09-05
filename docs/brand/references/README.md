@@ -35,15 +35,21 @@
 | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------- | ---------- |
 | [narae-graduation-quick-city.jpg](narae-graduation-quick-city.jpg) | 이나래 계원예술대학교 멀티미디어디자인 졸업작품 `QUICK CITY`. 구역 번호가 하루의 시각이다. 읽어낸 내용은 foundation.md 5-3절 | 본인 작업 | 재학 중    |
 | [uo-past-combination-liked.jpg](uo-past-combination-liked.jpg)     | 유오의 과거 조합. 여러 색 시드비즈를 여러 줄로 쌓고 티베탄 실버로 리듬을 준 것. 색이 많아도 톤이 내려가 있다                 | **좋음**  | 2025-07-25 |
+| [uo-now-01-layered-necklace.jpg](uo-now-01-layered-necklace.jpg)   | 유오 현재. 흰 본 heishi + 터콰이즈 + 실버 체인 3줄. 중앙에 각인 본 원통                                                      | **아님**  | 2026       |
+| [uo-now-02-black-dzi.jpg](uo-now-02-black-dzi.jpg)                 | 유오 현재. 매트 오닉스 + 실버 토글 + dzi 눈무늬 원통                                                                         | **아님**  | 2026       |
+| [uo-now-03-three-bracelets.jpg](uo-now-03-three-bracelets.jpg)     | 유오 현재. 페이즐리 참 / 태양 문양 타일 / 불가사리·산호                                                                      | **아님**  | 2026       |
+| [uo-now-04-red-white.jpg](uo-now-04-red-white.jpg)                 | 유오 현재. 산호 + 진주, 각인 본 원통. 소 두개골 원단 배경                                                                    | **아님**  | 2026       |
 
 ## 아직 파일로 없는 것 (링크만)
 
-| 무엇                 | 링크                                                                                                                                                                                                                                                                                                  | 판정                                        |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| 유오(uo) — 과거      | [@uo\_\_\_official](https://www.instagram.com/uo___official/) · [@uu.uooo](https://www.instagram.com/uu.uooo/) · [스토어](https://smartstore.naver.com/uuuooo)                                                                                                                                        | 좋음. 강한 유사성을 느끼고 실제 구매까지 함 |
-| 유오(uo) — 현재 조합 | [13620478575](https://smartstore.naver.com/uuuooo/products/13620478575) · [13645636752](https://smartstore.naver.com/uuuooo/products/13645636752) · [13579725747](https://smartstore.naver.com/uuuooo/products/13579725747) · [13604121861](https://smartstore.naver.com/uuuooo/products/13604121861) | **아님**                                    |
-| REE-COLLECT          | [reecollect.com](https://reecollect.com/)                                                                                                                                                                                                                                                             | 좋음. 최근 여기서 가방을 삼                 |
+| 무엇            | 링크                                                                                                                                                           | 판정                                                         |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| 유오(uo) — 과거 | [@uo\_\_\_official](https://www.instagram.com/uo___official/) · [@uu.uooo](https://www.instagram.com/uu.uooo/) · [스토어](https://smartstore.naver.com/uuuooo) | 좋음. 강한 유사성을 느끼고 실제 구매까지 함                  |
+| colorcolour     | [룩북](https://thecolorcolour.com/product/list_lookbook.html?cate_no=44) · [소개](https://thecolorcolour.com/shopinfo/company.html)                            | **좋음.** 지금 가장 꽂힌 것. 색감·레이어드·믹스매치의 타이밍 |
+| REE-COLLECT     | [reecollect.com](https://reecollect.com/)                                                                                                                      | 좋음. 최근 여기서 가방을 삼                                  |
 
 > 링크는 언젠가 사라진다. 중요한 화면은 캡처해서 파일로 넣어둘 것 — 유오의 좋았던 조합은 이미 품절로 사라져 인스타에만 남았다.
 >
-> ⚠️ 스마트스토어는 브라우저 안전 설정에 막혀 열리지 않는다. 위 상품 4개는 **캡처가 필요하다.**
+> ⚠️ 스마트스토어는 브라우저 안전 설정에 막혀 열리지 않는다. 그 쪽 상품은 캐처를 받아야 한다.
+>
+> ⚙️ 이 저장소는 **공개(public)** 다. 다른 가게의 상품 사진을 올리고 있다는 점을 알고 쓸 것.
