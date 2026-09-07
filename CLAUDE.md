@@ -111,6 +111,8 @@ DB 작업이 필요해지면 순서는 이렇다.
 - Tailwind 유틸로 노출돼 있다 — `bg-butter`, `text-ink`, `bg-cloud`, `text-ink-muted` 등.
 - layout token: `--container-max: 1280px`, `--header-height: 64px`
 
+> **어떤 token을 언제 쓰는지**는 값 목록만으로 정해지지 않는다. 실제 사용 규약은 **[docs/design/tokens.md](docs/design/tokens.md)** 에 있다. component를 새로 짜기 전에 반드시 읽을 것.
+
 ## 5. Git · PR 규칙
 
 브랜치 → PR → 리뷰 승인 1개 → 머지. **`main`에 직접 push하지 않는다.**
