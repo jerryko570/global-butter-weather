@@ -55,16 +55,25 @@ Claude Code가 매 작업마다 참고하는 기준 문서. **코드가 바뀌�
 
 ## 2. 지금 레포 상태 (실측)
 
-**앱 화면이 아직 하나도 없다.** `src/`에 있는 것은 CSS 두 개뿐이다.
+**M0 app shell이 서 있다.** 화면이 뜨고 다크모드가 돌아간다. 아직 배포는 안 됐다(I0.3).
 
 ```
-src/app/globals.css        # Tailwind v4 진입점 + 다크모드 variant
-src/app/styles/theme.css   # 브랜드 design token
+src/app/layout.tsx             # 전역 layout. font·다크모드 스크립트·Header
+src/app/page.tsx               # 임시 첫 화면 (M1에서 다시 짠다)
+src/app/globals.css            # Tailwind v4 진입점 + 다크모드 variant
+src/app/styles/theme.css       # design token 진입점 (아래 셋을 import)
+src/app/styles/colors.css      # 색 + 다크모드 반전
+src/app/styles/typography.css  # 서체·글자 크기
+src/app/styles/layout.css      # 화면 폭·높이, 모션
+src/components/Header.tsx      # 전역 header (로고 자리는 비어 있음)
+src/components/ThemeToggle.tsx # 다크모드 수동 토글
+src/components/Button.tsx      # primary·secondary·ghost
+src/lib/cn.ts                  # clsx + tailwind-merge
 ```
 
-`app/layout.tsx`·`page.tsx`가 없어서 `npm run dev`를 띄워도 볼 화면이 없고, `npx next build`는 `/404` route 하나만 생성한다. **app shell 세우기가 첫 개발 작업이다.**
+레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅(commit-msg·pre-commit·pre-push), commitlint, GitHub template·workflow, `pr.sh`, design token, Pretendard.
 
-레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅, commitlint, GitHub template·workflow, `pr.sh`, design token.
+다음은 **I0.3 배포** — Vercel에 연결하면 M0가 끝난다. 로드맵은 [docs/plan/roadmap.md](docs/plan/roadmap.md).
 
 ### 정리 대상 (알고는 있되 지나가며 건드리지 말 것)
 
@@ -96,7 +105,7 @@ DB 작업이 필요해지면 순서는 이렇다.
 3. 스키마 설계 → 이 문서에 확정 스키마 기록
 4. RLS 정책 (공개는 읽기만, 쓰기는 관리자로 제한) — 대충 넘기지 말 것
 
-## 4. 디자인 시스템 (`src/app/styles/theme.css` 실측)
+## 4. 디자인 시스템 (`src/app/styles/` 실측)
 
 | token                          | 값                    | 용도                                           |
 | ------------------------------ | --------------------- | ---------------------------------------------- |
@@ -291,8 +300,8 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 - RLS는 대충 넘기지 않는다. 쓰기 권한은 반드시 제한한다.
 - 커밋 전 `npm run lint`·타입 에러 확인. husky가 staged 파일에 eslint·prettier를 자동 적용한다.
 
-## 8. 다음 작업 후보
+## 8. 다음 작업
 
-1. **app shell** — `src/app/layout.tsx` + `page.tsx`, font·`globals.css` 연결. 화면이 떠야 나머지가 가능하다.
-2. **Supabase 연결** — 프로젝트 생성 → `.env.local` → `lib/supabase` (client/server 분리) → `next.config.ts` 호스트 교체
-3. **제품 정의 확정** — 시장·통화·결제 수단을 정하고 이 문서 1절을 갱신
+**[docs/plan/roadmap.md](docs/plan/roadmap.md)를 본다.** 마일스톤·이니셔티브·에픽·스토리로 나뉘어 있고 story 하나가 PR 하나다. 여기에 목록을 또 두면 두 곳이 어긋난다.
+
+지금 위치: **M0 · I0.3 배포**가 남았다. 그다음은 M1(첫 화면)이다.

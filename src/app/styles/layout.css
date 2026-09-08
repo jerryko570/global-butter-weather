@@ -1,0 +1,15 @@
+/* 화면 폭·높이와 모션 token.
+   쓰는 규약은 docs/design/tokens.md 4·5절.
+
+   이 값들은 Tailwind의 @theme으로 노출하지 않는다. 색·타이포와 달리
+   var()로 직접 참조하는 편이 자연스럽고(max-w-(--container-max)),
+   실제로 그렇게 쓰고 있다. 노출이 필요해지면 그때 추가한다. */
+
+:root {
+  --container-max: 1280px;
+  --header-height: 64px;
+
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+}
