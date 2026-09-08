@@ -6,6 +6,12 @@
   --butter-dark: #d4a800;
   --sky: #a8d8ea;
 
+  /* butter/sky 위에 얹는 텍스트. .dark에서 재정의하지 않는다 — butter/sky
+     자체가 다크에서도 반전되지 않으므로(5-8절), 그 위 텍스트도 테마와
+     무관하게 항상 어두워야 밝은 배경에서 대비가 유지된다. ink는 다크에서
+     밝은 색으로 뒤집히므로 이 용도에 쓸 수 없다. (Button primary variant) */
+  --ink-on-accent: #1a1a1a;
+
   /* 의미 token (라이트) */
   --cloud: #f7f7f7; /* 배경 */
   --ink: #1a1a1a; /* 본문 텍스트 */
@@ -73,6 +79,7 @@
   --color-butter-light: var(--butter-light);
   --color-butter-dark: var(--butter-dark);
   --color-sky: var(--sky);
+  --color-ink-on-accent: var(--ink-on-accent);
 
   /* 의미 token */
   --color-cloud: var(--cloud);

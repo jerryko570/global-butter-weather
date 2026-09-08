@@ -47,6 +47,12 @@
 
 `butter-light` / `butter-dark`는 `--butter` 자체의 명도 변형이다. 새로운 의미를 갖지 않는다 — hover/active처럼 상태가 바뀔 때 밝기만 다른 `--butter`가 필요한 경우에만 쓴다. 새 색을 뽑는 데 쓰지 않는다.
 
+### 2-3-1. 액센트 위의 텍스트 — `ink-on-accent`
+
+**butter/sky 배경 위에 얹는 텍스트는 `text-ink-on-accent`를 쓴다.** `ink`를 쓰지 않는다 — `ink`는 다크모드에서 밝은 색으로 뒤집히는데, butter/sky는 다크에서도 반전되지 않으므로(5-8절) 다크모드에서 밝은 배경에 밝은 글자가 겹쳐 대비가 사라진다.
+
+`Button`의 `primary` variant가 첫 사례다. `theme.css`의 `:root`에만 정의돼 있고 `.dark`에서 재정의하지 않는다 — 테마와 무관하게 항상 어두운 색이어야 하기 때문이다. **이 token은 예외적으로 다크모드에서 반전되지 않는다는 것을 기억할 것.**
+
 ### 2-4. 하드코딩 금지
 
 **hex 값을 component 코드에 직접 쓰지 않는다.** `#f5c842`처럼 쓰면 나중에 이 문서와 코드가 따로 논다. 항상 token 유틸리티(`bg-butter`, `text-ink` 등)를 거친다.
