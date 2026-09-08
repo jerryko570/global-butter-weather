@@ -36,6 +36,19 @@
     'Pretendard Variable', Pretendard, system-ui, -apple-system, 'Segoe UI',
     sans-serif;
 
+  /* 타이포 스케일 — 역할 이름으로 둔다. 크기 이름(sm/lg)으로 두면 "이 자리에
+     어떤 크기가 맞나"를 매번 다시 판단하게 되지만, 역할 이름이면 자리가
+     정해지는 순간 크기도 정해진다. 값은 지금 화면에서 실제로 쓰던 것을
+     그대로 가져왔다 — page.tsx의 제목 1.5rem, 본문 0.875rem.
+     쓰는 규약은 docs/design/tokens.md 3절. */
+  --size-display: 1.5rem; /* 페이지 제목. 화면에 하나 */
+  --size-title: 1.125rem; /* 구획 제목 */
+  --size-body: 0.875rem; /* 본문·버튼·UI 기본 */
+  --size-caption: 0.75rem; /* 보조·메타 */
+
+  --leading-display: 1.3;
+  --leading-body: 1.6; /* 본문은 넉넉하게 — 읽는 글이다 */
+
   /* layout */
   --container-max: 1280px;
   --header-height: 64px;
@@ -71,8 +84,17 @@
 
 /* Tailwind v4 — token을 유틸리티로 노출 (bg-gray-100, text-ink, bg-butter 등) */
 @theme inline {
-  /* 타이포 */
+  /* 타이포 — text-display, text-body 등으로 쓴다.
+     Tailwind 기본 스케일(text-sm/2xl)은 이제 쓰지 않는다. */
   --font-sans: var(--sans);
+  --text-display: var(--size-display);
+  --text-display--line-height: var(--leading-display);
+  --text-title: var(--size-title);
+  --text-title--line-height: var(--leading-display);
+  --text-body: var(--size-body);
+  --text-body--line-height: var(--leading-body);
+  --text-caption: var(--size-caption);
+  --text-caption--line-height: var(--leading-body);
 
   /* 브랜드 */
   --color-butter: var(--butter);
