@@ -73,7 +73,9 @@ src/lib/cn.ts                  # clsx + tailwind-merge
 
 레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅(commit-msg·pre-commit·pre-push), commitlint, GitHub template·workflow, `pr.sh`, design token, Pretendard.
 
-다음은 **I0.3 배포** — Vercel에 연결하면 M0가 끝난다. 로드맵은 [docs/plan/roadmap.md](docs/plan/roadmap.md).
+**배포됨** — https://global-butter-weather.vercel.app · `main`에 머지되면 자동 배포되고 PR마다 프리뷰 URL이 붙는다.
+
+다음은 **M1 첫 화면**이다. 로드맵은 [docs/plan/roadmap.md](docs/plan/roadmap.md).
 
 ### 정리 대상 (알고는 있되 지나가며 건드리지 말 것)
 
@@ -90,7 +92,7 @@ src/lib/cn.ts                  # clsx + tailwind-merge
 - 스타일 유틸: `clsx`, `tailwind-merge`, `class-variance-authority`
 - 분석: `posthog-js`
 - 결제: `@portone/browser-sdk` — **의존성만 있고 미사용**
-- 배포: Vercel 예정 (아직 레포에 연결 안 됨 — GitHub Deployments 0건)
+- 배포: **Vercel** (이나래 계정 `jerrys-projects`). `main` 자동 배포 + PR 프리뷰. 아래 9절
 
 > 옛 문서에 있던 Framer Motion·Toss Payments는 **이 레포 의존성에 없다.** 필요해지면 그때 추가한다.
 
@@ -292,7 +294,28 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 워크플로우: `.github/workflows/slack-pr-notify.yml`, `slack-deploy-notify.yml`
 시크릿: `SLACK_WEBHOOK_PR`, `SLACK_WEBHOOK_DEPLOY`
 
-## 7. 작업 원칙
+## 7. 배포 — Vercel
+
+|               |                                                          |
+| ------------- | -------------------------------------------------------- |
+| 사이트        | **https://global-butter-weather.vercel.app**             |
+| 계정          | 이나래 (`jerrys-projects`) — GitHub 저장소 소유자와 같다 |
+| 자동 배포     | `main`에 머지되면 프로덕션 배포                          |
+| **PR 프리뷰** | **PR을 열면 프리뷰 URL이 자동으로 붙는다**               |
+
+**PR 프리뷰가 리뷰 방식을 바꾼다.** 리뷰어는 스크린샷이 아니라 실제 화면을 눌러보고 판단할 수 있다. 화면이 바뀌는 PR이면 「🖼️ 화면」 칸에 프리뷰 링크를 함께 적는다.
+
+### 검색 노출은 막혀 있다
+
+`src/app/robots.ts`가 모든 크롤러를 막는다. 지금 첫 화면은 M1에서 다시 짤 임시본이라 검색에 잡히면 안 된다. **M1에서 첫 화면이 서면 이 파일을 풀고 sitemap을 붙인다.**
+
+### 계정이 갈리면 연결이 막힌다 ⚠️
+
+처음에 홍설아 계정으로 프로젝트를 만들었다가 GitHub 연결이 `400`으로 계속 실패했다. 협업자 권한(`write`)도 있었고, Vercel GitHub App 설치도 했고, Vercel 계정에 GitHub 연결도 했는데 안 됐다. **결국 저장소 소유자인 이나래 계정에서 새로 만들어 한 번에 해결했다.**
+
+배포 관련 문제가 생기면 **누구 계정에서 하고 있는지부터 확인할 것.** 원인을 다른 데서 찾느라 오래 걸린다.
+
+## 8. 작업 원칙
 
 - **한 번에 한 기능씩.** 요청받은 범위를 넘어 리팩터링하거나 기능을 부풀리지 않는다.
 - **모르는 건 지어내지 않는다.** 특히 DB 스키마·시장·결제 — 위 "아직 정해지지 않은 것"에 걸리면 먼저 묻는다.
@@ -300,7 +323,7 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 - RLS는 대충 넘기지 않는다. 쓰기 권한은 반드시 제한한다.
 - 커밋 전 `npm run lint`·타입 에러 확인. husky가 staged 파일에 eslint·prettier를 자동 적용한다.
 
-## 8. 다음 작업
+## 9. 다음 작업
 
 **[docs/plan/roadmap.md](docs/plan/roadmap.md)를 본다.** 마일스톤·이니셔티브·에픽·스토리로 나뉘어 있고 story 하나가 PR 하나다. 여기에 목록을 또 두면 두 곳이 어긋난다.
 
