@@ -9,3 +9,12 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
 }
+
+/* Tailwind v4 preflight는 button에 기본 cursor:pointer를 주지 않는다.
+   롤오버 때 손가락 커서로 바뀌도록 되살린다 — 라이트·다크 공통. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
