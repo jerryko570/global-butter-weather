@@ -5,10 +5,10 @@ export default function Home() {
   return (
     <main className="mx-auto flex w-full max-w-(--container-max) flex-1 items-center px-6">
       <div>
-        <h1 className="text-ink text-2xl font-medium tracking-tight">
+        <h1 className="text-ink text-display font-medium tracking-tight">
           버터웨더
         </h1>
-        <p className="text-ink-muted mt-3 text-sm">
+        <p className="text-ink-muted text-body mt-3">
           나의 하루에 부드럽게 스며드는 작은 온기
         </p>
         {/* 이 화면의 유일한 포인트. 원색은 면적이 아니라 포인트로 쓴다. */}

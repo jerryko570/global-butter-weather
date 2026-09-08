@@ -26,8 +26,11 @@ export const buttonVariants = cva(
         ghost: 'text-ink-muted hover:bg-gray-100 hover:text-ink',
       },
       size: {
-        md: 'h-10 px-5 text-sm',
-        sm: 'h-9 px-4 text-sm',
+        // 두 size 모두 text-body를 쓴다. 버튼 크기는 높이·좌우 여백으로
+        // 구분하고 글자 크기는 건드리지 않는다 — 글자가 작아지면 읽기가
+        // 나빠지는데 버튼은 누르라고 있는 것이라 그쪽을 희생하지 않는다.
+        md: 'h-10 px-5 text-body',
+        sm: 'h-9 px-4 text-body',
       },
     },
     defaultVariants: {
