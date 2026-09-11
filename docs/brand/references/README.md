@@ -40,6 +40,10 @@
 | [uo-now-03-three-bracelets.jpg](uo-now-03-three-bracelets.jpg)     | 유오 현재. 페이즐리 참 / 태양 문양 타일 / 불가사리·산호                                                                                       | **아님**  | 2026       |
 | [uo-now-04-red-white.jpg](uo-now-04-red-white.jpg)                 | 유오 현재. 산호 + 진주, 각인 본 원통. 소 두개골 원단 배경                                                                                     | **아님**  | 2026       |
 | [colorcolour-styling-timing.jpg](colorcolour-styling-timing.jpg)   | colorcolour 스타일링. 올블랙 스웻에 러스트 후드를 겹치고 같은 색을 허리에서 한 번 더. 쪼리로 카테고리만 하나 어긋냄. 「멈추는 타이밍」의 실례 | **좋음**  | 2026       |
+| [narae-past-bracelets.jpg](narae-past-bracelets.jpg)               | **이나래가 만든 것.** 2025년 비즈 팔찌 18점. 맑은 원색 위주. 읽어낸 내용은 foundation.md 5-9절                                                | 본인 작업 | 2025       |
+| [narae-now-bracelets.jpg](narae-now-bracelets.jpg)                 | **이나래가 만든 것.** 현재 비즈 팔찌 15점. 회색·버건디·네이비가 합류해 팔레트가 내려앉음                                                      | 본인 작업 | 2026       |
+| [narae-now-necklaces-ethnic.jpg](narae-now-necklaces-ethnic.jpg)   | **이나래가 만든 것.** 실버 목걸이 4점. 터콰이즈·조개·깃털. 펜던트가 손톱만 하다                                                               | 본인 작업 | 2026       |
+| [narae-now-necklaces-minimal.jpg](narae-now-necklaces-minimal.jpg) | **이나래가 만든 것.** 실버 목걸이 3점. 아주 가는 체인에 작은 꽃                                                                               | 본인 작업 | 2026       |
 
 ## 아직 파일로 없는 것 (링크만)
 
