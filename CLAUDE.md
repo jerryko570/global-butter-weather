@@ -141,14 +141,25 @@ DB 작업이 필요해지면 순서는 이렇다.
 
 브랜치 → PR → 리뷰 승인 1개 → 머지. **`main`에 직접 push하지 않는다.**
 
-> ⚠️ **`main`은 GitHub에서 보호되지 않는다.** 이 저장소는 무료 플랜의 private이라 브랜치 보호·ruleset을 쓸 수 없다(`rulesets` API가 *"Upgrade to GitHub Pro or make this repository public"*을 준다). 2026-09-05 public → private 전환 때 함께 꺼졌다.
+> ⚠️ **`main`은 아직 GitHub에서 보호되지 않는다. 다만 이제 걸 수 있다.**
 >
-> 그래서 아래 규칙들은 **서버가 아니라 사람이 지키는 것**이다. 다만 직접 push만은 husky `pre-push` 훅으로 막아두었다 — `npm install` 한 사람 모두에게 적용된다.
+> 2026-09-05에 public → private으로 바꾸면서 브랜치 보호·ruleset이 함께 꺼졌다. 무료 플랜의 private에서는 쓸 수 없는 기능이라 `rulesets` API가 _"Upgrade to GitHub Pro or make this repository public"_ 을 돌려줬다.
+>
+> **2026-09-12에 다시 public으로 돌렸고 그 제한이 풀렸다** (`rulesets`가 이제 빈 배열을 준다). 그런데 **푼 것과 건 것은 다르다** — 규칙은 아직 하나도 없고 `main`에 보호가 걸려 있지 않다. 걸기 전까지는 아래 표가 그대로 유효하다.
 >
 > |                             | 무엇이 막아주나                           |
 > | --------------------------- | ----------------------------------------- |
 > | `main` 직접 push·force push | `pre-push` 훅 (로컬)                      |
 > | 승인 없는 머지              | **아무것도 막지 않는다.** 규율로만 지킨다 |
+>
+> `pre-push` 훅은 로컬에만 있다 — `npm install` 한 사람에게만 걸리고, 웹에서 누르는 머지는 지나간다.
+>
+> **거는 방법** (저장소 `admin` 권한이 필요하다. 홍설아는 `push`까지라 이나래가 해야 한다):
+> Settings → Rules → Rulesets → New branch ruleset → Target `main` →
+> ☑ Require a pull request before merging (Required approvals: **1**)
+> ☑ Block force pushes
+>
+> **걸고 나면 이 경고 블록을 표까지 통째로 지운다.** 그때부터는 사람이 아니라 서버가 지킨다.
 
 ### 브랜치
 
@@ -291,7 +302,7 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 
 리뷰 승인 1개 후 머지. `main`에서 force push·브랜치 삭제 금지.
 
-**승인 없이도 머지 버튼이 눌린다.** GitHub이 막아주지 않으므로(위 경고 참조) 승인 없이 머지하지 않는 것은 전적으로 약속이다. 급해 보여도 예외를 두지 않는다 — 한 번 예외를 두면 그때부터 규칙이 아니다.
+**지금은 승인 없이도 머지 버튼이 눌린다.** ruleset을 아직 걸지 않았기 때문이다(위 경고 참조). 그래서 승인 없이 머지하지 않는 것은 **전적으로 약속이다.** 급해 보여도 예외를 두지 않는다 — 한 번 예외를 두면 그때부터 규칙이 아니다.
 
 ## 6. Slack 알림 — PR 본문이 곧 팀 공지다
 
