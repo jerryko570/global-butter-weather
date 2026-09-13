@@ -1,50 +1,66 @@
 import Image from 'next/image'
 import type { Metadata } from 'next'
+import Button from '@/components/Button'
 
 export const metadata: Metadata = {
-  title: '첫 화면 배치 시안 — 버터웨더',
+  title: '첫 화면 목업 — 버터웨더',
 }
 
 /**
- * M1 첫 화면 **배치** 시안. 고르고 나면 이 route는 지운다.
+ * M1 첫 화면 목업. **구조는 정해졌다** — 시안 H다.
+ * 확정되면 이 내용이 `/`로 가고 이 route는 지운다.
  *
- * 1차(좌우 50:50 분할)는 폐기됐다. karactor를 직독직해한 것이었기 때문이다.
- * 실제로 열어보니 karactor의 특징은 반으로 가르는 것이 아니라
- * **UI가 면을 갖지 않고 「틈」에 산다**는 것이었다 (foundation.md 5-6절).
+ * 앞선 시안 A~G는 폐기됐다. 이유는 foundation.md 5-15절에 있다 —
+ * 전부 상품을 보여주지 않았고, 뎁스를 만들었다.
  *
- * 세 시안이 공유하는 것 — 이것들은 고르는 대상이 아니라 전제다.
- * - **한 화면은 한 장면이다.** 정보를 쌓아 내려가지 않는다
- * - **UI는 자기 면을 요구하지 않는다.** 글자는 틈이나 구석에만 있다
- * - **화면은 쨍하고 상품은 차분하다** (5-13절). 면은 일러스트, 그 위/옆의
- *   사진 자리는 조용하다. 둘의 대비가 구조다
- * - **기울이지 않는다.** 기울임은 sunlovetour의 어휘이고 이나래의 그림에는
- *   기울어진 것이 하나도 없다
- * - **경계는 선명하다.** 그라데이션·blur로 두 면을 잇지 않는다 (5-9절)
+ * **레이아웃은 평범하다. 그래도 된다** (5-14절). 옛 버터웨더 사이트의
+ * 뼈대를 그대로 쓴다 — 왼쪽 고정 카테고리, 키비주얼, 상품 그리드,
+ * 사진 아래 카테고리·이름·가격. 한국에서 쇼핑하던 사람에게 익숙한 순서다.
  *
- * 시안에 쓴 일러스트는 **자리를 보이기 위한 것이지 선택이 아니다.**
- * 어느 그림이 첫 화면에 오는지는 이나래가 정한다 (5-9절).
+ * 감각은 레이아웃이 아니라 아래 세 자리에 싣는다.
+ * 1. **카테고리 앞의 모티프** — 이나래가 그린 것이 그대로 글머리가 된다
+ * 2. **키비주얼이 일러스트 면** — 아이덴티티 층은 쨍해도 된다 (5-13절)
+ * 3. **그리드에 드물게 끼는 일러스트 면** — 룩북이 샵 안에 있으므로
+ *    뎁스가 생기지 않는다. 8칸에 1개로 둔다
+ *
+ * 상단 알림 띠(무료배송 기준·입고 주기)는 두지 않는다.
+ *
+ * ⚠️ 상품 이름·가격·지표는 전부 **임시값**이다. M2에서 실제 데이터로 바꾼다.
  */
 
-/**
- * 상품 사진. 2025년에 찍은 것이고 **앞으로 바뀐다** (5-11절 — 새로 촬영할 예정).
- * 지금 넣은 이유는 점선 자리로는 「쨍한 면 / 차분한 상품」의 대비가 보이지
- * 않기 때문이다. 비율을 굳히지 않으려고 `object-cover`로만 받는다.
- */
-function Photo({ src, alt }: { src: string; alt: string }) {
+/** 상품 칸. 사진 → 카테고리 → 이름 → 가격 순서를 지킨다. */
+function ProductCell({
+  src,
+  category,
+  name,
+  price,
+}: {
+  src: string
+  category: string
+  name: string
+  price: string
+}) {
   return (
-    <div className="relative h-full w-full bg-white">
-      <Image
-        src={`/photos/${src}.jpg`}
-        alt={alt}
-        fill
-        sizes="(max-width: 768px) 100vw, 40vw"
-        className="object-cover"
-      />
-    </div>
+    <a href="#" className="group block">
+      <div className="relative aspect-square bg-white">
+        <Image
+          src={`/photos/${src}.jpg`}
+          alt={name}
+          fill
+          sizes="(max-width: 768px) 50vw, 22vw"
+          className="object-cover"
+        />
+      </div>
+      <p className="text-ink-subtle text-caption mt-3 tracking-[0.15em]">
+        {category}
+      </p>
+      <p className="text-ink text-body mt-1 group-hover:underline">{name}</p>
+      <p className="text-ink text-body mt-1 font-medium">{price}</p>
+    </a>
   )
 }
 
-/** 일러스트 면. 통째로 놓고 확대해 잘라낸다 (5-11절·5-10절 규칙 4). */
+/** 일러스트 면. 통째로 놓고 확대해 잘라낸다 (5-11절). */
 function Plane({ src, zoom }: { src: string; zoom: number }) {
   return (
     <div
@@ -59,454 +75,267 @@ function Plane({ src, zoom }: { src: string; zoom: number }) {
   )
 }
 
-/**
- * 모티프 하나를 메뉴 버튼으로 쓴다. 각 SVG가 이미 자기 바탕색을 품고 있어서
- * (5-11절) 그대로 얹으면 색 칩이 된다. 크기는 전부 같고 **높이만 어긋난다** —
- * 크기를 제각각 두지 않는다는 5-9절을 지키면서 리듬을 만드는 방법이다.
- */
-function MotifChip({
-  src,
+/** 사이드바 카테고리 한 줄. 모티프가 글머리 자리에 온다. */
+function CategoryRow({
+  motif,
   label,
-  drop,
+  active,
 }: {
-  src: string
+  motif: string
   label: string
-  drop: number
+  active?: boolean
 }) {
   return (
-    <div className="flex flex-col items-center" style={{ marginTop: drop }}>
-      <div
-        className="h-[114px] w-[96px] bg-cover bg-center"
-        style={{ backgroundImage: `url(/illustrations/${src}.svg)` }}
-        aria-hidden
-      />
-      <span className="text-ink text-caption mt-2 tracking-[0.2em]">
-        {label}
-      </span>
-    </div>
-  )
-}
-
-/**
- * 상품 칸. 사진 · 카테고리 · 이름 · 가격 — 한국 쇼핑몰에서 익숙한 순서다.
- * **이름과 가격은 임시값이다.** 자리를 보이기 위한 것이지 정해진 것이 아니다.
- */
-function ProductCell({
-  src,
-  category,
-  name,
-  price,
-}: {
-  src: string
-  category: string
-  name: string
-  price: string
-}) {
-  return (
-    <div>
-      <div className="aspect-square">
-        <Photo src={src} alt={name} />
-      </div>
-      <p className="text-ink-subtle text-caption mt-3 tracking-[0.15em]">
-        {category}
-      </p>
-      <p className="text-ink text-body mt-1">{name}</p>
-      <p className="text-ink text-body mt-1 font-medium">{price}</p>
-    </div>
-  )
-}
-
-/** 그리드 안에 끼어드는 일러스트 면. 룩북이 샵 목록 안으로 들어온다. */
-function PatternCell({ src }: { src: string }) {
-  return (
-    <div className="aspect-square">
-      <Plane src={src} zoom={180} />
-    </div>
-  )
-}
-
-/** 사이드바의 카테고리 한 줄. 모티프가 글머리 자리에 온다. */
-function CategoryRow({ motif, label }: { motif: string; label: string }) {
-  return (
-    <div className="flex items-center gap-3 py-2">
-      <div
+    <a href="#" className="group flex items-center gap-3 py-1.5">
+      <span
         className="h-9 w-8 shrink-0 bg-cover bg-center"
         style={{ backgroundImage: `url(/illustrations/${motif}.svg)` }}
         aria-hidden
       />
-      <span className="text-ink text-body">{label}</span>
-    </div>
+      <span
+        className={
+          active
+            ? 'text-ink text-body font-medium'
+            : 'text-ink-muted group-hover:text-ink text-body'
+        }
+      >
+        {label}
+      </span>
+    </a>
   )
 }
 
-function DraftLabel({
-  id,
-  title,
-  note,
-}: {
-  id: string
-  title: string
-  note: string
-}) {
+function QuietLink({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto w-full max-w-(--container-max) px-6 pt-16 pb-5">
-      <p className="text-ink text-body font-medium">
-        {id}. {title}
-      </p>
-      <p className="text-ink-muted text-caption mt-1 max-w-prose">{note}</p>
-    </div>
+    <a
+      href="#"
+      className="text-ink-muted hover:text-ink text-caption block py-1"
+    >
+      {children}
+    </a>
   )
 }
 
 export default function M1Draft() {
   return (
-    <div className="pb-24">
-      <div className="mx-auto w-full max-w-(--container-max) px-6 py-10">
-        <h1 className="text-ink text-display font-medium tracking-tight">
-          첫 화면 배치 시안
-        </h1>
-        <p className="text-ink-muted text-body mt-3 max-w-prose">
-          반으로 가르지 않습니다. 상품 사진은 2025년에 찍은 것이라 앞으로
-          바뀌고, 컬러 면에 쓴 일러스트도 자리를 보이기 위한 것이지 고른 것이
-          아닙니다.{' '}
-          <strong className="text-ink font-medium">
-            D는 앞의 셋과 종류가 다릅니다
-          </strong>{' '}
-          — 일러스트 면을 쓰지 않습니다.
-        </p>
-      </div>
+    <div className="bg-cloud min-h-dvh">
+      <div className="mx-auto flex w-full max-w-[1440px]">
+        {/* ───── 왼쪽 고정 ───── */}
+        <aside className="sticky top-0 hidden h-dvh w-[220px] shrink-0 flex-col border-r border-gray-200 px-5 py-6 md:flex">
+          <a
+            href="#"
+            className="text-ink text-body font-medium tracking-[0.12em]"
+          >
+            BUTTER WEATHER
+          </a>
 
-      {/* ───────── H. 익숙한 그리드 ───────── */}
-      <DraftLabel
-        id="H"
-        title="익숙한 그리드 — 상품이 먼저 보인다"
-        note="앞의 일곱은 상품을 안 보여주고 한 번 더 들어가야 했습니다. 이건 반대입니다. 옛 버터웨더 사이트의 뼈대(왼쪽 고정 카테고리 + 상품 그리드 + 가격)를 그대로 두되, 감각을 다른 세 자리에 싣습니다 — ① 카테고리 앞의 모티프 ② 위쪽 원색 띠 ③ 그리드 안에 끼어드는 일러스트 면. 5-14절 「레이아웃이 평범해도 된다」를 실제로 해본 것입니다."
-      />
-      <section className="mx-auto w-full max-w-(--container-max) px-6">
-        <div className="border border-gray-200">
-          {/* ① 구획선 — 한국 쇼핑몰에서 익숙한 안내 띠를 원색으로 */}
-          <div className="bg-butter text-ink text-caption flex items-center justify-between px-5 py-2">
-            <span>5만원 이상 무료배송</span>
-            <span>매주 새로운 입고</span>
-            <span>전 세계 배송</span>
-            <span className="tracking-[0.2em]">DESIGNED IN SEOUL</span>
+          <p className="text-ink-subtle text-caption mt-8 tracking-[0.15em]">
+            SHOP
+          </p>
+          <nav className="mt-1">
+            <CategoryRow motif="motif-sun" label="전체" active />
+            <CategoryRow motif="motif-tulip" label="키링" />
+            <CategoryRow motif="motif-blue-flower" label="비즈" />
+            <CategoryRow motif="motif-watering-can" label="기타" />
+          </nav>
+
+          <div className="mt-8 border-t border-gray-200 pt-4">
+            <QuietLink>소개</QuietLink>
+            <QuietLink>문의</QuietLink>
           </div>
 
-          <div className="flex">
-            {/* 왼쪽 고정 — 옛 구조 그대로. ② 감각은 카테고리 앞 모티프에 */}
-            <aside className="bg-cloud w-[210px] shrink-0 border-r border-gray-200 p-5">
-              <p className="text-ink text-body font-medium tracking-[0.12em]">
-                BUTTER WEATHER
+          <p className="text-ink-muted text-caption mt-8">
+            <span className="text-ink-subtle tracking-[0.15em]">LANGUAGE</span>
+            <br />
+            <span className="text-ink mt-1 inline-block font-medium">KR</span>
+            <span className="text-ink-subtle"> · EN</span>
+          </p>
+
+          {/* 아래로 밀어붙인다 */}
+          <div className="mt-auto border-t border-gray-200 pt-4">
+            <QuietLink>Instagram</QuietLink>
+            <QuietLink>Contact</QuietLink>
+          </div>
+        </aside>
+
+        {/* ───── 오른쪽 ───── */}
+        <main className="min-w-0 flex-1">
+          {/* 상단 — 알림 워딩은 두지 않는다. 계정 동작만 오른쪽에 */}
+          <div className="flex items-center justify-end gap-5 border-b border-gray-200 px-6 py-3">
+            <a href="#" className="text-ink-muted hover:text-ink text-caption">
+              로그인
+            </a>
+            <a href="#" className="text-ink-muted hover:text-ink text-caption">
+              회원가입
+            </a>
+            <a href="#" className="text-ink text-caption font-medium">
+              장바구니 (0)
+            </a>
+          </div>
+
+          {/* ───── 키비주얼 · 아이덴티티 ───── */}
+          <section className="flex flex-col border-b border-gray-200 lg:flex-row">
+            <div className="h-[42svh] lg:h-[56svh] lg:w-[52%]">
+              <Plane src="pattern-red-berry" zoom={220} />
+            </div>
+            <div className="flex flex-1 flex-col justify-center px-8 py-12 lg:px-12">
+              <p className="text-ink-subtle text-caption tracking-[0.15em]">
+                신규 컬렉션 — 2026 봄/여름
               </p>
-              <p className="text-ink-subtle text-caption mt-6 tracking-[0.15em]">
-                SHOP
-              </p>
-              <div className="mt-1">
-                <CategoryRow motif="motif-sun" label="전체" />
-                <CategoryRow motif="motif-tulip" label="키링" />
-                <CategoryRow motif="motif-blue-flower" label="비즈" />
-                <CategoryRow motif="motif-watering-can" label="기타" />
-              </div>
-              <p className="text-ink-muted text-caption mt-8">
-                KR · <span className="text-ink-subtle">EN</span>
-              </p>
-              <p className="text-ink-muted text-caption mt-8 leading-relaxed">
+              <h1 className="text-ink text-display mt-4 font-medium tracking-tight">
                 나의 하루에 부드럽게
                 <br />
                 스며드는 작은 온기
+              </h1>
+              <p className="text-ink-muted text-body mt-4 max-w-prose">
+                키링 하나, 비즈 하나가 담아내는 감정.
+                <br />
+                작은 오브제로 하루를 디자인합니다.
               </p>
-            </aside>
+              <div className="mt-8 flex gap-3">
+                <Button>쇼핑하기</Button>
+                <Button variant="secondary">신상품</Button>
+              </div>
 
-            {/* 오른쪽 — 스크롤 없이 상품이 바로 보인다 */}
-            <div className="flex-1 p-6">
-              <div className="grid grid-cols-4 gap-x-4 gap-y-8">
-                {/* ③ 룩북이 샵 안으로 들어온다 — 뎁스 없이 */}
-                <PatternCell src="pattern-clover" />
-                <ProductCell
-                  src="keyring-on-paper"
-                  category="KEYRING"
-                  name="꽃 비즈 키링"
-                  price="₩21,000"
-                />
-                <ProductCell
-                  src="keyring-with-jar"
-                  category="KEYRING"
-                  name="라인 비즈 키링"
-                  price="₩19,000"
-                />
-                <ProductCell
-                  src="keyring-on-phone"
-                  category="KEYRING"
-                  name="폰 스트랩"
-                  price="₩23,000"
-                />
-                <ProductCell
-                  src="keyring-on-wood"
-                  category="BEAD"
-                  name="미니 참"
-                  price="₩12,000"
-                />
-                <ProductCell
-                  src="keyring-on-orange-pattern"
-                  category="KEYRING"
-                  name="더블 플라워 키링"
-                  price="₩24,000"
-                />
-                <PatternCell src="pattern-red-berry" />
-                <ProductCell
-                  src="keyring-on-paper"
-                  category="BEAD"
-                  name="시드 비즈 세트"
-                  price="₩15,000"
-                />
+              <dl className="mt-10 flex gap-10 border-t border-gray-200 pt-5">
+                <div>
+                  <dt className="text-ink text-title font-medium">16</dt>
+                  <dd className="text-ink-muted text-caption mt-1">상품</dd>
+                </div>
+                <div>
+                  <dt className="text-ink text-title font-medium">KR · EN</dt>
+                  <dd className="text-ink-muted text-caption mt-1">언어</dd>
+                </div>
+                <div>
+                  <dt className="text-ink text-title font-medium">WW</dt>
+                  <dd className="text-ink-muted text-caption mt-1">배송</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+
+          {/* ───── 신상품 ───── */}
+          <section className="px-6 py-10">
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-ink text-title font-medium tracking-tight">
+                신상품
+              </h2>
+              <a
+                href="#"
+                className="text-ink-muted hover:text-ink text-caption"
+              >
+                전체 보기
+              </a>
+            </div>
+
+            <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4">
+              <ProductCell
+                src="keyring-on-paper"
+                category="KEYRING"
+                name="꽃 비즈 키링"
+                price="₩21,000"
+              />
+              <ProductCell
+                src="keyring-with-jar"
+                category="KEYRING"
+                name="라인 비즈 키링"
+                price="₩19,000"
+              />
+              <ProductCell
+                src="keyring-on-phone"
+                category="KEYRING"
+                name="폰 스트랩"
+                price="₩23,000"
+              />
+              <ProductCell
+                src="keyring-on-orange-pattern"
+                category="KEYRING"
+                name="더블 플라워 키링"
+                price="₩24,000"
+              />
+              <ProductCell
+                src="keyring-on-wood"
+                category="BEAD"
+                name="미니 참"
+                price="₩12,000"
+              />
+              <ProductCell
+                src="keyring-on-paper"
+                category="BEAD"
+                name="시드 비즈 세트"
+                price="₩15,000"
+              />
+              <ProductCell
+                src="keyring-with-jar"
+                category="KEYRING"
+                name="투톤 비즈 키링"
+                price="₩20,000"
+              />
+              {/* 룩북이 샵 안으로 — 8칸에 1개로 드물게 */}
+              <div className="aspect-square">
+                <Plane src="pattern-clover" zoom={190} />
               </div>
             </div>
-          </div>
-        </div>
-        <p className="text-ink-muted text-caption mt-3">
-          ⚠️ 이름과 가격은 자리를 보이기 위한 임시값입니다. 정해진 것이
-          아닙니다.
-        </p>
-      </section>
+          </section>
 
-      {/* ───────── A. 틈 ───────── */}
-      <DraftLabel
-        id="A"
-        title="틈"
-        note="화면 대부분이 일러스트 면이고, 그 사이를 좁은 흰 띠가 지나갑니다. 글자는 그 띠 안에만 세로로 섭니다 — karactor에서 가져올 원리가 「분할」이 아니라 「UI가 틈에 산다」였습니다. 띠는 가운데가 아니라 오른쪽으로 밀려 있습니다."
-      />
-      <section className="mx-auto w-full max-w-(--container-max) px-6">
-        <div className="flex h-[78svh]">
-          <div className="flex-1">
-            <Plane src="pattern-red-berry" zoom={260} />
-          </div>
+          {/* ───── footer ───── */}
+          <footer className="border-t border-gray-200 px-6 py-10">
+            <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
+              <div>
+                <p className="text-ink text-body font-medium tracking-[0.12em]">
+                  BUTTER WEATHER
+                </p>
+                <p className="text-ink-muted text-caption mt-3 leading-relaxed">
+                  작은 오브제, 정직한 디자인.
+                  <br />
+                  Designed in Seoul
+                </p>
+              </div>
 
-          {/* 틈 — UI가 사는 유일한 자리. 면을 갖지 않는다 */}
-          <div className="flex w-16 shrink-0 flex-col items-center justify-between bg-white py-8">
-            <span className="text-ink text-caption tracking-[0.3em] [writing-mode:vertical-rl]">
-              SHOP
-            </span>
-            <span className="text-ink text-caption font-medium tracking-[0.3em] [writing-mode:vertical-rl]">
-              버터웨더
-            </span>
-            <span className="text-ink text-caption tracking-[0.3em] [writing-mode:vertical-rl]">
-              LOOKBOOK
-            </span>
-          </div>
-
-          <div className="bg-cloud w-[28%] shrink-0 p-6">
-            <Photo src="keyring-on-paper" alt="종이 위에 놓인 비즈 키링" />
-          </div>
-        </div>
-      </section>
-
-      {/* ───────── B. 걸친 사진 ───────── */}
-      <DraftLabel
-        id="B"
-        title="걸친 사진"
-        note="면과 여백이 6:4로 나뉘고, 상품 사진 한 장이 그 경계를 물고 걸칩니다. 경계가 한가운데가 아니고, 사진이 두 층(쨍한 아이덴티티 · 차분한 상품)을 실제로 붙여 놓습니다. 글자는 아래 구석에 작게."
-      />
-      <section className="mx-auto w-full max-w-(--container-max) px-6">
-        <div className="relative h-[78svh]">
-          <div className="absolute inset-0 flex">
-            <div className="w-[60%]">
-              <Plane src="pattern-clover" zoom={230} />
+              <div className="flex gap-12">
+                <div>
+                  <p className="text-ink-subtle text-caption tracking-[0.15em]">
+                    SHOP
+                  </p>
+                  <div className="mt-2">
+                    <QuietLink>전체</QuietLink>
+                    <QuietLink>키링</QuietLink>
+                    <QuietLink>비즈</QuietLink>
+                    <QuietLink>기타</QuietLink>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-ink-subtle text-caption tracking-[0.15em]">
+                    ABOUT
+                  </p>
+                  <div className="mt-2">
+                    <QuietLink>소개</QuietLink>
+                    <QuietLink>배송·교환·반품</QuietLink>
+                    <QuietLink>문의</QuietLink>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-ink-subtle text-caption tracking-[0.15em]">
+                    FOLLOW
+                  </p>
+                  <div className="mt-2">
+                    <QuietLink>Instagram</QuietLink>
+                    <QuietLink>네이버 스마트스토어</QuietLink>
+                    <QuietLink>Contact</QuietLink>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="bg-cloud w-[40%]" />
-          </div>
 
-          {/* 경계를 물고 걸친 사진 한 장 */}
-          <div className="absolute top-[18%] left-[42%] h-[56%] w-[38%]">
-            <Photo src="keyring-on-phone" alt="휴대폰 뒷면에 걸린 비즈 키링" />
-          </div>
-
-          <div className="absolute bottom-8 left-8">
-            <p className="text-ink text-title font-medium tracking-tight">
-              버터웨더
+            {/* 한국 쇼핑몰에 반드시 있는 자리. 내용은 아직 없다 */}
+            <p className="text-ink-subtle text-caption mt-10 border-t border-gray-200 pt-5 leading-relaxed">
+              상호 · 대표 · 사업자등록번호 · 통신판매업신고번호 · 주소 ·
+              개인정보관리책임자 — 아직 채우지 않았습니다
+              <br />© 2026 BUTTER WEATHER
             </p>
-            <p className="text-ink-muted text-caption mt-1">
-              나의 하루에 부드럽게 스며드는 작은 온기
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ───────── C. 장면 넘김 ───────── */}
-      <DraftLabel
-        id="C"
-        title="장면 넘김"
-        note="한 화면에 다 담지 않고 장면을 넘깁니다. 장면마다 바탕이 바뀌는 것은 5-9절 「화면과 화면 사이는 넓혀도 된다」이고, sunlovetour가 실제로 이렇게 합니다. 아래 셋이 한 세트이며 각각이 한 화면입니다."
-      />
-      <section className="mx-auto w-full max-w-(--container-max) space-y-3 px-6">
-        {/* 1장면 — 면과 이름만 */}
-        <div className="relative h-[62svh]">
-          <Plane src="pattern-flower-cluster" zoom={240} />
-          <p className="text-ink text-title absolute bottom-6 left-6 bg-white px-3 py-1 font-medium tracking-tight">
-            버터웨더
-          </p>
-        </div>
-
-        {/* 2장면 — 여백과 상품 하나 */}
-        <div className="bg-cloud flex h-[62svh] items-center justify-center">
-          <div className="h-[62%] w-[38%]">
-            <Photo
-              src="keyring-on-wood"
-              alt="나무 위 주황 원 카드에 놓인 비즈 키링"
-            />
-          </div>
-        </div>
-
-        {/* 3장면 — 다른 면, 세로 글자 */}
-        <div className="flex h-[62svh]">
-          <div className="flex w-16 shrink-0 items-center justify-center bg-white">
-            <span className="text-ink text-caption tracking-[0.3em] [writing-mode:vertical-rl]">
-              LOOKBOOK
-            </span>
-          </div>
-          <div className="flex-1">
-            <Plane src="pattern-blue-flower" zoom={250} />
-          </div>
-        </div>
-      </section>
-
-      {/* ───────── D. 사진이 면을 품는다 ───────── */}
-      <DraftLabel
-        id="D"
-        title="사진이 면을 품는다"
-        note="앞의 셋과 종류가 다릅니다. 일러스트 면을 따로 두지 않고, 이미 쨍한 바닥 위에서 찍힌 사진 한 장을 그대로 씁니다. 5-13절의 두 층(쨍한 아이덴티티 · 차분한 상품)이 화면 배치가 아니라 사진 한 장 안에서 성립합니다. 흰 띠는 사진을 가로지르며 틈을 만들고, 글자는 거기에만 있습니다."
-      />
-      <section className="mx-auto w-full max-w-(--container-max) px-6">
-        <div className="relative h-[78svh]">
-          <Photo
-            src="keyring-on-orange-pattern"
-            alt="주황 레트로 패턴 바닥 위에 놓인 비즈 키링"
-          />
-
-          {/* 틈 — 사진을 가로질러 낸다. UI는 여기에만 산다 */}
-          <div className="absolute inset-y-0 right-[22%] flex w-16 flex-col items-center justify-between bg-white py-8">
-            <span className="text-ink text-caption tracking-[0.3em] [writing-mode:vertical-rl]">
-              SHOP
-            </span>
-            <span className="text-ink text-caption font-medium tracking-[0.3em] [writing-mode:vertical-rl]">
-              버터웨더
-            </span>
-            <span className="text-ink text-caption tracking-[0.3em] [writing-mode:vertical-rl]">
-              LOOKBOOK
-            </span>
-          </div>
-        </div>
-        <p className="text-ink-muted text-caption mt-3">
-          ⚠️ 이 사진의 원본이 583px이라 화면을 채우면 흐릿합니다. 새로 촬영하면
-          해결되는 문제이고, 지금은 배치만 봐주세요.
-        </p>
-      </section>
-
-      <div className="mx-auto w-full max-w-(--container-max) px-6 pt-24">
-        <p className="text-ink text-title font-medium tracking-tight">
-          여기부터는 다른 자리에 감각을 싣습니다
-        </p>
-        <p className="text-ink-muted text-body mt-3 max-w-prose">
-          A~D는 전부 「틈」 하나에만 감각을 실었습니다. 그래서 서로 닮아
-          보였습니다. E·F·G는 각각{' '}
-          <strong className="text-ink font-medium">
-            내비게이션 · 구획선 · 바닥
-          </strong>
-          에 감각을 싣습니다.
-        </p>
+          </footer>
+        </main>
       </div>
-
-      {/* ───────── E. 모티프가 메뉴가 된다 ───────── */}
-      <DraftLabel
-        id="E"
-        title="모티프가 메뉴가 된다"
-        note="감각을 내비게이션에 싣습니다. 이나래의 모티프 하나하나가 그대로 메뉴 버튼이 됩니다 — 각 SVG가 이미 자기 바탕색을 품고 있어서 얹기만 하면 색 칩이 됩니다. 크기는 전부 같고 높이만 어긋납니다. 화면의 나머지는 조용하고, 색은 메뉴에만 있습니다."
-      />
-      <section className="mx-auto w-full max-w-(--container-max) px-6">
-        <div className="bg-cloud flex h-[78svh] flex-col">
-          <div className="flex items-start justify-center gap-6 pt-12">
-            <MotifChip src="motif-tulip" label="SHOP" drop={0} />
-            <MotifChip src="motif-cloud-rainbow" label="LOOKBOOK" drop={30} />
-            <MotifChip src="motif-sun" label="ABOUT" drop={8} />
-            <MotifChip src="motif-watering-can" label="CARE" drop={38} />
-            <MotifChip src="motif-blue-flower" label="CONTACT" drop={16} />
-          </div>
-          <div className="flex flex-1 items-center justify-center px-10 pb-10">
-            <div className="h-[80%] w-[46%]">
-              <Photo src="keyring-with-jar" alt="유리병 옆에 놓인 비즈 키링" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ───────── F. 여백 없이 맞닿는다 ───────── */}
-      <DraftLabel
-        id="F"
-        title="여백 없이 맞닿는다"
-        note="감각을 구획선에 싣습니다. 사진과 일러스트 면을 여백 0으로 붙여서 격자 자체가 하나의 덩어리가 되고, 그 사이를 원색 가로 띠가 한 줄 가릅니다. 띠 양끝에 단어 하나씩 — BAGGU의 방식입니다. 룩북(사진)과 샵(상품)이 한 화면에 같이 있습니다."
-      />
-      <section className="mx-auto w-full max-w-(--container-max) px-6">
-        <div className="grid h-[42svh] grid-cols-4 gap-0">
-          <Photo src="keyring-on-paper" alt="종이 위에 놓인 비즈 키링" />
-          <Plane src="pattern-clover" zoom={200} />
-          <Photo src="keyring-on-phone" alt="휴대폰에 걸린 비즈 키링" />
-          <Plane src="pattern-blue-flower" zoom={200} />
-        </div>
-        {/* 구획선 — 띠가 나누고, 양끝에 단어 하나씩 */}
-        <div className="bg-butter flex items-center justify-between px-6 py-3">
-          <span className="text-ink text-body font-medium tracking-[0.2em]">
-            SHOP
-          </span>
-          <span className="text-ink text-body font-medium tracking-[0.2em]">
-            LOOKBOOK
-          </span>
-        </div>
-        <div className="grid h-[42svh] grid-cols-4 gap-0">
-          <Plane src="pattern-flower-cluster" zoom={200} />
-          <Photo src="keyring-on-wood" alt="나무 위에 놓인 비즈 키링" />
-          <Plane src="pattern-berry-branch" zoom={200} />
-          <Photo
-            src="keyring-on-orange-pattern"
-            alt="주황 패턴 바닥 위의 비즈 키링"
-          />
-        </div>
-      </section>
-
-      {/* ───────── G. 바닥이 바뀐다 ───────── */}
-      <DraftLabel
-        id="G"
-        title="바닥이 바뀐다"
-        note="감각을 바닥에 싣습니다. 레이아웃은 거의 없습니다 — 상품이 가로로 나란히 놓이고, 그 아래 깔린 바닥만 장면마다 바뀝니다. 상품을 흰 카드에 담지 않고 색면 위에 직접 올리는 Susan Alexandra의 방식입니다. 샵 목록이 그대로 룩북이 됩니다."
-      />
-      <section className="mx-auto w-full max-w-(--container-max) px-6">
-        <div className="relative h-[52svh]">
-          <Plane src="pattern-red-berry" zoom={200} />
-          <div className="absolute inset-0 flex items-center justify-center gap-6 px-10">
-            <div className="h-[62%] w-[26%]">
-              <Photo src="keyring-on-paper" alt="비즈 키링" />
-            </div>
-            <div className="h-[62%] w-[26%]">
-              <Photo src="keyring-with-jar" alt="비즈 키링" />
-            </div>
-            <div className="h-[62%] w-[26%]">
-              <Photo src="keyring-on-wood" alt="비즈 키링" />
-            </div>
-          </div>
-        </div>
-        <div className="relative mt-3 h-[52svh]">
-          <Plane src="pattern-clover" zoom={200} />
-          <div className="absolute inset-0 flex items-center justify-center gap-6 px-10">
-            <div className="h-[62%] w-[26%]">
-              <Photo src="keyring-on-phone" alt="비즈 키링" />
-            </div>
-            <div className="h-[62%] w-[26%]">
-              <Photo src="keyring-on-orange-pattern" alt="비즈 키링" />
-            </div>
-            <div className="h-[62%] w-[26%]">
-              <Photo src="keyring-on-paper" alt="비즈 키링" />
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }
