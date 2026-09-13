@@ -83,7 +83,10 @@ src/components/Header.tsx      # 전역 header (로고 자리는 비어 있음)
 src/components/ThemeToggle.tsx # 다크모드 수동 토글
 src/components/Button.tsx      # primary·secondary·ghost
 src/lib/cn.ts                  # clsx + tailwind-merge
+public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (pattern 6 · motif 10)
 ```
+
+**`public/illustrations/`는 이나래가 그린 원본이다.** 좌표를 반올림하거나 색을 바꾸는 등 파일 자체를 고치지 말 것. 목록과 쓰는 법은 [foundation.md 5-11절](docs/brand/foundation.md).
 
 레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅(commit-msg·pre-commit·pre-push), commitlint, GitHub template·workflow, `pr.sh`, design token, Pretendard.
 
