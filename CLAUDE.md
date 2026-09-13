@@ -88,6 +88,8 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 
 **`public/illustrations/`는 이나래가 그린 원본이다.** 좌표를 반올림하거나 색을 바꾸는 등 파일 자체를 고치지 말 것. 목록과 쓰는 법은 [foundation.md 5-11절](docs/brand/foundation.md).
 
+**일러스트는 통째로 놓는다 ★** — 각 SVG의 첫 path가 배경 사각형인데 **빼지 않는다.** 배경까지가 한 장의 그림이라 모티프만 떼어 다른 바탕에 올리지 않는다. 크기·위치를 정하고 확대해 잘라내는 것까지가 할 수 있는 일이다.
+
 레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅(commit-msg·pre-commit·pre-push), commitlint, GitHub template·workflow, `pr.sh`, design token, Pretendard.
 
 **배포됨** — https://global-butter-weather.vercel.app · `main`에 머지되면 자동 배포되고 PR마다 프리뷰 URL이 붙는다.
