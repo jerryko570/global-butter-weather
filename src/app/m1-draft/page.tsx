@@ -59,6 +59,34 @@ function Plane({ src, zoom }: { src: string; zoom: number }) {
   )
 }
 
+/**
+ * 모티프 하나를 메뉴 버튼으로 쓴다. 각 SVG가 이미 자기 바탕색을 품고 있어서
+ * (5-11절) 그대로 얹으면 색 칩이 된다. 크기는 전부 같고 **높이만 어긋난다** —
+ * 크기를 제각각 두지 않는다는 5-9절을 지키면서 리듬을 만드는 방법이다.
+ */
+function MotifChip({
+  src,
+  label,
+  drop,
+}: {
+  src: string
+  label: string
+  drop: number
+}) {
+  return (
+    <div className="flex flex-col items-center" style={{ marginTop: drop }}>
+      <div
+        className="h-[114px] w-[96px] bg-cover bg-center"
+        style={{ backgroundImage: `url(/illustrations/${src}.svg)` }}
+        aria-hidden
+      />
+      <span className="text-ink text-caption mt-2 tracking-[0.2em]">
+        {label}
+      </span>
+    </div>
+  )
+}
+
 function DraftLabel({
   id,
   title,
@@ -226,6 +254,113 @@ export default function M1Draft() {
           ⚠️ 이 사진의 원본이 583px이라 화면을 채우면 흐릿합니다. 새로 촬영하면
           해결되는 문제이고, 지금은 배치만 봐주세요.
         </p>
+      </section>
+
+      <div className="mx-auto w-full max-w-(--container-max) px-6 pt-24">
+        <p className="text-ink text-title font-medium tracking-tight">
+          여기부터는 다른 자리에 감각을 싣습니다
+        </p>
+        <p className="text-ink-muted text-body mt-3 max-w-prose">
+          A~D는 전부 「틈」 하나에만 감각을 실었습니다. 그래서 서로 닮아
+          보였습니다. E·F·G는 각각{' '}
+          <strong className="text-ink font-medium">
+            내비게이션 · 구획선 · 바닥
+          </strong>
+          에 감각을 싣습니다.
+        </p>
+      </div>
+
+      {/* ───────── E. 모티프가 메뉴가 된다 ───────── */}
+      <DraftLabel
+        id="E"
+        title="모티프가 메뉴가 된다"
+        note="감각을 내비게이션에 싣습니다. 이나래의 모티프 하나하나가 그대로 메뉴 버튼이 됩니다 — 각 SVG가 이미 자기 바탕색을 품고 있어서 얹기만 하면 색 칩이 됩니다. 크기는 전부 같고 높이만 어긋납니다. 화면의 나머지는 조용하고, 색은 메뉴에만 있습니다."
+      />
+      <section className="mx-auto w-full max-w-(--container-max) px-6">
+        <div className="bg-cloud flex h-[78svh] flex-col">
+          <div className="flex items-start justify-center gap-6 pt-12">
+            <MotifChip src="motif-tulip" label="SHOP" drop={0} />
+            <MotifChip src="motif-cloud-rainbow" label="LOOKBOOK" drop={30} />
+            <MotifChip src="motif-sun" label="ABOUT" drop={8} />
+            <MotifChip src="motif-watering-can" label="CARE" drop={38} />
+            <MotifChip src="motif-blue-flower" label="CONTACT" drop={16} />
+          </div>
+          <div className="flex flex-1 items-center justify-center px-10 pb-10">
+            <div className="h-[80%] w-[46%]">
+              <Photo src="keyring-with-jar" alt="유리병 옆에 놓인 비즈 키링" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ───────── F. 여백 없이 맞닿는다 ───────── */}
+      <DraftLabel
+        id="F"
+        title="여백 없이 맞닿는다"
+        note="감각을 구획선에 싣습니다. 사진과 일러스트 면을 여백 0으로 붙여서 격자 자체가 하나의 덩어리가 되고, 그 사이를 원색 가로 띠가 한 줄 가릅니다. 띠 양끝에 단어 하나씩 — BAGGU의 방식입니다. 룩북(사진)과 샵(상품)이 한 화면에 같이 있습니다."
+      />
+      <section className="mx-auto w-full max-w-(--container-max) px-6">
+        <div className="grid h-[42svh] grid-cols-4 gap-0">
+          <Photo src="keyring-on-paper" alt="종이 위에 놓인 비즈 키링" />
+          <Plane src="pattern-clover" zoom={200} />
+          <Photo src="keyring-on-phone" alt="휴대폰에 걸린 비즈 키링" />
+          <Plane src="pattern-blue-flower" zoom={200} />
+        </div>
+        {/* 구획선 — 띠가 나누고, 양끝에 단어 하나씩 */}
+        <div className="bg-butter flex items-center justify-between px-6 py-3">
+          <span className="text-ink text-body font-medium tracking-[0.2em]">
+            SHOP
+          </span>
+          <span className="text-ink text-body font-medium tracking-[0.2em]">
+            LOOKBOOK
+          </span>
+        </div>
+        <div className="grid h-[42svh] grid-cols-4 gap-0">
+          <Plane src="pattern-flower-cluster" zoom={200} />
+          <Photo src="keyring-on-wood" alt="나무 위에 놓인 비즈 키링" />
+          <Plane src="pattern-berry-branch" zoom={200} />
+          <Photo
+            src="keyring-on-orange-pattern"
+            alt="주황 패턴 바닥 위의 비즈 키링"
+          />
+        </div>
+      </section>
+
+      {/* ───────── G. 바닥이 바뀐다 ───────── */}
+      <DraftLabel
+        id="G"
+        title="바닥이 바뀐다"
+        note="감각을 바닥에 싣습니다. 레이아웃은 거의 없습니다 — 상품이 가로로 나란히 놓이고, 그 아래 깔린 바닥만 장면마다 바뀝니다. 상품을 흰 카드에 담지 않고 색면 위에 직접 올리는 Susan Alexandra의 방식입니다. 샵 목록이 그대로 룩북이 됩니다."
+      />
+      <section className="mx-auto w-full max-w-(--container-max) px-6">
+        <div className="relative h-[52svh]">
+          <Plane src="pattern-red-berry" zoom={200} />
+          <div className="absolute inset-0 flex items-center justify-center gap-6 px-10">
+            <div className="h-[62%] w-[26%]">
+              <Photo src="keyring-on-paper" alt="비즈 키링" />
+            </div>
+            <div className="h-[62%] w-[26%]">
+              <Photo src="keyring-with-jar" alt="비즈 키링" />
+            </div>
+            <div className="h-[62%] w-[26%]">
+              <Photo src="keyring-on-wood" alt="비즈 키링" />
+            </div>
+          </div>
+        </div>
+        <div className="relative mt-3 h-[52svh]">
+          <Plane src="pattern-clover" zoom={200} />
+          <div className="absolute inset-0 flex items-center justify-center gap-6 px-10">
+            <div className="h-[62%] w-[26%]">
+              <Photo src="keyring-on-phone" alt="비즈 키링" />
+            </div>
+            <div className="h-[62%] w-[26%]">
+              <Photo src="keyring-on-orange-pattern" alt="비즈 키링" />
+            </div>
+            <div className="h-[62%] w-[26%]">
+              <Photo src="keyring-on-paper" alt="비즈 키링" />
+            </div>
+          </div>
+        </div>
       </section>
     </div>
   )
