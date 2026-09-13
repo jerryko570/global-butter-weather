@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -24,13 +25,21 @@ export const metadata: Metadata = {
  * 어느 그림이 첫 화면에 오는지는 이나래가 정한다 (5-9절).
  */
 
-/** 아직 찍지 않은 상품 사진 자리. 5-11절 — 비율을 굳히지 않는다. */
-function PhotoSlot({ label }: { label: string }) {
+/**
+ * 상품 사진. 2025년에 찍은 것이고 **앞으로 바뀐다** (5-11절 — 새로 촬영할 예정).
+ * 지금 넣은 이유는 점선 자리로는 「쨍한 면 / 차분한 상품」의 대비가 보이지
+ * 않기 때문이다. 비율을 굳히지 않으려고 `object-cover`로만 받는다.
+ */
+function Photo({ src, alt }: { src: string; alt: string }) {
   return (
-    <div className="flex h-full w-full items-center justify-center border border-dashed border-gray-400 bg-white">
-      <span className="text-ink-muted text-caption px-3 text-center">
-        {label}
-      </span>
+    <div className="relative h-full w-full bg-white">
+      <Image
+        src={`/photos/${src}.jpg`}
+        alt={alt}
+        fill
+        sizes="(max-width: 768px) 100vw, 40vw"
+        className="object-cover"
+      />
     </div>
   )
 }
@@ -77,8 +86,9 @@ export default function M1Draft() {
           첫 화면 배치 시안
         </h1>
         <p className="text-ink-muted text-body mt-3 max-w-prose">
-          반으로 가르지 않습니다. 점선은 아직 찍지 않은 상품 사진 자리이고, 컬러
-          면에 쓴 일러스트는 자리를 보이기 위한 것이지 고른 것이 아닙니다.
+          반으로 가르지 않습니다. 상품 사진은 2025년에 찍은 것이라 앞으로
+          바뀌고, 컬러 면에 쓴 일러스트도 자리를 보이기 위한 것이지 고른 것이
+          아닙니다.
         </p>
       </div>
 
@@ -108,7 +118,7 @@ export default function M1Draft() {
           </div>
 
           <div className="bg-cloud w-[28%] shrink-0 p-6">
-            <PhotoSlot label="상품 사진 하나" />
+            <Photo src="keyring-on-paper" alt="종이 위에 놓인 비즈 키링" />
           </div>
         </div>
       </section>
@@ -130,7 +140,7 @@ export default function M1Draft() {
 
           {/* 경계를 물고 걸친 사진 한 장 */}
           <div className="absolute top-[18%] left-[42%] h-[56%] w-[38%]">
-            <PhotoSlot label="상품 사진 하나 — 경계를 물고 걸친다" />
+            <Photo src="keyring-on-phone" alt="휴대폰 뒷면에 걸린 비즈 키링" />
           </div>
 
           <div className="absolute bottom-8 left-8">
@@ -162,7 +172,10 @@ export default function M1Draft() {
         {/* 2장면 — 여백과 상품 하나 */}
         <div className="bg-cloud flex h-[62svh] items-center justify-center">
           <div className="h-[62%] w-[38%]">
-            <PhotoSlot label="상품 사진 하나 — 여백 가운데" />
+            <Photo
+              src="keyring-on-wood"
+              alt="나무 위 주황 원 카드에 놓인 비즈 키링"
+            />
           </div>
         </div>
 
