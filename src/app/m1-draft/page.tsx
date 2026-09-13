@@ -88,7 +88,11 @@ export default function M1Draft() {
         <p className="text-ink-muted text-body mt-3 max-w-prose">
           반으로 가르지 않습니다. 상품 사진은 2025년에 찍은 것이라 앞으로
           바뀌고, 컬러 면에 쓴 일러스트도 자리를 보이기 위한 것이지 고른 것이
-          아닙니다.
+          아닙니다.{' '}
+          <strong className="text-ink font-medium">
+            D는 앞의 셋과 종류가 다릅니다
+          </strong>{' '}
+          — 일러스트 면을 쓰지 않습니다.
         </p>
       </div>
 
@@ -190,6 +194,38 @@ export default function M1Draft() {
             <Plane src="pattern-blue-flower" zoom={250} />
           </div>
         </div>
+      </section>
+
+      {/* ───────── D. 사진이 면을 품는다 ───────── */}
+      <DraftLabel
+        id="D"
+        title="사진이 면을 품는다"
+        note="앞의 셋과 종류가 다릅니다. 일러스트 면을 따로 두지 않고, 이미 쨍한 바닥 위에서 찍힌 사진 한 장을 그대로 씁니다. 5-13절의 두 층(쨍한 아이덴티티 · 차분한 상품)이 화면 배치가 아니라 사진 한 장 안에서 성립합니다. 흰 띠는 사진을 가로지르며 틈을 만들고, 글자는 거기에만 있습니다."
+      />
+      <section className="mx-auto w-full max-w-(--container-max) px-6">
+        <div className="relative h-[78svh]">
+          <Photo
+            src="keyring-on-orange-pattern"
+            alt="주황 레트로 패턴 바닥 위에 놓인 비즈 키링"
+          />
+
+          {/* 틈 — 사진을 가로질러 낸다. UI는 여기에만 산다 */}
+          <div className="absolute inset-y-0 right-[22%] flex w-16 flex-col items-center justify-between bg-white py-8">
+            <span className="text-ink text-caption tracking-[0.3em] [writing-mode:vertical-rl]">
+              SHOP
+            </span>
+            <span className="text-ink text-caption font-medium tracking-[0.3em] [writing-mode:vertical-rl]">
+              버터웨더
+            </span>
+            <span className="text-ink text-caption tracking-[0.3em] [writing-mode:vertical-rl]">
+              LOOKBOOK
+            </span>
+          </div>
+        </div>
+        <p className="text-ink-muted text-caption mt-3">
+          ⚠️ 이 사진의 원본이 583px이라 화면을 채우면 흐릿합니다. 새로 촬영하면
+          해결되는 문제이고, 지금은 배치만 봐주세요.
+        </p>
       </section>
     </div>
   )
