@@ -87,6 +87,58 @@ function MotifChip({
   )
 }
 
+/**
+ * 상품 칸. 사진 · 카테고리 · 이름 · 가격 — 한국 쇼핑몰에서 익숙한 순서다.
+ * **이름과 가격은 임시값이다.** 자리를 보이기 위한 것이지 정해진 것이 아니다.
+ */
+function ProductCell({
+  src,
+  category,
+  name,
+  price,
+}: {
+  src: string
+  category: string
+  name: string
+  price: string
+}) {
+  return (
+    <div>
+      <div className="aspect-square">
+        <Photo src={src} alt={name} />
+      </div>
+      <p className="text-ink-subtle text-caption mt-3 tracking-[0.15em]">
+        {category}
+      </p>
+      <p className="text-ink text-body mt-1">{name}</p>
+      <p className="text-ink text-body mt-1 font-medium">{price}</p>
+    </div>
+  )
+}
+
+/** 그리드 안에 끼어드는 일러스트 면. 룩북이 샵 목록 안으로 들어온다. */
+function PatternCell({ src }: { src: string }) {
+  return (
+    <div className="aspect-square">
+      <Plane src={src} zoom={180} />
+    </div>
+  )
+}
+
+/** 사이드바의 카테고리 한 줄. 모티프가 글머리 자리에 온다. */
+function CategoryRow({ motif, label }: { motif: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 py-2">
+      <div
+        className="h-9 w-8 shrink-0 bg-cover bg-center"
+        style={{ backgroundImage: `url(/illustrations/${motif}.svg)` }}
+        aria-hidden
+      />
+      <span className="text-ink text-body">{label}</span>
+    </div>
+  )
+}
+
 function DraftLabel({
   id,
   title,
@@ -123,6 +175,99 @@ export default function M1Draft() {
           — 일러스트 면을 쓰지 않습니다.
         </p>
       </div>
+
+      {/* ───────── H. 익숙한 그리드 ───────── */}
+      <DraftLabel
+        id="H"
+        title="익숙한 그리드 — 상품이 먼저 보인다"
+        note="앞의 일곱은 상품을 안 보여주고 한 번 더 들어가야 했습니다. 이건 반대입니다. 옛 버터웨더 사이트의 뼈대(왼쪽 고정 카테고리 + 상품 그리드 + 가격)를 그대로 두되, 감각을 다른 세 자리에 싣습니다 — ① 카테고리 앞의 모티프 ② 위쪽 원색 띠 ③ 그리드 안에 끼어드는 일러스트 면. 5-14절 「레이아웃이 평범해도 된다」를 실제로 해본 것입니다."
+      />
+      <section className="mx-auto w-full max-w-(--container-max) px-6">
+        <div className="border border-gray-200">
+          {/* ① 구획선 — 한국 쇼핑몰에서 익숙한 안내 띠를 원색으로 */}
+          <div className="bg-butter text-ink text-caption flex items-center justify-between px-5 py-2">
+            <span>5만원 이상 무료배송</span>
+            <span>매주 새로운 입고</span>
+            <span>전 세계 배송</span>
+            <span className="tracking-[0.2em]">DESIGNED IN SEOUL</span>
+          </div>
+
+          <div className="flex">
+            {/* 왼쪽 고정 — 옛 구조 그대로. ② 감각은 카테고리 앞 모티프에 */}
+            <aside className="bg-cloud w-[210px] shrink-0 border-r border-gray-200 p-5">
+              <p className="text-ink text-body font-medium tracking-[0.12em]">
+                BUTTER WEATHER
+              </p>
+              <p className="text-ink-subtle text-caption mt-6 tracking-[0.15em]">
+                SHOP
+              </p>
+              <div className="mt-1">
+                <CategoryRow motif="motif-sun" label="전체" />
+                <CategoryRow motif="motif-tulip" label="키링" />
+                <CategoryRow motif="motif-blue-flower" label="비즈" />
+                <CategoryRow motif="motif-watering-can" label="기타" />
+              </div>
+              <p className="text-ink-muted text-caption mt-8">
+                KR · <span className="text-ink-subtle">EN</span>
+              </p>
+              <p className="text-ink-muted text-caption mt-8 leading-relaxed">
+                나의 하루에 부드럽게
+                <br />
+                스며드는 작은 온기
+              </p>
+            </aside>
+
+            {/* 오른쪽 — 스크롤 없이 상품이 바로 보인다 */}
+            <div className="flex-1 p-6">
+              <div className="grid grid-cols-4 gap-x-4 gap-y-8">
+                {/* ③ 룩북이 샵 안으로 들어온다 — 뎁스 없이 */}
+                <PatternCell src="pattern-clover" />
+                <ProductCell
+                  src="keyring-on-paper"
+                  category="KEYRING"
+                  name="꽃 비즈 키링"
+                  price="₩21,000"
+                />
+                <ProductCell
+                  src="keyring-with-jar"
+                  category="KEYRING"
+                  name="라인 비즈 키링"
+                  price="₩19,000"
+                />
+                <ProductCell
+                  src="keyring-on-phone"
+                  category="KEYRING"
+                  name="폰 스트랩"
+                  price="₩23,000"
+                />
+                <ProductCell
+                  src="keyring-on-wood"
+                  category="BEAD"
+                  name="미니 참"
+                  price="₩12,000"
+                />
+                <ProductCell
+                  src="keyring-on-orange-pattern"
+                  category="KEYRING"
+                  name="더블 플라워 키링"
+                  price="₩24,000"
+                />
+                <PatternCell src="pattern-red-berry" />
+                <ProductCell
+                  src="keyring-on-paper"
+                  category="BEAD"
+                  name="시드 비즈 세트"
+                  price="₩15,000"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <p className="text-ink-muted text-caption mt-3">
+          ⚠️ 이름과 가격은 자리를 보이기 위한 임시값입니다. 정해진 것이
+          아닙니다.
+        </p>
+      </section>
 
       {/* ───────── A. 틈 ───────── */}
       <DraftLabel
