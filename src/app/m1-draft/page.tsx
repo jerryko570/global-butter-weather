@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import type { Metadata } from 'next'
-import Button from '@/components/Button'
 import ThemeToggle from '@/components/ThemeToggle'
 
 export const metadata: Metadata = {
@@ -8,58 +7,92 @@ export const metadata: Metadata = {
 }
 
 /**
- * M1 첫 화면 목업. **구조는 정해졌다** — 시안 H다.
- * 확정되면 이 내용이 `/`로 가고 이 route는 지운다.
+ * M1 첫 화면 목업. **옛 버터웨더 사이트의 디자인을 그대로 계승한다.**
+ * 원본은 `jerryko570/butter-weather-shop`의 `(shop)/layout.tsx`·`(shop)/page.tsx`·
+ * `components/layout/{Sidebar,Footer}.tsx`다.
  *
- * 앞선 시안 A~G는 폐기됐다. 이유는 foundation.md 5-15절에 있다 —
- * 전부 상품을 보여주지 않았고, 뎁스를 만들었다.
+ * ⚠️ CLAUDE.md 1절에 「코드는 butter-weather-shop에서 가져오지 않았다」고
+ * 적혀 있는데, **2026-09-15에 이 방침이 바뀌었다.** 디자인은 계승한다.
  *
- * **레이아웃은 평범하다. 그래도 된다** (5-14절). 옛 버터웨더 사이트의
- * 뼈대를 그대로 쓴다 — 왼쪽 고정 카테고리, 키비주얼, 상품 그리드,
- * 사진 아래 카테고리·이름·가격. 한국에서 쇼핑하던 사람에게 익숙한 순서다.
+ * 계승한 조형 — 이것들이 이 디자인의 성격이다. 지우지 말 것.
+ * - **얇은 격자선이 화면을 나눈다.** 구획마다, 상품 칸마다 `gray-200` 실선이
+ *   있다. 인쇄된 카탈로그처럼 읽힌다. 선을 걷어내면 이 디자인이 아니다
+ * - **제목은 serif.** 본문·라벨은 sans. 브랜드의 목소리만 serif다
+ * - **라벨은 10~11px 대문자에 자간을 넓게.** 아주 작고 조용하다
+ * - **상품 사진은 3:4 세로.** 정사각이 아니다
+ * - **버튼은 모서리가 없는 사각형.** 검정 면 / 테두리만
+ * - 태그라인은 **serif italic**
  *
- * 감각은 레이아웃이 아니라 아래 세 자리에 싣는다.
- * 1. **카테고리 앞의 모티프** — 이나래가 그린 것이 그대로 글머리가 된다
- * 2. **키비주얼이 일러스트 면** — 아이덴티티 층은 쨍해도 된다 (5-13절)
- * 3. **그리드에 드물게 끼는 일러스트 면** — 룩북이 샵 안에 있으므로
- *    뎁스가 생기지 않는다. 8칸에 1개로 둔다
+ * 우리가 더한 것 — 둘 다 이나래 확인을 받았다.
+ * - 카테고리 앞의 모티프 (「과하지 않다」)
+ * - 상품 격자에 드물게 끼는 일러스트 면 (8칸에 1개)
  *
- * 상단 알림 띠(무료배송 기준·입고 주기)는 두지 않는다.
+ * 뺀 것 — 상단 티커 띠(무료배송 기준·입고 주기). 이나래가 빼라고 했다.
+ *
+ * ⚠️ 글자 크기가 우리 token scale(24/18/14/12px)을 벗어난다. 이 디자인은
+ * 10·11·13·15·20·22·38px을 쓴다. 지금은 원본에 맞춰 직접 적었다 —
+ * scale을 이 디자인에서 다시 뽑는 것은 Design/System 작업으로 따로 한다.
  *
  * ⚠️ 상품 이름·가격·지표는 전부 **임시값**이다. M2에서 실제 데이터로 바꾼다.
  */
 
-/** 상품 칸. 사진 → 카테고리 → 이름 → 가격 순서를 지킨다. */
-function ProductCell({
-  src,
-  name,
-  price,
-}: {
-  src: string
-  name: string
-  price: string
-}) {
-  return (
-    <a href="#" className="group block">
-      <div className="relative aspect-square bg-white">
-        <Image
-          src={`/photos/${src}.jpg`}
-          alt={name}
-          fill
-          sizes="(max-width: 768px) 50vw, 22vw"
-          className="object-cover"
-        />
-      </div>
-      {/* 칸이 서로 맞닿으므로 글자에만 안쪽 여백을 준다 */}
-      <div className="px-3 pt-3 pb-8">
-        <p className="text-ink text-body group-hover:underline">{name}</p>
-        <p className="text-ink-muted text-body mt-0.5">{price}</p>
-      </div>
-    </a>
-  )
-}
+const CATEGORIES = [
+  { motif: 'motif-sun', label: '전체', active: true },
+  { motif: 'motif-tulip', label: '키링' },
+  { motif: 'motif-blue-flower', label: '비즈' },
+  { motif: 'motif-watering-can', label: '기타' },
+]
 
-/** 일러스트 면. 통째로 놓고 확대해 잘라낸다 (5-11절). */
+const PRODUCTS = [
+  {
+    src: 'keyring-on-paper',
+    cat: 'KEYRING',
+    name: '꽃 비즈 키링',
+    price: '₩21,000',
+  },
+  {
+    src: 'keyring-with-jar',
+    cat: 'KEYRING',
+    name: '라인 비즈 키링',
+    price: '₩19,000',
+  },
+  {
+    src: 'keyring-on-phone',
+    cat: 'KEYRING',
+    name: '폰 스트랩',
+    price: '₩23,000',
+  },
+  {
+    src: 'keyring-on-orange-pattern',
+    cat: 'KEYRING',
+    name: '더블 플라워 키링',
+    price: '₩24,000',
+  },
+  { src: 'keyring-on-wood', cat: 'BEAD', name: '미니 참', price: '₩12,000' },
+  {
+    src: 'keyring-on-paper',
+    cat: 'BEAD',
+    name: '시드 비즈 세트',
+    price: '₩15,000',
+  },
+  {
+    src: 'keyring-with-jar',
+    cat: 'KEYRING',
+    name: '투톤 비즈 키링',
+    price: '₩20,000',
+  },
+]
+
+const FOOTER_COLS = [
+  { title: 'SHOP', links: ['신상품', '키링', '비즈', '전체 상품'] },
+  { title: 'ORDER', links: ['배송 안내', '교환·반품', '자주 묻는 질문'] },
+  {
+    title: 'BRAND',
+    links: ['소개', 'Instagram', '네이버 스마트스토어', 'Contact'],
+  },
+]
+
+/** 일러스트 면. 통째로 놓고 확대해 잘라낸다 (foundation.md 5-11절). */
 function Plane({ src, zoom }: { src: string; zoom: number }) {
   return (
     <div
@@ -74,264 +107,301 @@ function Plane({ src, zoom }: { src: string; zoom: number }) {
   )
 }
 
-/** 사이드바 카테고리 한 줄. 모티프가 글머리 자리에 온다. */
-function CategoryRow({
-  motif,
-  label,
-  active,
+/** 10~11px 대문자 라벨. 이 디자인에서 가장 자주 쓰이는 조각이다. */
+function Label({
+  children,
+  className = '',
 }: {
-  motif: string
-  label: string
-  active?: boolean
+  children: React.ReactNode
+  className?: string
 }) {
   return (
-    <a href="#" className="group flex items-center gap-3 py-1.5">
-      <span
-        className="h-9 w-8 shrink-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(/illustrations/${motif}.svg)` }}
-        aria-hidden
-      />
-      <span
-        className={
-          active
-            ? 'text-ink text-body font-medium'
-            : 'text-ink-muted group-hover:text-ink text-body'
-        }
-      >
-        {label}
-      </span>
-    </a>
-  )
-}
-
-function QuietLink({ children }: { children: React.ReactNode }) {
-  return (
-    <a
-      href="#"
-      className="text-ink-muted hover:text-ink text-caption block py-1"
+    <p
+      className={`text-ink-subtle text-[10px] tracking-[0.14em] uppercase ${className}`}
     >
       {children}
-    </a>
+    </p>
   )
 }
 
 export default function M1Draft() {
   return (
-    <div className="bg-cloud min-h-dvh">
-      <div className="mx-auto flex w-full max-w-[1440px]">
-        {/* ───── 왼쪽 고정 ───── */}
-        <aside className="sticky top-0 hidden h-dvh w-[220px] shrink-0 flex-col px-5 py-8 md:flex">
+    <div className="lg:flex lg:min-h-dvh">
+      {/* ═══ 왼쪽 사이드바 — 구획마다 실선으로 나뉜다 ═══ */}
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-gray-200 lg:flex">
+        <div className="border-b border-gray-200 px-6 py-5">
           <a
             href="#"
-            className="text-ink text-body font-medium tracking-[0.12em]"
+            className="text-ink font-serif text-[15px] tracking-[0.12em] uppercase"
           >
-            BUTTER WEATHER
+            Butter Weather
           </a>
+        </div>
 
-          <p className="text-ink-subtle text-caption mt-8 tracking-[0.15em]">
-            SHOP
-          </p>
-          <nav className="mt-1">
-            <CategoryRow motif="motif-sun" label="전체" active />
-            <CategoryRow motif="motif-tulip" label="키링" />
-            <CategoryRow motif="motif-blue-flower" label="비즈" />
-            <CategoryRow motif="motif-watering-can" label="기타" />
+        <div className="border-b border-gray-200 px-6 py-6">
+          <Label className="mb-3">Shop</Label>
+          <nav className="flex flex-col gap-1">
+            {CATEGORIES.map((c) => (
+              <a
+                key={c.label}
+                href="#"
+                className="group flex items-center gap-3"
+              >
+                <span
+                  className="h-9 w-8 shrink-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(/illustrations/${c.motif}.svg)`,
+                  }}
+                  aria-hidden
+                />
+                <span
+                  className={
+                    c.active
+                      ? 'text-ink text-[14px]'
+                      : 'text-ink-muted group-hover:text-ink text-[14px]'
+                  }
+                >
+                  {c.label}
+                </span>
+              </a>
+            ))}
           </nav>
 
-          <div className="mt-8">
-            <QuietLink>소개</QuietLink>
-            <QuietLink>문의</QuietLink>
+          <div className="mt-6 flex items-center gap-2">
+            <Label>Language</Label>
+            <span className="text-ink text-[11px]">KR</span>
+            <span className="text-ink-subtle text-[11px]">·</span>
+            <span className="text-ink-subtle hover:text-ink text-[11px]">
+              EN
+            </span>
           </div>
+        </div>
 
-          <p className="text-ink-muted text-caption mt-8">
-            <span className="text-ink-subtle tracking-[0.15em]">LANGUAGE</span>
+        {/* 태그라인 — serif italic. 이 디자인의 목소리다 */}
+        <div className="border-b border-gray-200 px-6 py-6">
+          <p className="text-ink-muted font-serif text-[14px] leading-relaxed italic">
+            작은 오브제,
             <br />
-            <span className="text-ink mt-1 inline-block font-medium">KR</span>
-            <span className="text-ink-subtle"> · EN</span>
+            정직한 디자인.
           </p>
+        </div>
 
-          {/* 아래로 밀어붙인다 */}
-          <div className="mt-auto">
-            <QuietLink>Instagram</QuietLink>
-            <QuietLink>Contact</QuietLink>
-            <div className="mt-4">
-              <ThemeToggle />
-            </div>
-          </div>
-        </aside>
+        <div className="px-6 py-6">
+          <a href="#" className="text-ink-muted hover:text-ink text-[14px]">
+            소개
+          </a>
+        </div>
 
-        {/* ───── 오른쪽 ───── */}
-        <main className="min-w-0 flex-1">
-          {/* 상단 — 알림 워딩은 두지 않는다. 계정 동작만 오른쪽에 */}
-          <div className="flex items-center justify-end gap-5 px-6 py-4">
-            <a href="#" className="text-ink-muted hover:text-ink text-caption">
-              로그인
+        <div className="mt-auto border-t border-gray-200 px-6 py-5">
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            <a href="#" className="text-ink-subtle hover:text-ink text-[11px]">
+              Instagram
             </a>
-            <a href="#" className="text-ink-muted hover:text-ink text-caption">
-              회원가입
-            </a>
-            <a href="#" className="text-ink text-caption font-medium">
-              장바구니 (0)
+            <a href="#" className="text-ink-subtle hover:text-ink text-[11px]">
+              Contact
             </a>
           </div>
+          <div className="mt-4">
+            <ThemeToggle />
+          </div>
+        </div>
+      </aside>
 
-          {/* ───── 키비주얼 · 아이덴티티 ───── */}
-          <section className="flex flex-col lg:flex-row">
-            <div className="h-[42svh] lg:h-[56svh] lg:w-[52%]">
+      {/* ═══ 오른쪽 ═══ */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* 계정·장바구니. 티커 띠는 두지 않는다 */}
+        <div className="flex items-center justify-end gap-5 border-b border-gray-200 px-6 py-3">
+          <a href="#" className="text-ink-muted hover:text-ink text-[12px]">
+            로그인
+          </a>
+          <a href="#" className="text-ink-muted hover:text-ink text-[12px]">
+            회원가입
+          </a>
+          <a
+            href="#"
+            className="text-ink-muted hover:text-ink text-[12px] tracking-wide uppercase"
+          >
+            Cart (0)
+          </a>
+        </div>
+
+        <main className="flex-1">
+          {/* ───── 히어로 ───── */}
+          <section className="grid grid-cols-1 border-b border-gray-200 lg:grid-cols-2">
+            <div className="relative min-h-[400px] border-b border-gray-200 lg:min-h-[520px] lg:border-r lg:border-b-0">
               <Plane src="pattern-red-berry" zoom={220} />
+              <span className="text-ink-muted absolute top-6 left-6 z-10 bg-white px-2 py-1 text-[10px] tracking-[0.14em] uppercase">
+                SS 2026
+              </span>
             </div>
-            <div className="flex flex-1 flex-col justify-center px-8 py-12 lg:px-12">
-              <p className="text-ink-subtle text-caption tracking-[0.15em]">
-                신규 컬렉션 — 2026 봄/여름
-              </p>
-              <h1 className="text-ink text-display mt-4 font-medium tracking-tight">
-                나의 하루에 부드럽게
-                <br />
-                스며드는 작은 온기
-              </h1>
-              <p className="text-ink-muted text-body mt-4 max-w-prose">
-                키링 하나, 비즈 하나가 담아내는 감정.
-                <br />
-                작은 오브제로 하루를 디자인합니다.
-              </p>
-              <div className="mt-8 flex gap-3">
-                <Button>쇼핑하기</Button>
-                <Button variant="secondary">신상품</Button>
+
+            <div className="flex flex-col justify-between p-12 lg:p-14">
+              <div>
+                <Label className="mb-5">신규 컬렉션 — 2026 봄/여름</Label>
+                <h1 className="text-ink mb-5 font-serif text-[38px] leading-[1.15]">
+                  나의 하루에 부드럽게
+                  <br />
+                  스며드는 작은 온기
+                </h1>
+                <p className="text-ink-muted max-w-xs text-[13px] leading-relaxed font-light">
+                  키링 하나, 비즈 하나가 담아내는 감정.
+                  <br />
+                  작은 오브제로 하루를 디자인합니다.
+                </p>
+                <div className="mt-10 flex gap-3">
+                  <a
+                    href="#"
+                    className="bg-ink text-cloud px-7 py-3 text-[11px] tracking-widest uppercase"
+                  >
+                    쇼핑하기
+                  </a>
+                  <a
+                    href="#"
+                    className="text-ink hover:border-ink border border-gray-300 px-7 py-3 text-[11px] tracking-widest uppercase"
+                  >
+                    신상품
+                  </a>
+                </div>
               </div>
 
-              <dl className="mt-12 flex gap-10">
-                <div>
-                  <dt className="text-ink text-title font-medium">16</dt>
-                  <dd className="text-ink-muted text-caption mt-1">상품</dd>
-                </div>
-                <div>
-                  <dt className="text-ink text-title font-medium">KR · EN</dt>
-                  <dd className="text-ink-muted text-caption mt-1">언어</dd>
-                </div>
-                <div>
-                  <dt className="text-ink text-title font-medium">WW</dt>
-                  <dd className="text-ink-muted text-caption mt-1">배송</dd>
-                </div>
+              <dl className="mt-10 flex gap-8 border-t border-gray-200 pt-8">
+                {[
+                  ['16', '상품'],
+                  ['KR · EN', '언어'],
+                  ['WW', '배송'],
+                ].map(([val, label]) => (
+                  <div key={label}>
+                    <dt className="text-ink font-serif text-[22px]">{val}</dt>
+                    <dd className="text-ink-subtle mt-1 text-[11px]">
+                      {label}
+                    </dd>
+                  </div>
+                ))}
               </dl>
             </div>
           </section>
 
           {/* ───── 신상품 ───── */}
-          <section className="pt-20 pb-10">
-            <div className="flex items-baseline justify-between px-6">
-              <h2 className="text-ink text-display font-medium tracking-tight">
-                신상품
-              </h2>
-              <a
-                href="#"
-                className="text-ink-muted hover:text-ink text-caption"
-              >
-                전체 보기
-              </a>
-            </div>
+          <div className="flex items-center justify-between border-b border-gray-200 px-7 py-5">
+            <h2 className="text-ink font-serif text-[20px]">신상품</h2>
+            <a
+              href="#"
+              className="text-ink-subtle hover:border-ink hover:text-ink border-b border-gray-300 pb-0.5 text-[11px] tracking-widest uppercase"
+            >
+              전체 보기
+            </a>
+          </div>
 
-            {/* 여백 0 — 칸이 서로 맞닿는다. 격자 자체가 한 덩어리가 되고
-                시선이 선이 아니라 사진과 그래픽으로 간다 */}
-            <div className="mt-8 grid grid-cols-2 gap-0 md:grid-cols-4">
-              <ProductCell
-                src="keyring-on-paper"
-                name="꽃 비즈 키링"
-                price="₩21,000"
-              />
-              <ProductCell
-                src="keyring-with-jar"
-                name="라인 비즈 키링"
-                price="₩19,000"
-              />
-              <ProductCell
-                src="keyring-on-phone"
-                name="폰 스트랩"
-                price="₩23,000"
-              />
-              <ProductCell
-                src="keyring-on-orange-pattern"
-                name="더블 플라워 키링"
-                price="₩24,000"
-              />
-              <ProductCell
-                src="keyring-on-wood"
-                name="미니 참"
-                price="₩12,000"
-              />
-              <ProductCell
-                src="keyring-on-paper"
-                name="시드 비즈 세트"
-                price="₩15,000"
-              />
-              <ProductCell
-                src="keyring-with-jar"
-                name="투톤 비즈 키링"
-                price="₩20,000"
-              />
-              {/* 룩북이 샵 안으로 — 8칸에 1개로 드물게 */}
-              <div className="aspect-square">
+          <div className="grid grid-cols-2 border-b border-gray-200 lg:grid-cols-4">
+            {PRODUCTS.map((p, i) => (
+              <a
+                key={`${p.src}-${i}`}
+                href="#"
+                className="group border-r border-b border-gray-200 [&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(4n)]:border-r-0"
+              >
+                <div className="relative aspect-3/4 overflow-hidden bg-gray-100">
+                  <Image
+                    src={`/photos/${p.src}.jpg`}
+                    alt={p.name}
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 25vw"
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                <div className="border-t border-gray-200 p-4">
+                  <Label className="mb-1">{p.cat}</Label>
+                  <p className="text-ink mb-2 text-[13px] group-hover:underline">
+                    {p.name}
+                  </p>
+                  <p className="text-ink text-[13px] font-medium">{p.price}</p>
+                </div>
+              </a>
+            ))}
+
+            {/* 룩북이 샵 안으로 — 8칸에 1개. 상품과 같은 칸 크기를 쓴다 */}
+            <div className="border-b border-gray-200 lg:[&:nth-child(4n)]:border-r-0">
+              <div className="aspect-3/4">
                 <Plane src="pattern-clover" zoom={190} />
               </div>
-            </div>
-          </section>
-
-          {/* ───── footer ───── */}
-          <footer className="px-6 pt-20 pb-12">
-            <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
-              <div>
-                <p className="text-ink text-body font-medium tracking-[0.12em]">
-                  BUTTER WEATHER
-                </p>
-                <p className="text-ink-muted text-caption mt-3 leading-relaxed">
-                  작은 오브제, 정직한 디자인.
-                  <br />
-                  Designed in Seoul
+              <div className="border-t border-gray-200 p-4">
+                <Label className="mb-1">Lookbook</Label>
+                <p className="text-ink-muted text-[13px]">
+                  2026 봄/여름 그래픽
                 </p>
               </div>
-
-              <div className="flex gap-12">
-                <div>
-                  <p className="text-ink-subtle text-caption tracking-[0.15em]">
-                    SHOP
-                  </p>
-                  <div className="mt-2">
-                    <QuietLink>전체</QuietLink>
-                    <QuietLink>키링</QuietLink>
-                    <QuietLink>비즈</QuietLink>
-                    <QuietLink>기타</QuietLink>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-ink-subtle text-caption tracking-[0.15em]">
-                    ABOUT
-                  </p>
-                  <div className="mt-2">
-                    <QuietLink>소개</QuietLink>
-                    <QuietLink>배송·교환·반품</QuietLink>
-                    <QuietLink>문의</QuietLink>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-ink-subtle text-caption tracking-[0.15em]">
-                    FOLLOW
-                  </p>
-                  <div className="mt-2">
-                    <QuietLink>Instagram</QuietLink>
-                    <QuietLink>네이버 스마트스토어</QuietLink>
-                    <QuietLink>Contact</QuietLink>
-                  </div>
-                </div>
-              </div>
             </div>
+          </div>
 
-            {/* 한국 쇼핑몰에 반드시 있는 자리. 내용은 아직 없다 */}
-            <p className="text-ink-subtle text-caption mt-12 leading-relaxed">
-              상호 · 대표 · 사업자등록번호 · 통신판매업신고번호 · 주소 ·
-              개인정보관리책임자 — 아직 채우지 않았습니다
-              <br />© 2026 BUTTER WEATHER
-            </p>
-          </footer>
+          {/* ───── 브랜드 스토리 ───── */}
+          <div className="grid grid-cols-1 border-b border-gray-200 lg:grid-cols-2">
+            <div className="relative min-h-[260px] border-b border-gray-200 lg:border-r lg:border-b-0">
+              <Image
+                src="/photos/keyring-on-orange-pattern.jpg"
+                alt="주황 패턴 바닥 위의 비즈 키링"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="flex flex-col justify-center p-12">
+              <Label className="mb-4">Our Story</Label>
+              <h3 className="text-ink mb-4 font-serif text-[22px] leading-snug">
+                작은 오브제,
+                <br />
+                정직한 디자인.
+              </h3>
+              <p className="text-ink-muted mb-6 text-[12px] leading-relaxed font-light">
+                하나하나 손으로 만듭니다.
+                <br />
+                매주 새로운 것이 들어옵니다.
+              </p>
+              <a
+                href="#"
+                className="text-ink border-ink hover:text-ink-muted inline-block w-fit border-b pb-0.5 text-[11px] tracking-widest uppercase"
+              >
+                더 보기
+              </a>
+            </div>
+          </div>
         </main>
+
+        {/* ───── footer ───── */}
+        <footer>
+          <div className="grid grid-cols-1 border-t border-gray-200 sm:grid-cols-3">
+            {FOOTER_COLS.map((col) => (
+              <div
+                key={col.title}
+                className="border-b border-gray-200 p-7 sm:border-r sm:border-b-0 sm:last:border-r-0"
+              >
+                <Label className="mb-4">{col.title}</Label>
+                <ul className="flex flex-col gap-2">
+                  {col.links.map((l) => (
+                    <li key={l}>
+                      <a
+                        href="#"
+                        className="text-ink-muted hover:text-ink text-[13px]"
+                      >
+                        {l}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between border-t border-gray-200 px-7 py-4">
+            <p className="text-ink-subtle text-[11px]">
+              © 2026 Butter Weather — 사업자 정보는 아직 채우지 않았습니다
+            </p>
+            <div className="flex items-center gap-4">
+              <span className="text-ink text-[11px]">KR</span>
+              <span className="text-ink-subtle hover:text-ink text-[11px]">
+                EN
+              </span>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   )
