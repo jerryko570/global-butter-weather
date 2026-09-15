@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Header from '@/components/Header'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -36,11 +35,13 @@ export default function RootLayout({
         <link rel="stylesheet" href="/fonts/pretendard/pretendard.css" />
       </head>
       {/* 배경·본문색·font는 globals.css에서 token으로 잡는다.
-          틀은 조용해야 하므로 여기서 더 얹지 않는다 (foundation.md 5-8절). */}
-      <body className="flex min-h-dvh flex-col antialiased">
-        <Header />
-        {children}
-      </body>
+          틀은 조용해야 하므로 여기서 더 얹지 않는다 (foundation.md 5-8절).
+
+          **전역 Header는 없다.** 첫 화면이 왼쪽 고정 사이드바 구조로 정해지면서
+          상단 bar가 자리를 잃었다 (2026-09-15). ThemeToggle을 비롯한 전역 제어는
+          사이드바가 맡는다. 상단에 다시 bar를 두려 하지 말 것 — 사이드바와
+          역할이 겹친다. */}
+      <body className="flex min-h-dvh flex-col antialiased">{children}</body>
     </html>
   )
 }

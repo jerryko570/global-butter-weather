@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import Button from '@/components/Button'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export const metadata: Metadata = {
   title: '첫 화면 목업 — 버터웨더',
@@ -31,12 +32,10 @@ export const metadata: Metadata = {
 /** 상품 칸. 사진 → 카테고리 → 이름 → 가격 순서를 지킨다. */
 function ProductCell({
   src,
-  category,
   name,
   price,
 }: {
   src: string
-  category: string
   name: string
   price: string
 }) {
@@ -51,11 +50,11 @@ function ProductCell({
           className="object-cover"
         />
       </div>
-      <p className="text-ink-subtle text-caption mt-3 tracking-[0.15em]">
-        {category}
-      </p>
-      <p className="text-ink text-body mt-1 group-hover:underline">{name}</p>
-      <p className="text-ink text-body mt-1 font-medium">{price}</p>
+      {/* 칸이 서로 맞닿으므로 글자에만 안쪽 여백을 준다 */}
+      <div className="px-3 pt-3 pb-8">
+        <p className="text-ink text-body group-hover:underline">{name}</p>
+        <p className="text-ink-muted text-body mt-0.5">{price}</p>
+      </div>
     </a>
   )
 }
@@ -121,7 +120,7 @@ export default function M1Draft() {
     <div className="bg-cloud min-h-dvh">
       <div className="mx-auto flex w-full max-w-[1440px]">
         {/* ───── 왼쪽 고정 ───── */}
-        <aside className="sticky top-0 hidden h-dvh w-[220px] shrink-0 flex-col border-r border-gray-200 px-5 py-6 md:flex">
+        <aside className="sticky top-0 hidden h-dvh w-[220px] shrink-0 flex-col px-5 py-8 md:flex">
           <a
             href="#"
             className="text-ink text-body font-medium tracking-[0.12em]"
@@ -139,7 +138,7 @@ export default function M1Draft() {
             <CategoryRow motif="motif-watering-can" label="기타" />
           </nav>
 
-          <div className="mt-8 border-t border-gray-200 pt-4">
+          <div className="mt-8">
             <QuietLink>소개</QuietLink>
             <QuietLink>문의</QuietLink>
           </div>
@@ -152,16 +151,19 @@ export default function M1Draft() {
           </p>
 
           {/* 아래로 밀어붙인다 */}
-          <div className="mt-auto border-t border-gray-200 pt-4">
+          <div className="mt-auto">
             <QuietLink>Instagram</QuietLink>
             <QuietLink>Contact</QuietLink>
+            <div className="mt-4">
+              <ThemeToggle />
+            </div>
           </div>
         </aside>
 
         {/* ───── 오른쪽 ───── */}
         <main className="min-w-0 flex-1">
           {/* 상단 — 알림 워딩은 두지 않는다. 계정 동작만 오른쪽에 */}
-          <div className="flex items-center justify-end gap-5 border-b border-gray-200 px-6 py-3">
+          <div className="flex items-center justify-end gap-5 px-6 py-4">
             <a href="#" className="text-ink-muted hover:text-ink text-caption">
               로그인
             </a>
@@ -174,7 +176,7 @@ export default function M1Draft() {
           </div>
 
           {/* ───── 키비주얼 · 아이덴티티 ───── */}
-          <section className="flex flex-col border-b border-gray-200 lg:flex-row">
+          <section className="flex flex-col lg:flex-row">
             <div className="h-[42svh] lg:h-[56svh] lg:w-[52%]">
               <Plane src="pattern-red-berry" zoom={220} />
             </div>
@@ -197,7 +199,7 @@ export default function M1Draft() {
                 <Button variant="secondary">신상품</Button>
               </div>
 
-              <dl className="mt-10 flex gap-10 border-t border-gray-200 pt-5">
+              <dl className="mt-12 flex gap-10">
                 <div>
                   <dt className="text-ink text-title font-medium">16</dt>
                   <dd className="text-ink-muted text-caption mt-1">상품</dd>
@@ -215,9 +217,9 @@ export default function M1Draft() {
           </section>
 
           {/* ───── 신상품 ───── */}
-          <section className="px-6 py-10">
-            <div className="flex items-baseline justify-between">
-              <h2 className="text-ink text-title font-medium tracking-tight">
+          <section className="pt-20 pb-10">
+            <div className="flex items-baseline justify-between px-6">
+              <h2 className="text-ink text-display font-medium tracking-tight">
                 신상품
               </h2>
               <a
@@ -228,46 +230,41 @@ export default function M1Draft() {
               </a>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4">
+            {/* 여백 0 — 칸이 서로 맞닿는다. 격자 자체가 한 덩어리가 되고
+                시선이 선이 아니라 사진과 그래픽으로 간다 */}
+            <div className="mt-8 grid grid-cols-2 gap-0 md:grid-cols-4">
               <ProductCell
                 src="keyring-on-paper"
-                category="KEYRING"
                 name="꽃 비즈 키링"
                 price="₩21,000"
               />
               <ProductCell
                 src="keyring-with-jar"
-                category="KEYRING"
                 name="라인 비즈 키링"
                 price="₩19,000"
               />
               <ProductCell
                 src="keyring-on-phone"
-                category="KEYRING"
                 name="폰 스트랩"
                 price="₩23,000"
               />
               <ProductCell
                 src="keyring-on-orange-pattern"
-                category="KEYRING"
                 name="더블 플라워 키링"
                 price="₩24,000"
               />
               <ProductCell
                 src="keyring-on-wood"
-                category="BEAD"
                 name="미니 참"
                 price="₩12,000"
               />
               <ProductCell
                 src="keyring-on-paper"
-                category="BEAD"
                 name="시드 비즈 세트"
                 price="₩15,000"
               />
               <ProductCell
                 src="keyring-with-jar"
-                category="KEYRING"
                 name="투톤 비즈 키링"
                 price="₩20,000"
               />
@@ -279,7 +276,7 @@ export default function M1Draft() {
           </section>
 
           {/* ───── footer ───── */}
-          <footer className="border-t border-gray-200 px-6 py-10">
+          <footer className="px-6 pt-20 pb-12">
             <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
               <div>
                 <p className="text-ink text-body font-medium tracking-[0.12em]">
@@ -328,7 +325,7 @@ export default function M1Draft() {
             </div>
 
             {/* 한국 쇼핑몰에 반드시 있는 자리. 내용은 아직 없다 */}
-            <p className="text-ink-subtle text-caption mt-10 border-t border-gray-200 pt-5 leading-relaxed">
+            <p className="text-ink-subtle text-caption mt-12 leading-relaxed">
               상호 · 대표 · 사업자등록번호 · 통신판매업신고번호 · 주소 ·
               개인정보관리책임자 — 아직 채우지 않았습니다
               <br />© 2026 BUTTER WEATHER
