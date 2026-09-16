@@ -15,14 +15,15 @@
   /* serif는 **브랜드의 목소리**에만 쓴다 — 제목·지표·워드마크·태그라인.
      본문과 라벨은 sans다. 계승한 디자인의 핵심 성격이 이 구분이다.
 
-     ⚠️ **어떤 서체인지는 아직 정해지지 않았다.** 아래는 OS에 있는 것을
-     주워 쓰는 대비책일 뿐이라 **기기마다 다르게 보인다** — 라틴은 Georgia,
-     한글은 macOS에서 AppleMyungjo, Windows에서 바탕으로 떨어진다.
-     브랜드 제목이 사람마다 다른 얼굴로 보인다는 뜻이다.
-     웹폰트를 정하는 것은 이나래의 판단이다 (tokens.md 3-3절). */
-  --serif:
-    ui-serif, Georgia, 'Times New Roman', AppleMyungjo, 'Nanum Myeongjo',
-    Batang, 바탕, serif;
+     **나눔명조로 정해졌다 (2026-09-16).** 계승한 디자인이 웹폰트를 싣지
+     않아 기기마다 다른 서체로 떨어지던 것을 고정한 것이다 — 이나래가
+     디자인할 때 보고 있던 macOS의 AppleMyungjo에 가장 가까운 한글 명조다.
+     새 얼굴을 고른 것이 아니라 보고 있던 것을 붙잡은 쪽이다.
+     싣는 방식은 public/fonts/nanum-myeongjo/README.md.
+
+     뒤의 것들은 웹폰트가 늦게 오거나 실패했을 때의 대비책이다. 라틴 글자는
+     나눔명조에도 있지만 Georgia를 앞에 두지 않는다 — 한 서체로 통일한다. */
+  --serif: 'Nanum Myeongjo', AppleMyungjo, Batang, 바탕, ui-serif, serif;
 
   /* 스케일 — 역할 이름으로 둔다. 크기 이름(sm/lg)으로 두면 "이 자리에
      어떤 크기가 맞나"를 매번 다시 판단하게 되지만, 역할 이름이면 자리가

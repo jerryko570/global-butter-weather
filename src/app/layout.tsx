@@ -33,6 +33,13 @@ export default function RootLayout({
             않아 쓸 수 없다. 자세한 사정은 public/fonts/pretendard/README.md */}
         {/* eslint-disable-next-line @next/next/no-css-tags -- 위 사유로 의도한 것 */}
         <link rel="stylesheet" href="/fonts/pretendard/pretendard.css" />
+        {/* 나눔명조 — 브랜드의 목소리(제목·지표·워드마크·태그라인)에만 쓴다.
+            같은 이유로 동적 서브셋이다. public/fonts/nanum-myeongjo/README.md */}
+        {/* eslint-disable-next-line @next/next/no-css-tags -- 위 사유로 의도한 것 */}
+        <link
+          rel="stylesheet"
+          href="/fonts/nanum-myeongjo/nanum-myeongjo.css"
+        />
       </head>
       {/* 배경·본문색·font는 globals.css에서 token으로 잡는다.
           틀은 조용해야 하므로 여기서 더 얹지 않는다 (foundation.md 5-8절).
