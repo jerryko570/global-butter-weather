@@ -34,11 +34,19 @@ import ThemeToggle from '@/components/ThemeToggle'
  * 디자인은 언제든 바뀔 수 있다. 여기서 더 붙들지 않고 M2로 넘어간다.
  */
 
+/**
+ * 2026-09-16에 확정됐다. **소재가 아니라 형태로 나눈다** — 「비즈」는
+ * 재료 이름이었고 「팔찌·목걸이」는 몸의 어디에 걸리는지다.
+ * 「기타」는 없앴다. 지금 만드는 것 셋이 전부다.
+ *
+ * 모티프 배정은 형태를 따라갔다 — 팔찌는 호를 그리는 무지개, 목걸이는
+ * 줄기가 아래로 늘어지는 꽃. 바꿔도 되는 부분이다.
+ */
 const CATEGORIES = [
   { motif: 'motif-sun', label: '전체', active: true },
   { motif: 'motif-tulip', label: '키링' },
-  { motif: 'motif-blue-flower', label: '비즈' },
-  { motif: 'motif-watering-can', label: '기타' },
+  { motif: 'motif-rainbow', label: '팔찌' },
+  { motif: 'motif-blue-flower', label: '목걸이' },
 ]
 
 const PRODUCTS = [
@@ -82,7 +90,7 @@ const PRODUCTS = [
 ]
 
 const FOOTER_COLS = [
-  { title: 'SHOP', links: ['신상품', '키링', '비즈', '전체 상품'] },
+  { title: 'SHOP', links: ['신상품', '키링', '팔찌', '목걸이'] },
   { title: 'ORDER', links: ['배송 안내', '교환·반품', '자주 묻는 질문'] },
   {
     title: 'BRAND',
