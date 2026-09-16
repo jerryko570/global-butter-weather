@@ -103,7 +103,6 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 
 ### 정리 대상 (알고는 있되 지나가며 건드리지 말 것)
 
-- `next.config.ts`의 이미지 호스트가 **옛 프로젝트의 Supabase 도메인**(`ljjpgsmufioeixspkrpw.supabase.co`)으로 박혀 있다. 새 프로젝트를 만들면 교체할 것.
 - `package-json-addition.json`은 이미 `package.json`에 반영된 잔재 파일이다.
 - `package-lock.json`의 `name`이 `butter-weather-shop`으로 남아 있다 (`npm install` 시 자동 수정됨).
 
@@ -120,16 +119,36 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 
 > 옛 문서에 있던 Framer Motion·Toss Payments는 **이 레포 의존성에 없다.** 필요해지면 그때 추가한다.
 
-### 3-2. Supabase — 아직 없음
+### 3-2. Supabase — 프로젝트는 있고, 테이블은 아직 없다
 
-새 프로젝트를 만들지 않았다. `.env.local`도 없다. 따라서 **테이블·RLS·Storage에 대해 이 문서가 단언하는 내용은 없다.**
+프로젝트를 만들었다 (`ghrpcggsjgiiitxjqdsw`, 이나래 계정). `.env.local`·`next.config.ts` 이미지 호스트·client 까지 연결돼 있다.
 
-DB 작업이 필요해지면 순서는 이렇다.
+**테이블은 아직 만들지 않았다.** 마이그레이션 SQL 은 있고 실행만 남았다.
 
-1. Supabase 프로젝트 생성 → `.env.local`에 URL·anon key
-2. `next.config.ts` 이미지 호스트를 새 프로젝트 도메인으로 교체
-3. 스키마 설계 → 이 문서에 확정 스키마 기록
-4. RLS 정책 (공개는 읽기만, 쓰기는 관리자로 제한) — 대충 넘기지 말 것
+> **API 키는 `publishable`(`sb_publishable_*`)을 쓴다.** `anon` 키는 2026년 말에 제거된다. 둘 다 브라우저로 나가는 값이라 비밀이 아니고 — **데이터를 지키는 것은 키가 아니라 RLS 다.**
+>
+> `secret` 키(`sb_secret_*`)는 **저장소에 두지 않는다.** RLS 를 우회하므로 Vercel 환경변수에만 넣는다.
+
+스키마는 파일로 있다.
+
+| 무엇           | 어디                                           |
+| -------------- | ---------------------------------------------- |
+| 확정 SQL       | [`supabase/migrations/`](supabase/migrations/) |
+| 왜 그렇게 짰나 | [`docs/dev/schema.md`](docs/dev/schema.md)     |
+
+**옛 레포의 `products` 테이블을 계승한다.** 디자인과 같은 이유다 — 이미 한 번 장사에 쓰인 모양이라 새로 상상하는 것보다 낫다. 다만 옛 쪽은 대시보드에서 손으로 만들어 재현할 수 없었고, 여기서는 `.sql`로 남긴다.
+
+기억해 둘 것 셋.
+
+- **가격과 재고는 `products`가 아니라 `product_variants`에 있다 ★** — 옵션마다 값이 다르기 때문이다. 옵션이 하나뿐인 물건도 variant 를 하나 만든다. **두 군데에 두면 반드시 어긋난다**
+- **카테고리는 형태다** — `keyring` · `bracelet` · `necklace`. 소재가 아니다. `etc`를 두지 않는다
+- **`status`(판매 상태)와 `is_active`(노출 여부)는 다른 축이다.** 품절이어도 보여야 하고, 팔 수 있어도 감춰야 할 때가 있다. `is_active` 기본값은 **`false`(감춤)**다
+- **쓰기 정책을 만들지 않는다.** RLS가 전부 막고, 관리자 작업은 `service_role` 키로만 한다. 그 키는 서버에서만 쓴다
+
+남은 것은 둘이다.
+
+1. Supabase 대시보드 → **SQL Editor** 에 `supabase/migrations/0001_products.sql` 붙여넣고 실행
+2. `docs/dev/schema.md` 맨 위의 「아직 실행되지 않았다」 줄 삭제
 
 ## 4. 디자인 시스템 (`src/app/styles/` 실측)
 

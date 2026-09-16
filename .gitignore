@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# 예시 파일은 올린다. 어떤 값이 필요한지 알려주는 문서라서다 (실제 값은 없다)
+!.env.example
 
 # vercel
 .vercel
