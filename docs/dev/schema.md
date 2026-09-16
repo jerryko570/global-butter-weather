@@ -2,7 +2,9 @@
 
 확정 SQL은 [`supabase/migrations/`](../../supabase/migrations/)에 있다. **이 문서는 왜 그렇게 짰는지**를 적는다.
 
-> ⚠️ **아직 실행되지 않았다.** Supabase 프로젝트는 만들어졌지만(`ghrpcggsjgiiitxjqdsw`) 테이블은 아직 없다. 실행하고 나면 이 줄을 지운다.
+> **실행됐다 (2026-09-16).** 프로젝트는 `ghrpcggsjgiiitxjqdsw`(이나래 계정)이고 `products` · `product_variants` · `products_public` 이 서 있다.
+>
+> 확인한 것 — 셋 다 publishable 키로 조회되고(200), `insert` 는 RLS 가 막고(`42501`), 없는 카테고리(`bead`)는 enum 이 거부한다(`22P02`).
 
 ## 0. 옛 레포에서 계승한다
 
