@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ljjpgsmufioeixspkrpw.supabase.co',
+        hostname: 'ghrpcggsjgiiitxjqdsw.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
       // 임시 플레이스홀더 이미지 (layout 확인용 — 실제 촬영컷으로 교체 예정)
