@@ -1,5 +1,7 @@
 import Image from 'next/image'
 import ThemeToggle from '@/components/ThemeToggle'
+import { getProducts, formatKRW } from '@/lib/queries/products'
+import type { ProductListItem } from '@/types/product'
 
 /**
  * 첫 화면. **옛 버터웨더 사이트의 디자인을 그대로 계승한다.**
@@ -28,8 +30,8 @@ import ThemeToggle from '@/components/ThemeToggle'
  * 10·11·13·15·20·22·38px을 쓴다. 지금은 원본에 맞춰 직접 적었다 —
  * scale을 이 디자인에서 다시 뽑는 것은 Design/System 작업으로 따로 한다.
  *
- * ⚠️ 상품 이름·가격·지표는 전부 **임시값**이다. M2에서 Supabase 데이터로
- * 바꾼다. 지금 화면에 보이는 가격은 정해진 것이 아니다.
+ * 상품은 **Supabase 에서 읽는다** (`products_public` 뷰). 하드코딩하지 말 것.
+ * 화면에 안 보이면 데이터가 없거나 `is_active` 가 꺼져 있는 것이다.
  *
  * 디자인은 언제든 바뀔 수 있다. 여기서 더 붙들지 않고 M2로 넘어간다.
  */
@@ -42,51 +44,26 @@ import ThemeToggle from '@/components/ThemeToggle'
  * 모티프 배정은 형태를 따라갔다 — 팔찌는 호를 그리는 무지개, 목걸이는
  * 줄기가 아래로 늘어지는 꽃. 바꿔도 되는 부분이다.
  */
+/**
+ * 상품이 바뀌면 화면도 바뀌어야 한다. 빌드 때 한 번 굽고 마는 것이
+ * 기본이라 그대로 두면 **새 상품을 넣어도 재배포 전까지 안 보인다.**
+ * 60초마다 다시 굽는다 — 손으로 고치는 작은 가게에 이 정도면 충분하고,
+ * 매 요청마다 DB를 때리지 않는다.
+ */
+export const revalidate = 60
+
+/** DB 값 → 화면 라벨. 칸 안의 대문자 라벨에 쓴다. */
+const CATEGORY_LABEL: Record<string, string> = {
+  keyring: 'KEYRING',
+  bracelet: 'BRACELET',
+  necklace: 'NECKLACE',
+}
+
 const CATEGORIES = [
   { motif: 'motif-sun', label: '전체', active: true },
   { motif: 'motif-tulip', label: '키링' },
   { motif: 'motif-rainbow', label: '팔찌' },
   { motif: 'motif-blue-flower', label: '목걸이' },
-]
-
-const PRODUCTS = [
-  {
-    src: 'keyring-on-paper',
-    cat: 'KEYRING',
-    name: '꽃 비즈 키링',
-    price: '₩21,000',
-  },
-  {
-    src: 'keyring-with-jar',
-    cat: 'KEYRING',
-    name: '라인 비즈 키링',
-    price: '₩19,000',
-  },
-  {
-    src: 'keyring-on-phone',
-    cat: 'KEYRING',
-    name: '폰 스트랩',
-    price: '₩23,000',
-  },
-  {
-    src: 'keyring-on-orange-pattern',
-    cat: 'KEYRING',
-    name: '더블 플라워 키링',
-    price: '₩24,000',
-  },
-  { src: 'keyring-on-wood', cat: 'BEAD', name: '미니 참', price: '₩12,000' },
-  {
-    src: 'keyring-on-paper',
-    cat: 'BEAD',
-    name: '시드 비즈 세트',
-    price: '₩15,000',
-  },
-  {
-    src: 'keyring-with-jar',
-    cat: 'KEYRING',
-    name: '투톤 비즈 키링',
-    price: '₩20,000',
-  },
 ]
 
 const FOOTER_COLS = [
@@ -113,6 +90,44 @@ function Plane({ src, zoom }: { src: string; zoom: number }) {
   )
 }
 
+/**
+ * 상품 칸. **사진 → 카테고리 → 이름 → 가격** 순서를 지킨다 (5-15절).
+ * 가격은 「얼마부터」다 — 옵션마다 값이 달라 최저가를 보여준다.
+ */
+function ProductCell({ product }: { product: ProductListItem }) {
+  const image = product.images[0]
+  return (
+    <a
+      href={`/products/${product.slug}`}
+      className="group border-r border-b border-gray-200 [&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(4n)]:border-r-0"
+    >
+      <div className="relative aspect-3/4 overflow-hidden bg-gray-100">
+        {image ? (
+          <Image
+            src={image}
+            alt={product.name}
+            fill
+            sizes="(max-width: 1024px) 50vw, 25vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : null}
+      </div>
+      <div className="border-t border-gray-200 p-4">
+        <Label className="mb-1">{CATEGORY_LABEL[product.category]}</Label>
+        <p className="text-ink text-body mb-2 group-hover:underline">
+          {product.name}
+        </p>
+        <p className="text-ink text-body font-medium">
+          {formatKRW(product.min_price_krw)}
+          {product.variant_count > 1 ? (
+            <span className="text-ink-subtle"> 부터</span>
+          ) : null}
+        </p>
+      </div>
+    </a>
+  )
+}
+
 /** 10~11px 대문자 라벨. 이 디자인에서 가장 자주 쓰이는 조각이다. */
 function Label({
   children,
@@ -128,7 +143,11 @@ function Label({
   )
 }
 
-export default function Home() {
+export default async function Home() {
+  const products = await getProducts()
+  // 격자에 일러스트 면이 한 칸 들어가므로 상품은 7개까지만 (8칸에 1개)
+  const preview = products.slice(0, 7)
+
   return (
     <div className="lg:flex lg:min-h-dvh">
       {/* ═══ 왼쪽 사이드바 — 구획마다 실선으로 나뉜다 ═══ */}
@@ -267,7 +286,7 @@ export default function Home() {
 
               <dl className="mt-10 flex gap-8 border-t border-gray-200 pt-8">
                 {[
-                  ['16', '상품'],
+                  [String(products.length), '상품'],
                   ['KR · EN', '언어'],
                   ['WW', '배송'],
                 ].map(([val, label]) => (
@@ -293,43 +312,37 @@ export default function Home() {
             </a>
           </div>
 
-          <div className="grid grid-cols-2 border-b border-gray-200 lg:grid-cols-4">
-            {PRODUCTS.map((p, i) => (
-              <a
-                key={`${p.src}-${i}`}
-                href="#"
-                className="group border-r border-b border-gray-200 [&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(4n)]:border-r-0"
-              >
-                <div className="relative aspect-3/4 overflow-hidden bg-gray-100">
-                  <Image
-                    src={`/photos/${p.src}.jpg`}
-                    alt={p.name}
-                    fill
-                    sizes="(max-width: 1024px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+          {preview.length === 0 ? (
+            /* 상품이 하나도 없을 때. 격자를 빈 채로 두면 화면이 무너져
+               보이므로 한 줄로 대신한다. 데이터가 없는 것과 못 읽은 것은
+               다른 일이라, 못 읽었을 때는 서버 로그에 남는다. */
+            <div className="border-b border-gray-200 px-7 py-20 text-center">
+              <p className="text-ink-muted text-body">
+                아직 등록된 상품이 없습니다.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 border-b border-gray-200 lg:grid-cols-4">
+              {preview.map((product) => (
+                <ProductCell key={product.id} product={product} />
+              ))}
+
+              {/* 룩북이 샵 안으로 — 8칸에 1개. 상품과 같은 칸 크기를 쓴다.
+                  따로 페이지를 두면 뎁스가 되고, 칸으로 끼우면 같은 화면이다
+                  (foundation.md 5-15절). */}
+              <div className="border-b border-gray-200 lg:[&:nth-child(4n)]:border-r-0">
+                <div className="aspect-3/4">
+                  <Plane src="pattern-clover" zoom={190} />
                 </div>
                 <div className="border-t border-gray-200 p-4">
-                  <Label className="mb-1">{p.cat}</Label>
-                  <p className="text-ink text-body mb-2 group-hover:underline">
-                    {p.name}
+                  <Label className="mb-1">Lookbook</Label>
+                  <p className="text-ink-muted text-body">
+                    2026 봄/여름 그래픽
                   </p>
-                  <p className="text-ink text-body font-medium">{p.price}</p>
                 </div>
-              </a>
-            ))}
-
-            {/* 룩북이 샵 안으로 — 8칸에 1개. 상품과 같은 칸 크기를 쓴다 */}
-            <div className="border-b border-gray-200 lg:[&:nth-child(4n)]:border-r-0">
-              <div className="aspect-3/4">
-                <Plane src="pattern-clover" zoom={190} />
-              </div>
-              <div className="border-t border-gray-200 p-4">
-                <Label className="mb-1">Lookbook</Label>
-                <p className="text-ink-muted text-body">2026 봄/여름 그래픽</p>
               </div>
             </div>
-          </div>
+          )}
 
           {/* ───── 브랜드 스토리 ───── */}
           <div className="grid grid-cols-1 border-b border-gray-200 lg:grid-cols-2">
