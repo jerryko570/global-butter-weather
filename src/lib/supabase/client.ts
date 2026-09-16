@@ -24,11 +24,18 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL
 const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
 if (!url || !key) {
-  // 빌드가 조용히 통과하고 화면에서 빈 목록으로 나타나는 것을 막는다.
-  // 필요한 값은 .env.example 에 적혀 있다.
+  // 여기서 멈추는 것은 의도다. 빌드가 조용히 통과하면 **빈 상점이 배포되고**
+  // 화면만 보고는 「상품이 없는 것」과 「DB를 못 읽은 것」을 구분할 수 없다.
+  //
+  // ⚠️ Vercel 은 환경변수를 **환경별로 따로** 둔다. Production 에만 넣으면
+  // Preview 빌드가 여기서 죽는다 (2026-09-16에 실제로 그랬다).
+  // 넣을 때 Production·Preview·Development 를 **전부** 체크할 것.
   throw new Error(
-    'Supabase 환경변수가 없습니다. .env.example 을 보고 .env.local 을 만드세요 — ' +
-      'NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'
+    'Supabase 환경변수가 없습니다 — NEXT_PUBLIC_SUPABASE_URL, ' +
+      'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY\n' +
+      '· 로컬: .env.example 을 보고 .env.local 을 만드세요\n' +
+      '· Vercel: Project Settings → Environment Variables. ' +
+      'Production 뿐 아니라 **Preview 에도** 넣어야 PR 프리뷰가 빌드됩니다.'
   )
 }
 

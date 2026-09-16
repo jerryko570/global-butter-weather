@@ -183,4 +183,5 @@ product-images/
 
 1. ~~`0001_products.sql` 실행~~ → **끝남 (2026-09-16)**
 2. **`0002_product_images_bucket.sql` 실행** — 아직 안 했다
-3. 사진을 Storage 로 옮기고 `images` 의 값을 경로로 바꾼다. 옮기는 동안 `/photos/...` 와 섞여 있어도 화면은 둘 다 그린다
+3. **Vercel 환경변수를 Preview 에도 넣는다** — Production 에만 있으면 PR 프리뷰 빌드가 죽는다 (2026-09-16에 실제로 그랬다). Project Settings → Environment Variables 에서 Production·Preview·Development 를 전부 체크
+4. 사진을 Storage 로 옮기고 `images` 의 값을 경로로 바꾼다. 옮기는 동안 `/photos/...` 와 섞여 있어도 화면은 둘 다 그린다
