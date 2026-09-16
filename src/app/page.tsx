@@ -114,9 +114,7 @@ function Label({
   className?: string
 }) {
   return (
-    <p
-      className={`text-ink-subtle text-[10px] tracking-[0.14em] uppercase ${className}`}
-    >
+    <p className={`text-ink-subtle text-label uppercase ${className}`}>
       {children}
     </p>
   )
@@ -128,10 +126,7 @@ export default function Home() {
       {/* ═══ 왼쪽 사이드바 — 구획마다 실선으로 나뉜다 ═══ */}
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-gray-200 lg:flex">
         <div className="border-b border-gray-200 px-6 py-5">
-          <a
-            href="#"
-            className="text-ink font-serif text-[15px] tracking-[0.12em] uppercase"
-          >
+          <a href="#" className="text-ink text-wordmark font-serif uppercase">
             Butter Weather
           </a>
         </div>
@@ -155,8 +150,8 @@ export default function Home() {
                 <span
                   className={
                     c.active
-                      ? 'text-ink text-[14px]'
-                      : 'text-ink-muted group-hover:text-ink text-[14px]'
+                      ? 'text-ink text-body'
+                      : 'text-ink-muted group-hover:text-ink text-body'
                   }
                 >
                   {c.label}
@@ -167,9 +162,9 @@ export default function Home() {
 
           <div className="mt-6 flex items-center gap-2">
             <Label>Language</Label>
-            <span className="text-ink text-[11px]">KR</span>
-            <span className="text-ink-subtle text-[11px]">·</span>
-            <span className="text-ink-subtle hover:text-ink text-[11px]">
+            <span className="text-ink text-caption">KR</span>
+            <span className="text-ink-subtle text-caption">·</span>
+            <span className="text-ink-subtle hover:text-ink text-caption">
               EN
             </span>
           </div>
@@ -177,7 +172,7 @@ export default function Home() {
 
         {/* 태그라인 — serif italic. 이 디자인의 목소리다 */}
         <div className="border-b border-gray-200 px-6 py-6">
-          <p className="text-ink-muted font-serif text-[14px] leading-relaxed italic">
+          <p className="text-ink-muted text-body font-serif leading-relaxed italic">
             작은 오브제,
             <br />
             정직한 디자인.
@@ -185,17 +180,17 @@ export default function Home() {
         </div>
 
         <div className="px-6 py-6">
-          <a href="#" className="text-ink-muted hover:text-ink text-[14px]">
+          <a href="#" className="text-ink-muted hover:text-ink text-body">
             소개
           </a>
         </div>
 
         <div className="mt-auto border-t border-gray-200 px-6 py-5">
           <div className="flex flex-wrap gap-x-3 gap-y-1">
-            <a href="#" className="text-ink-subtle hover:text-ink text-[11px]">
+            <a href="#" className="text-ink-subtle hover:text-ink text-caption">
               Instagram
             </a>
-            <a href="#" className="text-ink-subtle hover:text-ink text-[11px]">
+            <a href="#" className="text-ink-subtle hover:text-ink text-caption">
               Contact
             </a>
           </div>
@@ -209,15 +204,15 @@ export default function Home() {
       <div className="flex min-w-0 flex-1 flex-col">
         {/* 계정·장바구니. 티커 띠는 두지 않는다 */}
         <div className="flex items-center justify-end gap-5 border-b border-gray-200 px-6 py-3">
-          <a href="#" className="text-ink-muted hover:text-ink text-[12px]">
+          <a href="#" className="text-ink-muted hover:text-ink text-caption">
             로그인
           </a>
-          <a href="#" className="text-ink-muted hover:text-ink text-[12px]">
+          <a href="#" className="text-ink-muted hover:text-ink text-caption">
             회원가입
           </a>
           <a
             href="#"
-            className="text-ink-muted hover:text-ink text-[12px] tracking-wide uppercase"
+            className="text-ink-muted hover:text-ink text-caption tracking-wide uppercase"
           >
             Cart (0)
           </a>
@@ -228,7 +223,7 @@ export default function Home() {
           <section className="grid grid-cols-1 border-b border-gray-200 lg:grid-cols-2">
             <div className="relative min-h-[400px] border-b border-gray-200 lg:min-h-[520px] lg:border-r lg:border-b-0">
               <Plane src="pattern-red-berry" zoom={220} />
-              <span className="text-ink-muted absolute top-6 left-6 z-10 bg-white px-2 py-1 text-[10px] tracking-[0.14em] uppercase">
+              <span className="text-ink-muted text-label absolute top-6 left-6 z-10 bg-white px-2 py-1 uppercase">
                 SS 2026
               </span>
             </div>
@@ -236,12 +231,12 @@ export default function Home() {
             <div className="flex flex-col justify-between p-12 lg:p-14">
               <div>
                 <Label className="mb-5">신규 컬렉션 — 2026 봄/여름</Label>
-                <h1 className="text-ink mb-5 font-serif text-[38px] leading-[1.15]">
+                <h1 className="text-ink text-display mb-5 font-serif">
                   나의 하루에 부드럽게
                   <br />
                   스며드는 작은 온기
                 </h1>
-                <p className="text-ink-muted max-w-xs text-[13px] leading-relaxed font-light">
+                <p className="text-ink-muted text-body max-w-xs leading-relaxed font-light">
                   키링 하나, 비즈 하나가 담아내는 감정.
                   <br />
                   작은 오브제로 하루를 디자인합니다.
@@ -249,13 +244,13 @@ export default function Home() {
                 <div className="mt-10 flex gap-3">
                   <a
                     href="#"
-                    className="bg-ink text-cloud px-7 py-3 text-[11px] tracking-widest uppercase"
+                    className="bg-ink text-cloud text-caption px-7 py-3 tracking-widest uppercase"
                   >
                     쇼핑하기
                   </a>
                   <a
                     href="#"
-                    className="text-ink hover:border-ink border border-gray-300 px-7 py-3 text-[11px] tracking-widest uppercase"
+                    className="text-ink hover:border-ink text-caption border border-gray-300 px-7 py-3 tracking-widest uppercase"
                   >
                     신상품
                   </a>
@@ -269,8 +264,8 @@ export default function Home() {
                   ['WW', '배송'],
                 ].map(([val, label]) => (
                   <div key={label}>
-                    <dt className="text-ink font-serif text-[22px]">{val}</dt>
-                    <dd className="text-ink-subtle mt-1 text-[11px]">
+                    <dt className="text-ink text-title font-serif">{val}</dt>
+                    <dd className="text-ink-subtle text-caption mt-1">
                       {label}
                     </dd>
                   </div>
@@ -281,10 +276,10 @@ export default function Home() {
 
           {/* ───── 신상품 ───── */}
           <div className="flex items-center justify-between border-b border-gray-200 px-7 py-5">
-            <h2 className="text-ink font-serif text-[20px]">신상품</h2>
+            <h2 className="text-ink text-title font-serif">신상품</h2>
             <a
               href="#"
-              className="text-ink-subtle hover:border-ink hover:text-ink border-b border-gray-300 pb-0.5 text-[11px] tracking-widest uppercase"
+              className="text-ink-subtle hover:border-ink hover:text-ink text-caption border-b border-gray-300 pb-0.5 tracking-widest uppercase"
             >
               전체 보기
             </a>
@@ -308,10 +303,10 @@ export default function Home() {
                 </div>
                 <div className="border-t border-gray-200 p-4">
                   <Label className="mb-1">{p.cat}</Label>
-                  <p className="text-ink mb-2 text-[13px] group-hover:underline">
+                  <p className="text-ink text-body mb-2 group-hover:underline">
                     {p.name}
                   </p>
-                  <p className="text-ink text-[13px] font-medium">{p.price}</p>
+                  <p className="text-ink text-body font-medium">{p.price}</p>
                 </div>
               </a>
             ))}
@@ -323,9 +318,7 @@ export default function Home() {
               </div>
               <div className="border-t border-gray-200 p-4">
                 <Label className="mb-1">Lookbook</Label>
-                <p className="text-ink-muted text-[13px]">
-                  2026 봄/여름 그래픽
-                </p>
+                <p className="text-ink-muted text-body">2026 봄/여름 그래픽</p>
               </div>
             </div>
           </div>
@@ -343,19 +336,19 @@ export default function Home() {
             </div>
             <div className="flex flex-col justify-center p-12">
               <Label className="mb-4">Our Story</Label>
-              <h3 className="text-ink mb-4 font-serif text-[22px] leading-snug">
+              <h3 className="text-ink text-title mb-4 font-serif leading-snug">
                 작은 오브제,
                 <br />
                 정직한 디자인.
               </h3>
-              <p className="text-ink-muted mb-6 text-[12px] leading-relaxed font-light">
+              <p className="text-ink-muted text-caption mb-6 leading-relaxed font-light">
                 하나하나 손으로 만듭니다.
                 <br />
                 매주 새로운 것이 들어옵니다.
               </p>
               <a
                 href="#"
-                className="text-ink border-ink hover:text-ink-muted inline-block w-fit border-b pb-0.5 text-[11px] tracking-widest uppercase"
+                className="text-ink border-ink hover:text-ink-muted text-caption inline-block w-fit border-b pb-0.5 tracking-widest uppercase"
               >
                 더 보기
               </a>
@@ -377,7 +370,7 @@ export default function Home() {
                     <li key={l}>
                       <a
                         href="#"
-                        className="text-ink-muted hover:text-ink text-[13px]"
+                        className="text-ink-muted hover:text-ink text-body"
                       >
                         {l}
                       </a>
@@ -389,12 +382,12 @@ export default function Home() {
           </div>
 
           <div className="flex items-center justify-between border-t border-gray-200 px-7 py-4">
-            <p className="text-ink-subtle text-[11px]">
+            <p className="text-ink-subtle text-caption">
               © 2026 Butter Weather — 사업자 정보는 아직 채우지 않았습니다
             </p>
             <div className="flex items-center gap-4">
-              <span className="text-ink text-[11px]">KR</span>
-              <span className="text-ink-subtle hover:text-ink text-[11px]">
+              <span className="text-ink text-caption">KR</span>
+              <span className="text-ink-subtle hover:text-ink text-caption">
                 EN
               </span>
             </div>
