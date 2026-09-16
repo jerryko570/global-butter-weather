@@ -14,7 +14,10 @@
 #   Docs/Plan     Docs/Dev
 #
 # 옵션:
-#   --changes  "<바꾼 것>"      개발자가 읽는 칸. 줄바꿈은 \n 으로.
+#   --changes  "<바꾼 것>"      개발자가 읽는 칸.
+#
+#   줄바꿈은 **네 칸 모두** \n 으로 넘긴다 — 작업 내용·--changes·--review·--screen.
+#   문단을 나누려면 \n\n. 목록은 \n- 처럼 줄 앞에 붙인다.
 #   --review   "<봐주세요>"     리뷰어 판단이 필요한 곳. 없으면 생략(자동으로 "특별히 없음")
 #   --screen   "<화면>"         스크린샷 설명. 생략하면 "화면 변화 없음"
 #   --roadmap  "<M0 · I0.1>"    로드맵 위치. 생략하면 줄 자체가 빠진다
@@ -132,7 +135,13 @@ else
   [ -z "$SCREEN" ] && SCREEN="화면 변화 없음"
 
   # \n 을 실제 줄바꿈으로 편다 (--changes 를 여러 줄로 넘기기 위함)
+  # **네 칸 전부에 적용한다.** 예전에는 --changes 에만 걸려 있어서 작업
+  # 내용·봐주세요·화면 칸이 한 줄로 뭉치고 \n 이 글자 그대로 보였다.
+  # 봐주세요는 ①②③ 을 나눠 적는 칸이라 이게 특히 읽기 나빴다.
+  DESCRIPTION=$(printf '%b' "$DESCRIPTION")
   CHANGES=$(printf '%b' "$CHANGES")
+  REVIEW=$(printf '%b' "$REVIEW")
+  SCREEN=$(printf '%b' "$SCREEN")
 
   PR_BODY=""
   [ -n "$ROADMAP" ] && PR_BODY="> 🗺️ ${ROADMAP}
