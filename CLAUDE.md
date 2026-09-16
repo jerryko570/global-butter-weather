@@ -145,6 +145,8 @@ DB 작업이 필요해지면 순서는 이렇다.
 - 브랜드 액센트(butter·sky)는 다크에서도 그대로 유지하고, 의미 token과 grayscale만 반전한다.
 - Tailwind 유틸로 노출돼 있다 — `bg-butter`, `text-ink`, `bg-cloud`, `text-ink-muted` 등.
 - layout token: `--container-max: 1280px`, `--header-height: 64px`
+- **타이포는 역할 이름 여섯 개다** — `text-display`(38) `text-title`(22) `text-wordmark`(15) `text-body`(13) `text-caption`(11) `text-label`(10). Tailwind 기본 스케일(`text-sm`)을 쓰지 않는다.
+- **serif는 브랜드의 목소리에만 ★** — 제목·지표·워드마크·태그라인만 serif이고 본문·라벨은 sans다. 계승한 디자인의 핵심 성격이라 본문에 serif를 쓰면 다른 브랜드가 된다. ⚠️ **어떤 serif인지는 아직 미정**이라 기기마다 다르게 보인다 (tokens.md 3-3절).
 
 > **어떤 token을 언제 쓰는지**는 값 목록만으로 정해지지 않는다. 실제 사용 규약은 **[docs/design/tokens.md](docs/design/tokens.md)** 에 있다. component를 새로 짜기 전에 반드시 읽을 것.
 
