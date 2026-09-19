@@ -87,7 +87,7 @@ export default async function ProductDetailPage({ params }: Props) {
               </p>
             ) : null}
 
-            <VariantPicker variants={product.variants} />
+            <VariantPicker product={product} variants={product.variants} />
           </div>
         </div>
       </div>
