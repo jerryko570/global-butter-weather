@@ -134,16 +134,54 @@ Supabase 가 `anon`·`service_role` 키를 **2026년 말에 제거**한다. 새 
 
 **secret 키는 저장소에도 이 문서에도 두지 않는다.** 필요해지면 Vercel 환경변수에 직접 넣는다.
 
-## 7. 아직 짜지 않은 것
+## 7. 사진은 Storage 에 둔다 (2026-09-16)
+
+처음에는 사진이 레포 안(`public/photos/`)에 있었다. 그 방식은 **사진 한 장을 추가할 때마다 코드를 고쳐 배포해야 한다.** 상품이 늘면 못 버틴다.
+
+### 버킷
+
+`product-images`, **공개 버킷**이다. 상품 사진은 감출 것이 아니고, 공개여야 `/storage/v1/object/public/...` 주소로 바로 받을 수 있다. 서명 주소는 만료가 있어 CDN 캐시와 `next/image` 에 얹기 나쁘다.
+
+쓰기 정책은 **만들지 않는다.** `products` 와 같은 규칙이다 — publishable 키로는 못 올린다. **대시보드 업로드는 secret 권한으로 움직이므로 정책 없이도 올라간다.**
+
+### DB 에는 경로만 넣는다 ★
+
+`images[]` 에 **전체 주소를 넣지 않는다.** 저장소 안의 경로만 넣는다.
+
+```
+images: ['flower-bead-keyring/01.jpg', 'flower-bead-keyring/02.jpg']
+```
+
+전체 주소를 넣으면 **프로젝트가 바뀔 때 모든 행을 고쳐야 한다.** 경로만 두면 `src/lib/images.ts` 한 군데를 고치면 끝난다.
+
+`imageUrl()` 이 주소를 만든다. **이미 완성된 주소(`https://`)나 레포 안의 절대경로(`/photos/...`)는 그대로 통과시킨다** — 옮기는 동안 둘이 공존한다.
+
+### 폴더는 slug 로 나눈다
+
+```
+product-images/
+  flower-bead-keyring/01.jpg
+  flower-bead-keyring/02.jpg
+```
+
+상품별로 묶이고 번호로 순서가 정해진다. 한 폴더에 전부 쌓으면 어느 상품 것인지 알 수 없고 이름이 겹친다.
+
+### 올리는 법
+
+1. 대시보드 → **Storage** → `product-images`
+2. slug 이름으로 폴더를 만들고 사진을 올린다
+3. 상품 행의 `images` 에 **경로만** 넣는다 (`flower-bead-keyring/01.jpg`)
+
+> ⚠️ 사진을 올리는 것만으로는 화면에 안 나온다. `images` 에 경로를 넣어야 연결된다.
+
+## 8. 아직 짜지 않은 것
 
 - **orders · order_items** — 결제가 붙을 때. 옛 레포에 설계가 있다(주문 시점 가격·이름을 박제하는 스냅샷 구조). 계승할 것
-- **이미지 저장소** — Supabase Storage 버킷과 정책
 - **재고 차감** — `stock` 컬럼만 있고 줄이는 로직이 없다. 주문과 같이 판단한다
 
-## 8. 실행 순서
+## 9. 실행 순서
 
-1. Supabase 대시보드 → **SQL Editor** 에 `0001_products.sql` 붙여넣고 실행
-2. `.env.local` 에 `NEXT_PUBLIC_SUPABASE_URL` · `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-3. Vercel 환경변수에도 같은 둘
-4. `next.config.ts` 이미지 호스트를 새 프로젝트 도메인으로 교체
-5. 이 문서 맨 위의 「아직 실행되지 않았다」 줄 삭제
+1. ~~`0001_products.sql` 실행~~ → **끝남 (2026-09-16)**
+2. **`0002_product_images_bucket.sql` 실행** — 아직 안 했다
+3. **Vercel 환경변수를 Preview 에도 넣는다** — Production 에만 있으면 PR 프리뷰 빌드가 죽는다 (2026-09-16에 실제로 그랬다). Project Settings → Environment Variables 에서 Production·Preview·Development 를 전부 체크
+4. 사진을 Storage 로 옮기고 `images` 의 값을 경로로 바꾼다. 옮기는 동안 `/photos/...` 와 섞여 있어도 화면은 둘 다 그린다

@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import ThemeToggle from '@/components/ThemeToggle'
 import { getProducts, formatKRW } from '@/lib/queries/products'
+import { imageUrl } from '@/lib/images'
 import type { ProductListItem } from '@/types/product'
 
 /**
@@ -95,7 +96,9 @@ function Plane({ src, zoom }: { src: string; zoom: number }) {
  * 가격은 「얼마부터」다 — 옵션마다 값이 달라 최저가를 보여준다.
  */
 function ProductCell({ product }: { product: ProductListItem }) {
-  const image = product.images[0]
+  // DB 에는 저장소 안의 경로만 들어 있다. 주소를 만드는 규칙은 한 군데에
+  // 둔다 — 화면마다 조합하면 프로젝트가 바뀔 때 전부 고쳐야 한다.
+  const image = imageUrl(product.images[0] ?? '')
   return (
     <a
       href={`/products/${product.slug}`}
