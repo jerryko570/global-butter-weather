@@ -62,3 +62,15 @@ export interface ProductListItem extends Product {
   total_stock: number
   variant_count: number
 }
+
+/**
+ * 상세 화면이 읽는 꼴. **옵션을 뭉개지 않고 그대로 들고 있다.**
+ *
+ * 목록의 `ProductListItem` 과 다른 타입인 것이 중요하다 — 목록은 최저가·
+ * 총재고만 있으면 되고, 상세는 옵션마다 가격과 재고를 보여줘야 한다.
+ * 하나로 합치면 목록에서 쓰지도 않을 옵션 배열을 늘 끌고 다니게 된다.
+ */
+export interface ProductDetail extends Product {
+  /** `position` 순으로 정렬돼 있다 */
+  variants: ProductVariant[]
+}
