@@ -1,9 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Label from '@/components/Label'
+import { useToast } from '@/components/Toast'
 import { formatKRW } from '@/lib/queries/products'
-import type { ProductVariant } from '@/types/product'
+import { useCart } from '@/lib/store/cart'
+import type { ProductDetail, ProductVariant } from '@/types/product'
 
 /**
  * 옵션·수량을 고르고 사는 자리.
@@ -18,17 +21,25 @@ import type { ProductVariant } from '@/types/product'
  * 처음 고르는 것은 **재고가 있는 첫 옵션**이다. 품절인 것이 먼저 잡혀
  * 살 수 없는 화면으로 열리지 않게 한다.
  *
- * ⚠️ **두 버튼 다 아직 눌리지 않는다 (M3).** 장바구니도 결제도 없다.
+ * **`Add to Cart` 는 실제로 담는다.** 담는 것은 브라우저 안의 일이라
+ * 로그인도 서버도 필요 없다 (`lib/store/cart.ts`).
+ *
+ * ⚠️ **`Buy It Now` 는 아직 눌리지 않는다.** 주문서와 결제가 I3.3 이다.
  * 자리만 잡아두고 안내를 함께 둔다 — 눌러도 아무 일이 없는 버튼보다 왜
  * 안 되는지 보이는 편이 낫다 (2026-09-19 이나래 확인).
  *
  * 옛 사이트는 장바구니 없이 **바로 결제**였다. 이번에는 둘 다 둔다.
  */
 export default function VariantPicker({
+  product,
   variants,
 }: {
+  product: ProductDetail
   variants: ProductVariant[]
 }) {
+  const router = useRouter()
+  const { show } = useToast()
+  const add = useCart((s) => s.add)
   const firstInStock = variants.findIndex((v) => v.stock > 0)
   const [selected, setSelected] = useState(
     firstInStock === -1 ? 0 : firstInStock
@@ -43,6 +54,28 @@ export default function VariantPicker({
   function pick(i: number) {
     setSelected(i)
     setQuantity(1)
+  }
+
+  function addToCart() {
+    add(
+      {
+        variantId: variant.id,
+        productId: product.id,
+        slug: product.slug,
+        // **보여주기 위한 사본이다.** 영수증의 숫자는 주문할 때 서버가
+        // DB 에서 다시 읽는다 (lib/store/cart.ts)
+        productName: product.name,
+        variantName: variant.name,
+        priceKrw: variant.price_krw,
+        image: product.images[0] ?? null,
+        stock: variant.stock,
+      },
+      quantity
+    )
+    show(`장바구니에 담았습니다 — ${variant.name} ${quantity}개`)
+    // 담고 나서 화면을 옮기지 않는다. 다른 옵션도 담을 수 있어야 한다.
+    // 대신 위쪽 Cart 숫자가 바로 올라간다
+    router.refresh()
   }
 
   return (
@@ -123,8 +156,9 @@ export default function VariantPicker({
       <div className="flex flex-col gap-3">
         <button
           type="button"
-          disabled
-          className="text-ink text-caption w-full cursor-not-allowed border border-gray-300 py-3.5 tracking-widest uppercase opacity-40"
+          onClick={addToCart}
+          disabled={soldOut}
+          className="text-ink hover:border-ink text-caption w-full border border-gray-300 py-3.5 tracking-widest uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-40"
         >
           Add to Cart
         </button>
@@ -136,7 +170,7 @@ export default function VariantPicker({
           {soldOut ? 'Sold Out' : 'Buy It Now'}
         </button>
         <p className="text-ink-subtle text-caption">
-          장바구니와 결제는 아직 준비 중입니다.
+          결제는 아직 준비 중입니다. 장바구니에는 담을 수 있습니다.
         </p>
       </div>
     </div>
