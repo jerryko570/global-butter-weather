@@ -6,6 +6,7 @@ import Label from '@/components/Label'
 import { imageUrl } from '@/lib/images'
 import { compressImage, formatBytes } from '@/lib/compressImage'
 import { uploadProductImages } from '@/lib/queries/adminProducts'
+import { LIMITS } from '@/lib/productLimits'
 
 /**
  * 사진 칸. 고르기·끌어다 놓기·순서 바꾸기·대표 지정을 맡는다.
@@ -41,6 +42,17 @@ export default function ImageField({
   async function accept(files: File[]) {
     const picked = files.filter((f) => f.type.startsWith('image/') || !f.type)
     if (picked.length === 0) return
+
+    // 올린 뒤에 「10장까지입니다」라고 하면 저장소에 쓰레기가 남는다
+    const room = LIMITS.images.max - images.length
+    if (room <= 0) {
+      onError(`사진은 ${LIMITS.images.max}장까지입니다.`)
+      return
+    }
+    if (picked.length > room) {
+      onError(`사진은 ${LIMITS.images.max}장까지입니다. ${room}장만 올립니다.`)
+      picked.length = room
+    }
 
     setUploading(true)
     try {
