@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteProduct } from '@/lib/queries/adminProducts'
 import { revalidateShop } from '@/app/admin/actions'
+import { useToast } from '@/components/Toast'
 
 /**
  * 목록의 삭제 단추. **목록 자체는 server component 라 여기만 client 다.**
@@ -19,6 +20,7 @@ export default function DeleteProductButton({
   name: string
 }) {
   const router = useRouter()
+  const { show } = useToast()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,9 +37,12 @@ export default function DeleteProductButton({
     try {
       await deleteProduct(id)
       await revalidateShop()
+      show(`"${name}" 을(를) 지웠습니다`)
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : '지우지 못했습니다.')
+      const msg = err instanceof Error ? err.message : '지우지 못했습니다.'
+      setError(msg)
+      show(msg, 'fail')
     } finally {
       setBusy(false)
     }

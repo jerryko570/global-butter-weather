@@ -1,4 +1,5 @@
 import AdminNav from '@/components/admin/AdminNav'
+import { ToastProvider } from '@/components/Toast'
 
 /**
  * 어드민 껍데기. **가게 화면의 `(shop)/layout.tsx` 와 다른 껍데기다** —
@@ -19,9 +20,11 @@ export default function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="min-h-dvh">
-      <AdminNav />
-      <main className="mx-auto max-w-3xl px-6 py-10">{children}</main>
-    </div>
+    <ToastProvider>
+      <div className="min-h-dvh">
+        <AdminNav />
+        <main className="mx-auto max-w-3xl px-6 py-10">{children}</main>
+      </div>
+    </ToastProvider>
   )
 }

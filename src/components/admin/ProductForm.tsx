@@ -1,15 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Label from '@/components/Label'
-import { imageUrl } from '@/lib/images'
-import { compressImage, formatBytes } from '@/lib/compressImage'
+import ImageField from '@/components/admin/ImageField'
+import { useToast } from '@/components/Toast'
 import {
   createProduct,
   updateProduct,
-  uploadProductImages,
   type ProductInput,
   type VariantInput,
 } from '@/lib/queries/adminProducts'
@@ -74,6 +72,7 @@ export default function ProductForm({
   initial?: ProductDetail
 }) {
   const router = useRouter()
+  const { show } = useToast()
   const editing = Boolean(initial)
 
   const [slug, setSlug] = useState(initial?.slug ?? '')
@@ -96,43 +95,12 @@ export default function ProductForm({
     })) ?? [{ ...EMPTY_VARIANT }]
   )
 
-  const [uploading, setUploading] = useState(false)
   const [uploadNote, setUploadNote] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   function setVariant(i: number, patch: Partial<VariantInput>) {
     setVariants((vs) => vs.map((v, j) => (i === j ? { ...v, ...patch } : v)))
-  }
-
-  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? [])
-    if (files.length === 0) return
-    setError(null)
-    setUploadNote(null)
-    setUploading(true)
-    try {
-      // 1. 먼저 줄인다. 폰 사진은 5MB 를 넘는데 화면에서 가장 큰 자리가
-      //    1000px 이 안 된다. 원본을 그대로 올리면 이 구간이 제일 느리다.
-      const before = files.reduce((n, f) => n + f.size, 0)
-      const shrunk = await Promise.all(files.map(compressImage))
-      const after = shrunk.reduce((n, f) => n + f.size, 0)
-
-      // 2. 한 번에 올린다. 장마다 부르면 폴더 목록을 그때마다 다시 읽는다
-      const paths = await uploadProductImages(slug, shrunk)
-      setImages((prev) => [...prev, ...paths])
-
-      setUploadNote(
-        after < before
-          ? `${files.length}장 올렸습니다 — ${formatBytes(before)} → ${formatBytes(after)}`
-          : `${files.length}장 올렸습니다 — ${formatBytes(after)}`
-      )
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '사진을 올리지 못했습니다.')
-    } finally {
-      setUploading(false)
-      e.target.value = ''
-    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -169,10 +137,14 @@ export default function ProductForm({
       }
       // 가게 화면은 60초 주기로 굽는다. 바꾼 즉시 보이도록 깨운다
       await revalidateShop()
+      // 목록으로 옮기면 폼이 사라지므로, 무엇이 됐는지는 알림으로 남긴다
+      show(initial ? '저장했습니다' : '등록했습니다')
       router.push('/admin/products')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : '저장하지 못했습니다.')
+      const msg = err instanceof Error ? err.message : '저장하지 못했습니다.'
+      setError(msg)
+      show(msg, 'fail')
     } finally {
       setSaving(false)
     }
@@ -234,76 +206,20 @@ export default function ProductForm({
       </Field>
 
       {/* ───── 사진 ───── */}
-      <Field
-        label="사진"
-        hint={
-          slug
-            ? `product-images/${slug}/ 아래에 01, 02… 로 올라갑니다. 첫 장이 대표입니다.`
-            : 'slug 를 먼저 입력해 주세요. 그 이름으로 폴더가 만들어집니다.'
-        }
-      >
-        <div className="flex flex-wrap gap-2">
-          {images.map((path, i) => (
-            <div
-              key={path}
-              className="relative h-20 w-20 overflow-hidden border border-gray-200 bg-gray-100"
-            >
-              <Image
-                src={imageUrl(path)}
-                alt=""
-                fill
-                sizes="80px"
-                className="object-cover"
-              />
-              {i === 0 ? (
-                <span className="bg-ink text-cloud text-label absolute top-0 left-0 px-1">
-                  대표
-                </span>
-              ) : null}
-              <button
-                type="button"
-                onClick={() =>
-                  setImages((prev) => prev.filter((p) => p !== path))
-                }
-                aria-label="사진 빼기"
-                className="text-ink absolute right-0 bottom-0 bg-white/90 px-1 text-xs"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-
-          <label
-            className={`text-caption flex h-20 w-20 items-center justify-center border border-dashed text-center ${
-              slug
-                ? 'hover:border-ink text-ink-muted cursor-pointer border-gray-300'
-                : 'text-ink-subtle cursor-not-allowed border-gray-200'
-            }`}
-          >
-            {uploading ? '올리는 중…' : slug ? '+ 사진' : 'slug 먼저'}
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              disabled={!slug || uploading}
-              onChange={handleUpload}
-              className="hidden"
-            />
-          </label>
-        </div>
-      </Field>
-      <div className="-mt-6 flex flex-col gap-1">
-        {uploadNote ? (
-          <p className="text-ink-muted text-caption">{uploadNote}</p>
-        ) : null}
-        <p className="text-ink-subtle text-caption">
-          ⚠️ 사진을 여기서 빼도 저장소의 파일은 지워지지 않습니다. 화면에서만
-          빠집니다.
-        </p>
-        <p className="text-ink-subtle text-caption">
-          올리기 전에 긴 변 1600px 으로 줄입니다. 원본은 저장하지 않습니다.
-        </p>
-      </div>
+      <ImageField
+        slug={slug}
+        images={images}
+        onChange={setImages}
+        onNotice={(t) => {
+          setUploadNote(t)
+          show(t)
+        }}
+        onError={setError}
+        disabled={saving}
+      />
+      {uploadNote ? (
+        <p className="text-ink-muted text-caption -mt-6">{uploadNote}</p>
+      ) : null}
 
       {/* ───── 옵션 ───── */}
       <Field
@@ -409,7 +325,7 @@ export default function ProductForm({
       <div className="flex gap-3">
         <button
           type="submit"
-          disabled={saving || uploading}
+          disabled={saving}
           className="bg-ink text-cloud text-caption px-7 py-3 tracking-widest uppercase disabled:opacity-40"
         >
           {saving ? '저장 중…' : editing ? '저장' : '등록'}

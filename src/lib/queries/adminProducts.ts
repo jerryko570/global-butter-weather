@@ -176,10 +176,12 @@ export async function deleteProduct(id: string): Promise<void> {
  * 읽게 되어 왕복이 두 배가 된다. 처음에 그렇게 짰다가 느려서 고쳤다
  * (2026-09-19).
  *
- * 순서는 지킨다 — 번호가 고른 순서를 따라가야 대표 사진을 예측할 수 있다.
- * 올리기 자체는 한 장씩 기다린다. 같은 번호를 두 장이 가져가면 안 된다.
+ * **번호를 먼저 다 정하고 동시에 올린다.** 순서대로 기다릴 이유가 없다 —
+ * 번호가 이미 정해져 있어 겹치지 않기 때문이다. 다섯 장이면 다섯 배 가깝게
+ * 빨라진다.
  *
- * 줄이는 것은 `compressImage` 가 한다. 여기서는 받은 파일을 그대로 올린다.
+ * 줄이고 형식을 맞추는 것은 `compressImage` 가 한다. 여기서는 받은 파일을
+ * 그대로 올린다.
  */
 export async function uploadProductImages(
   slug: string,
@@ -194,25 +196,53 @@ export async function uploadProductImages(
     .from('product-images')
     .list(slug, { limit: 1000 })
 
-  let next =
+  const start =
     (existing ?? []).reduce((max, f) => {
       const n = Number(f.name.split('.')[0])
       return Number.isFinite(n) && n > max ? n : max
     }, 0) + 1
 
-  const paths: string[] = []
-  for (const file of files) {
-    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
-    const path = `${slug}/${String(next).padStart(2, '0')}.${ext}`
+  // 번호를 먼저 배정한다. 이래야 동시에 올려도 겹치지 않는다
+  const planned = files.map((file, i) => ({
+    file,
+    path: `${slug}/${String(start + i).padStart(2, '0')}.${extensionOf(file)}`,
+  }))
 
-    const { error } = await supabase.storage
-      .from('product-images')
-      .upload(path, file, { cacheControl: '3600', upsert: false })
-    if (error) throw new Error(error.message)
+  await Promise.all(
+    planned.map(async ({ file, path }) => {
+      const { error } = await supabase.storage
+        .from('product-images')
+        .upload(path, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type || undefined,
+        })
+      if (error) throw new Error(`${file.name} — ${error.message}`)
+    })
+  )
 
-    paths.push(path)
-    next += 1
+  return planned.map((p) => p.path)
+}
+
+/**
+ * 확장자는 **파일 이름이 아니라 실제 형식에서** 뽑는다.
+ *
+ * 이름만 믿으면 두 가지가 깨진다 — 이름에 점이 없는 파일(`photo`)은
+ * 확장자가 `photo` 가 되고, 이름만 `.jpg` 인 HEIC 는 엉뚱한 이름으로
+ * 저장된다. 둘 다 화면에서 엑스박스로 끝난다.
+ */
+function extensionOf(file: File): string {
+  const byType: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+    'image/avif': 'avif',
   }
+  if (byType[file.type]) return byType[file.type]
 
-  return paths
+  const fromName = file.name.includes('.')
+    ? (file.name.split('.').pop() ?? '').toLowerCase()
+    : ''
+  return /^[a-z0-9]{2,5}$/.test(fromName) ? fromName : 'jpg'
 }
