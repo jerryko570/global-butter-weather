@@ -5,13 +5,15 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Label from '@/components/Label'
 import { imageUrl } from '@/lib/images'
+import { compressImage, formatBytes } from '@/lib/compressImage'
 import {
   createProduct,
   updateProduct,
-  uploadProductImage,
+  uploadProductImages,
   type ProductInput,
   type VariantInput,
 } from '@/lib/queries/adminProducts'
+import { revalidateShop } from '@/app/admin/actions'
 import type { ProductCategory, ProductDetail } from '@/types/product'
 
 /**
@@ -95,6 +97,7 @@ export default function ProductForm({
   )
 
   const [uploading, setUploading] = useState(false)
+  const [uploadNote, setUploadNote] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -106,14 +109,24 @@ export default function ProductForm({
     const files = Array.from(e.target.files ?? [])
     if (files.length === 0) return
     setError(null)
+    setUploadNote(null)
     setUploading(true)
     try {
-      // 한 장씩 올린다. 번호를 폴더에서 세어 붙이므로 동시에 올리면
-      // 같은 번호를 두 장이 가져간다.
-      for (const file of files) {
-        const path = await uploadProductImage(slug, file)
-        setImages((prev) => [...prev, path])
-      }
+      // 1. 먼저 줄인다. 폰 사진은 5MB 를 넘는데 화면에서 가장 큰 자리가
+      //    1000px 이 안 된다. 원본을 그대로 올리면 이 구간이 제일 느리다.
+      const before = files.reduce((n, f) => n + f.size, 0)
+      const shrunk = await Promise.all(files.map(compressImage))
+      const after = shrunk.reduce((n, f) => n + f.size, 0)
+
+      // 2. 한 번에 올린다. 장마다 부르면 폴더 목록을 그때마다 다시 읽는다
+      const paths = await uploadProductImages(slug, shrunk)
+      setImages((prev) => [...prev, ...paths])
+
+      setUploadNote(
+        after < before
+          ? `${files.length}장 올렸습니다 — ${formatBytes(before)} → ${formatBytes(after)}`
+          : `${files.length}장 올렸습니다 — ${formatBytes(after)}`
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : '사진을 올리지 못했습니다.')
     } finally {
@@ -154,6 +167,8 @@ export default function ProductForm({
       } else {
         await createProduct(input, variants)
       }
+      // 가게 화면은 60초 주기로 굽는다. 바꾼 즉시 보이도록 깨운다
+      await revalidateShop()
       router.push('/admin/products')
       router.refresh()
     } catch (err) {
@@ -277,10 +292,18 @@ export default function ProductForm({
           </label>
         </div>
       </Field>
-      <p className="text-ink-subtle text-caption -mt-6">
-        ⚠️ 사진을 여기서 빼도 저장소의 파일은 지워지지 않습니다. 화면에서만
-        빠집니다.
-      </p>
+      <div className="-mt-6 flex flex-col gap-1">
+        {uploadNote ? (
+          <p className="text-ink-muted text-caption">{uploadNote}</p>
+        ) : null}
+        <p className="text-ink-subtle text-caption">
+          ⚠️ 사진을 여기서 빼도 저장소의 파일은 지워지지 않습니다. 화면에서만
+          빠집니다.
+        </p>
+        <p className="text-ink-subtle text-caption">
+          올리기 전에 긴 변 1600px 으로 줄입니다. 원본은 저장하지 않습니다.
+        </p>
+      </div>
 
       {/* ───── 옵션 ───── */}
       <Field

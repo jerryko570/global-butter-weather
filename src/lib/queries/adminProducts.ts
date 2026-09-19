@@ -172,33 +172,47 @@ export async function deleteProduct(id: string): Promise<void> {
  * 그 부분만 계승하지 않는다 — 전체 주소를 넣으면 프로젝트가 바뀔 때 모든
  * 행을 고쳐야 한다. 여기서는 **경로만** 돌려준다.
  *
- * 번호는 폴더에 이미 있는 것 중 가장 큰 수 + 1 이다. 지웠다 다시 올려도
- * 겹치지 않는다.
+ * **여러 장을 한 번에 받는다.** 한 장씩 부르면 폴더 목록을 장마다 다시
+ * 읽게 되어 왕복이 두 배가 된다. 처음에 그렇게 짰다가 느려서 고쳤다
+ * (2026-09-19).
+ *
+ * 순서는 지킨다 — 번호가 고른 순서를 따라가야 대표 사진을 예측할 수 있다.
+ * 올리기 자체는 한 장씩 기다린다. 같은 번호를 두 장이 가져가면 안 된다.
+ *
+ * 줄이는 것은 `compressImage` 가 한다. 여기서는 받은 파일을 그대로 올린다.
  */
-export async function uploadProductImage(
+export async function uploadProductImages(
   slug: string,
-  file: File
-): Promise<string> {
+  files: File[]
+): Promise<string[]> {
   if (!slug) throw new Error('slug 를 먼저 입력해 주세요. 폴더 이름이 됩니다.')
 
   const supabase = createClient()
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
 
+  // 폴더 목록은 **한 번만** 읽는다. 다음 번호는 여기서 세어 나간다
   const { data: existing } = await supabase.storage
     .from('product-images')
     .list(slug, { limit: 1000 })
 
-  const maxNo = (existing ?? []).reduce((max, f) => {
-    const n = Number(f.name.split('.')[0])
-    return Number.isFinite(n) && n > max ? n : max
-  }, 0)
+  let next =
+    (existing ?? []).reduce((max, f) => {
+      const n = Number(f.name.split('.')[0])
+      return Number.isFinite(n) && n > max ? n : max
+    }, 0) + 1
 
-  const path = `${slug}/${String(maxNo + 1).padStart(2, '0')}.${ext}`
+  const paths: string[] = []
+  for (const file of files) {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase()
+    const path = `${slug}/${String(next).padStart(2, '0')}.${ext}`
 
-  const { error } = await supabase.storage
-    .from('product-images')
-    .upload(path, file, { cacheControl: '3600', upsert: false })
-  if (error) throw new Error(error.message)
+    const { error } = await supabase.storage
+      .from('product-images')
+      .upload(path, file, { cacheControl: '3600', upsert: false })
+    if (error) throw new Error(error.message)
 
-  return path
+    paths.push(path)
+    next += 1
+  }
+
+  return paths
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteProduct } from '@/lib/queries/adminProducts'
+import { revalidateShop } from '@/app/admin/actions'
 
 /**
  * 목록의 삭제 단추. **목록 자체는 server component 라 여기만 client 다.**
@@ -33,6 +34,7 @@ export default function DeleteProductButton({
     setBusy(true)
     try {
       await deleteProduct(id)
+      await revalidateShop()
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : '지우지 못했습니다.')
