@@ -4,21 +4,30 @@
 -- `docs/design/checkout-data-model.md` (2026-07-08). 거기서 이미
 -- orders(영수증 표지) + order_items(줄들) 로 정해 두었다.
 --
+-- ⚠️ **다시 실행해도 되게 썼다.** create table 은 `if not exists`, policy 와
+-- trigger 는 만들기 전에 `drop ... if exists`, enum 은 예외를 삼킨다.
+-- 중간에서 실패하면 **앞쪽만 들어간 상태**로 멈추는데, 그대로 두면 다시
+-- 돌릴 수가 없어 사람이 어디까지 갔는지 세어야 한다 (0004 에서 실제로
+-- 그랬다).
+--
 -- 우리 쪽에서 달라진 곳은 **옵션**이다. 옛 쪽은 products.options 가
 -- text[] 였고 order_items.option 이 그 문자열을 박제했다. 우리는
 -- product_variants 테이블이 있어 어느 옵션이었는지 가리킬 수 있다.
 
 -- ── 주문 상태 ───────────────────────────────────────────────
-create type order_status as enum (
+do $enum$ begin
+  create type order_status as enum (
   'pending',    -- 주문서를 만들었고 결제를 기다린다
   'paid',       -- 결제됨. **이때 재고가 깎인다**
   'shipped',    -- 보냄
   'done',       -- 끝
   'cancelled'   -- 취소
-);
+  );
+exception when duplicate_object then null;
+end $enum$;
 
 -- ── orders — 영수증 표지 ────────────────────────────────────
-create table orders (
+create table if not exists orders (
   id          uuid primary key default gen_random_uuid(),
 
   -- **회원만 산다 (2026-09-19 확정).** 구글·카카오 OAuth 로 들어오므로
@@ -53,7 +62,7 @@ create table orders (
   updated_at  timestamptz not null default now()
 );
 
-create index orders_user_idx on orders (user_id, created_at desc);
+create index if not exists orders_user_idx on orders (user_id, created_at desc);
 
 -- ── order_items — 영수증의 줄들 ─────────────────────────────
 --
@@ -61,7 +70,7 @@ create index orders_user_idx on orders (user_id, created_at desc);
 -- 가격이 바뀌어도 영수증은 그때 그대로여야 한다. 그래서 이름·옵션 이름·
 -- 단가를 복사해 들고 있고, **바뀌어도 되는 것(사진)만** product_id 로
 -- 이어 본다.
-create table order_items (
+create table if not exists order_items (
   id          uuid primary key default gen_random_uuid(),
   order_id    uuid not null references orders(id) on delete cascade,
 
@@ -79,8 +88,9 @@ create table order_items (
   created_at  timestamptz not null default now()
 );
 
-create index order_items_order_idx on order_items (order_id);
+create index if not exists order_items_order_idx on order_items (order_id);
 
+drop trigger if exists orders_updated_at on orders;
 create trigger orders_updated_at
   before update on orders
   for each row execute function set_updated_at();
@@ -90,16 +100,19 @@ alter table orders enable row level security;
 alter table order_items enable row level security;
 
 -- 손님은 **자기 주문만** 본다. 회원 필수라 이 한 줄로 끝난다
+drop policy if exists orders_own on orders;
 create policy orders_own on orders
   for select to authenticated
   using (user_id = auth.uid());
 
+drop policy if exists orders_insert_own on orders;
 create policy orders_insert_own on orders
   for insert to authenticated
   with check (user_id = auth.uid());
 
 -- 줄은 **부모 영수증이 자기 것일 때만** 보인다. 이게 없으면 남의 주문
 -- 내역이 order_id 를 통해 새어 나간다
+drop policy if exists order_items_own on order_items;
 create policy order_items_own on order_items
   for select to authenticated
   using (exists (
@@ -107,6 +120,7 @@ create policy order_items_own on order_items
     where o.id = order_items.order_id and o.user_id = auth.uid()
   ));
 
+drop policy if exists order_items_insert_own on order_items;
 create policy order_items_insert_own on order_items
   for insert to authenticated
   with check (exists (
@@ -116,10 +130,12 @@ create policy order_items_insert_own on order_items
 
 -- 손님은 주문을 **고치거나 지우지 못한다.** update·delete 정책을 만들지
 -- 않는다. 취소는 관리자가 status 를 바꾸는 것이다 (아래 정책).
+drop policy if exists orders_admin_all on orders;
 create policy orders_admin_all on orders
   for all to authenticated
   using (is_admin()) with check (is_admin());
 
+drop policy if exists order_items_admin_all on order_items;
 create policy order_items_admin_all on order_items
   for all to authenticated
   using (is_admin()) with check (is_admin());
@@ -210,7 +226,7 @@ grant execute on function mark_order_paid(uuid, text, text) to service_role;
 -- ⚠️ **날짜는 한국 시각이다.** Postgres 의 `current_date` 는 UTC 라
 -- 그대로 쓰면 한국 시각 0시~9시 주문이 **전날 번호**를 받는다.
 
-create table order_number_counters (
+create table if not exists order_number_counters (
   day     date    primary key,
   last_no integer not null default 0
 );
@@ -242,7 +258,7 @@ $$;
 
 revoke all on function next_order_no() from public;
 
-alter table orders add column order_no text unique;
+alter table orders add column if not exists order_no text unique;
 
 -- **번호는 트리거가 붙인다.** column default 로 두면 손님이 위 함수의
 -- 실행 권한을 가져야 하는데, 트리거 함수는 시스템이 부르므로 손님에게
@@ -262,6 +278,7 @@ begin
 end;
 $$;
 
+drop trigger if exists orders_set_order_no on orders;
 create trigger orders_set_order_no
   before insert on orders
   for each row execute function set_order_no();
