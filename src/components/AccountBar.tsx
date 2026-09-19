@@ -1,10 +1,13 @@
+import CartLink from '@/components/CartLink'
+
 /**
  * 본문 위의 얇은 줄. 계정과 장바구니만 둔다.
  *
  * **티커 띠(무료배송 기준·입고 주기)는 두지 않는다** — 이나래가 빼라고
  * 했다 (2026-09-15). 다시 넣지 말 것.
  *
- * ⚠️ 링크는 아직 아무 데도 가지 않는다. 로그인·장바구니는 M3다.
+ * ⚠️ 로그인·회원가입은 아직 아무 데도 가지 않는다 (I3.3).
+ * **장바구니만 실제로 이어져 있다** — 숫자도 담긴 개수다.
  */
 export default function AccountBar() {
   return (
@@ -15,12 +18,7 @@ export default function AccountBar() {
       <a href="#" className="text-ink-muted hover:text-ink text-caption">
         회원가입
       </a>
-      <a
-        href="#"
-        className="text-ink-muted hover:text-ink text-caption tracking-wide uppercase"
-      >
-        Cart (0)
-      </a>
+      <CartLink />
     </div>
   )
 }
