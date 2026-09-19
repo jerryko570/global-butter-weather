@@ -131,10 +131,11 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 
 스키마는 파일로 있다.
 
-| 무엇           | 어디                                           |
-| -------------- | ---------------------------------------------- |
-| 확정 SQL       | [`supabase/migrations/`](supabase/migrations/) |
-| 왜 그렇게 짰나 | [`docs/dev/schema.md`](docs/dev/schema.md)     |
+| 무엇             | 어디                                                               |
+| ---------------- | ------------------------------------------------------------------ |
+| 확정 SQL         | [`supabase/migrations/`](supabase/migrations/)                     |
+| 왜 그렇게 짰나   | [`docs/dev/schema.md`](docs/dev/schema.md)                         |
+| 소셜 로그인 설정 | [`docs/dev/social-login-setup.md`](docs/dev/social-login-setup.md) |
 
 **옛 레포의 `products` 테이블을 계승한다.** 디자인과 같은 이유다 — 이미 한 번 장사에 쓰인 모양이라 새로 상상하는 것보다 낫다. 다만 옛 쪽은 대시보드에서 손으로 만들어 재현할 수 없었고, 여기서는 `.sql`로 남긴다.
 
