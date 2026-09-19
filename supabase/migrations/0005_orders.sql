@@ -194,3 +194,76 @@ revoke all on function mark_order_paid(uuid, text, text) from public;
 -- 손님이 직접 부르지 못한다. **결제가 실제로 됐는지는 서버만 안다** —
 -- 결제사 통지를 받은 서버가 secret 키로 부른다
 grant execute on function mark_order_paid(uuid, text, text) to service_role;
+
+-- ── 주문번호 ────────────────────────────────────────────────
+--
+-- `id` 는 uuid 라 손님에게 「주문번호 알려주세요」 하기 나쁘다.
+-- 사람이 부를 수 있는 번호를 따로 둔다.
+--
+-- 꼴은 **`YYMMDD-NNNN`** 이다 — `260919-0007`.
+--
+-- 이나래가 처음 제안한 것은 `yyyymmddhhmmss` + 순번이었다. 그러면
+-- 17자리가 되어 전화로 불러주기 어렵고, **초까지 넣어도 순번은 여전히
+-- 필요하다** — 같은 초에 둘이 들어오면 겹치기 때문이다. 유일성을
+-- 만드는 것이 순번이라면 초는 자리만 차지한다.
+--
+-- ⚠️ **날짜는 한국 시각이다.** Postgres 의 `current_date` 는 UTC 라
+-- 그대로 쓰면 한국 시각 0시~9시 주문이 **전날 번호**를 받는다.
+
+create table order_number_counters (
+  day     date    primary key,
+  last_no integer not null default 0
+);
+
+-- 손님이 읽을 이유가 없다. 정책을 만들지 않아 API 로 닫힌다
+alter table order_number_counters enable row level security;
+
+create or replace function next_order_no()
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  kst_day date := (now() at time zone 'Asia/Seoul')::date;
+  no      integer;
+begin
+  -- upsert 한 문장이라 **두 주문이 같은 번호를 가져갈 수 없다.**
+  -- 읽고 나서 1을 더하는 방식이었다면 그 사이가 틈이 된다.
+  insert into order_number_counters (day, last_no)
+  values (kst_day, 1)
+  on conflict (day) do update
+    set last_no = order_number_counters.last_no + 1
+  returning last_no into no;
+
+  return to_char(kst_day, 'YYMMDD') || '-' || lpad(no::text, 4, '0');
+end;
+$$;
+
+revoke all on function next_order_no() from public;
+
+alter table orders add column order_no text unique;
+
+-- **번호는 트리거가 붙인다.** column default 로 두면 손님이 위 함수의
+-- 실행 권한을 가져야 하는데, 트리거 함수는 시스템이 부르므로 손님에게
+-- 아무 권한도 열지 않아도 된다.
+--
+-- 그리고 **손님이 보낸 값을 쓰지 않는다.** default 는 값을 같이 보내면
+-- 그것이 이긴다 — 번호를 손님이 정하게 두는 셈이다.
+create or replace function set_order_no()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  new.order_no := next_order_no();
+  return new;
+end;
+$$;
+
+create trigger orders_set_order_no
+  before insert on orders
+  for each row execute function set_order_no();
+
+-- 목록·조회가 이 번호로 들어온다. unique 가 이미 색인을 만든다
