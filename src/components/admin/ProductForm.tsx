@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Label from '@/components/Label'
 import ImageField from '@/components/admin/ImageField'
 import { useToast } from '@/components/Toast'
+import { LIMITS, validateProduct } from '@/lib/productLimits'
 import {
   createProduct,
   updateProduct,
@@ -107,10 +108,19 @@ export default function ProductForm({
     e.preventDefault()
     setError(null)
 
-    if (variants.length === 0 || variants.some((v) => !v.name.trim())) {
-      setError(
-        '옵션 이름을 채워 주세요. 옵션이 없는 상품은 화면에 나오지 않습니다.'
-      )
+    // DB 의 CHECK 제약과 같은 값을 미리 본다. 저장을 눌렀다가 DB 에서
+    // 튕기면 어느 칸이 문제인지 알 수 없다 (schema.md 7-2절).
+    const problems = validateProduct({
+      slug,
+      name,
+      nameEn,
+      description,
+      images,
+      variants,
+    })
+    if (problems.length > 0) {
+      setError(problems.join('\n'))
+      show('저장하지 못했습니다', 'fail')
       return
     }
 
@@ -158,6 +168,7 @@ export default function ProductForm({
             className={inputClass}
             value={name}
             onChange={(e) => setName(e.target.value)}
+            maxLength={LIMITS.name.max}
             required
           />
         </Field>
@@ -166,6 +177,7 @@ export default function ProductForm({
             className={inputClass}
             value={nameEn}
             onChange={(e) => setNameEn(e.target.value)}
+            maxLength={LIMITS.nameEn.max}
           />
         </Field>
       </div>
@@ -178,7 +190,8 @@ export default function ProductForm({
           className={inputClass}
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
-          pattern="[a-z0-9-]+"
+          minLength={LIMITS.slug.min}
+          maxLength={LIMITS.slug.max}
           required
         />
       </Field>
@@ -202,6 +215,7 @@ export default function ProductForm({
           className={`${inputClass} min-h-24`}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          maxLength={LIMITS.description.max}
         />
       </Field>
 
@@ -245,19 +259,22 @@ export default function ProductForm({
               <input
                 className={inputClass}
                 placeholder="이름 *"
+                maxLength={LIMITS.variantName.max}
                 value={v.name}
                 onChange={(e) => setVariant(i, { name: e.target.value })}
               />
               <input
                 className={inputClass}
                 placeholder="영문 이름"
+                maxLength={LIMITS.variantNameEn.max}
                 value={v.name_en ?? ''}
                 onChange={(e) => setVariant(i, { name_en: e.target.value })}
               />
               <input
                 className={inputClass}
                 type="number"
-                min={0}
+                min={LIMITS.priceKrw.min}
+                max={LIMITS.priceKrw.max}
                 placeholder="가격 (원)"
                 value={v.price_krw}
                 onChange={(e) =>
@@ -267,7 +284,8 @@ export default function ProductForm({
               <input
                 className={inputClass}
                 type="number"
-                min={0}
+                min={LIMITS.stock.min}
+                max={LIMITS.stock.max}
                 placeholder="재고"
                 value={v.stock}
                 onChange={(e) =>
@@ -317,7 +335,7 @@ export default function ProductForm({
       </Field>
 
       {error ? (
-        <p className="text-caption border border-red-200 bg-red-50 p-3 text-red-600">
+        <p className="text-caption border border-red-200 bg-red-50 p-3 whitespace-pre-line text-red-600">
           {error}
         </p>
       ) : null}
