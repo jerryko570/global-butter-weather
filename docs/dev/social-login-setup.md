@@ -55,19 +55,27 @@ https://ghrpcggsjgiiitxjqdsw.supabase.co/auth/v1/callback
 
 앱 이름 · 회사명 · 카테고리 · 주 도메인을 채운다.
 
-### 2. 앱 설정 → 플랫폼 키 → **REST API 키**
+### 2. 키 두 개를 가져온다 — 왼쪽 **「앱」** 메뉴 안이다
 
-⚠️ **이것이 Client ID 다.** JavaScript 키도 Native 키도 아니다. 셋이 나란히 있어서 틀리기 쉽다.
+```
+사이드바의 「앱」 ˅ 을 펼친다
+  → 플랫폼 키
+    → REST API 키            ← 이것이 Client ID
+      → 그 아래 클라이언트 시크릿
+```
 
-### 3. 「카카오 로그인 클라이언트 시크릿」 활성화
+⚠️ **「카카오 로그인」 메뉴가 아니다.** 시크릿을 「카카오 로그인 → 일반」에서 찾다가 못 찾기 쉽다 (2026-09-19에 실제로 그랬다). **키는 「앱」, 로그인 설정은 「카카오 로그인」**으로 갈린다.
 
-같은 화면에서 켜고 코드를 복사한다.
+⚠️ **REST API 키가 Client ID 다.** JavaScript 키·Native 키가 나란히 있어 틀리기 쉽다.
 
-### 4. Redirect URI 등록
+클라이언트 시크릿은 **새로 만든 앱이면 이미 켜져 있다** — [공식 문서](https://developers.kakao.com/docs/ko/kakaologin/prerequisite)에 「카카오 디벨로퍼스에서 발급한 모든 REST API 키에 대해 보안을 위해 자동으로 활성화된다」고 되어 있다. 켜는 게 아니라 복사만 하면 될 수 있다.
 
-맨 위의 Supabase 콜백 주소.
+### 3. 카카오 로그인 → 일반
 
-### 5. 동의항목
+- **사용 설정**을 `ON` 으로
+- 같은 화면을 **아래로 스크롤**하면 `OpenID Connect` 다음에 **Redirect URI** 칸이 있다. 맨 위의 Supabase 콜백 주소를 넣는다
+
+### 4. 동의항목
 
 - `profile_nickname` · `profile_image`
 - ⚠️ **`account_email` 은 비즈니스 앱만 쓸 수 있다.** 개인 앱이면 **이메일 없는 손님이 들어온다** — 아래 「알아둘 것」 참조
