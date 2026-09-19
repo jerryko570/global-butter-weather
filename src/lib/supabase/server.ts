@@ -32,3 +32,34 @@ export async function createClient() {
     }
   )
 }
+
+/**
+ * **route handler 전용 client.** 쿠키를 실제로 심는다.
+ *
+ * 위의 `createClient()` 는 `setAll` 이 빈 함수다 — 서버 component 에서는
+ * 쿠키를 쓸 수 없기 때문이다. 그런데 **OAuth 콜백은 세션 쿠키를 심어야
+ * 한다.** route handler 는 쓸 수 있으므로 여기서만 따로 만든다.
+ *
+ * 둘을 하나로 합치지 말 것. 합치면 서버 component 에서 쿠키를 쓰려다
+ * 던지고, 그 예외는 화면 전체를 죽인다.
+ */
+export async function createRouteClient() {
+  const cookieStore = await cookies()
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(list) {
+          list.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+}
