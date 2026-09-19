@@ -5,6 +5,8 @@
 > **실행됐다 (2026-09-16).** 프로젝트는 `ghrpcggsjgiiitxjqdsw`(이나래 계정)이고 `products` · `product_variants` · `products_public` 이 서 있다.
 >
 > 확인한 것 — 셋 다 publishable 키로 조회되고(200), `insert` 는 RLS 가 막고(`42501`), 없는 카테고리(`bead`)는 enum 이 거부한다(`22P02`).
+>
+> **`0002` 도 실행됐다 (2026-09-19).** `product-images` 버킷이 서 있고 publishable 키로 목록이 조회된다(200). **다만 아직 비어 있다** — 사진은 여전히 레포 안 `public/photos/` 에 있고, `imageUrl()` 이 `/` 로 시작하는 값을 그대로 통과시켜 화면은 정상이다. 9절 4번이 남은 일이다.
 
 ## 0. 옛 레포에서 계승한다
 
@@ -182,6 +184,6 @@ product-images/
 ## 9. 실행 순서
 
 1. ~~`0001_products.sql` 실행~~ → **끝남 (2026-09-16)**
-2. **`0002_product_images_bucket.sql` 실행** — 아직 안 했다
-3. **Vercel 환경변수를 Preview 에도 넣는다** — Production 에만 있으면 PR 프리뷰 빌드가 죽는다 (2026-09-16에 실제로 그랬다). Project Settings → Environment Variables 에서 Production·Preview·Development 를 전부 체크
+2. ~~`0002_product_images_bucket.sql` 실행~~ → **끝남 (2026-09-19)**
+3. ~~**Vercel 환경변수를 Preview 에도 넣는다**~~ → **끝남 (2026-09-16).** Production 에만 있으면 PR 프리뷰 빌드가 죽는다. 그날 05:40·05:45 프리뷰가 연달아 죽고 05:52 부터 성공한 것이 그 경계다. Project Settings → Environment Variables 에서 Production·Preview·Development 를 전부 체크해야 한다
 4. 사진을 Storage 로 옮기고 `images` 의 값을 경로로 바꾼다. 옮기는 동안 `/photos/...` 와 섞여 있어도 화면은 둘 다 그린다

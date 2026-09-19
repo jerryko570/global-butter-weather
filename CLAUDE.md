@@ -119,11 +119,11 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 
 > 옛 문서에 있던 Framer Motion·Toss Payments는 **이 레포 의존성에 없다.** 필요해지면 그때 추가한다.
 
-### 3-2. Supabase — 프로젝트는 있고, 테이블은 아직 없다
+### 3-2. Supabase — 스키마가 서 있다
 
 프로젝트를 만들었다 (`ghrpcggsjgiiitxjqdsw`, 이나래 계정). `.env.local`·`next.config.ts` 이미지 호스트·client 까지 연결돼 있다.
 
-**테이블은 아직 만들지 않았다.** 마이그레이션 SQL 은 있고 실행만 남았다.
+**마이그레이션 둘 다 실행됐다** — `0001`(2026-09-16), `0002`(2026-09-19). 실측으로 `products` · `product_variants` · `products_public` 과 `product-images` 버킷이 서 있고, publishable 키의 `insert` 는 막힌다.
 
 > **API 키는 `publishable`(`sb_publishable_*`)을 쓴다.** `anon` 키는 2026년 말에 제거된다. 둘 다 브라우저로 나가는 값이라 비밀이 아니고 — **데이터를 지키는 것은 키가 아니라 RLS 다.**
 >
@@ -145,10 +145,9 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 - **`status`(판매 상태)와 `is_active`(노출 여부)는 다른 축이다.** 품절이어도 보여야 하고, 팔 수 있어도 감춰야 할 때가 있다. `is_active` 기본값은 **`false`(감춤)**다
 - **쓰기 정책을 만들지 않는다.** RLS가 전부 막고, 관리자 작업은 `service_role` 키로만 한다. 그 키는 서버에서만 쓴다
 
-남은 것은 둘이다.
+**남은 것은 사진을 옮기는 일 하나다.** `product-images` 버킷은 서 있지만 **비어 있고**, 사진은 아직 레포 안 `public/photos/` 에 있다. 대시보드에서 올리고 `products.images` 의 값을 버킷 안 경로(`키링/01.jpg`)로 바꾸면 끝난다.
 
-1. Supabase 대시보드 → **SQL Editor** 에 `supabase/migrations/0001_products.sql` 붙여넣고 실행
-2. `docs/dev/schema.md` 맨 위의 「아직 실행되지 않았다」 줄 삭제
+**옮기는 동안 둘이 섞여 있어도 화면은 깨지지 않는다** — `src/lib/images.ts` 의 `imageUrl()` 이 `/` 로 시작하는 값과 완성된 주소를 그대로 통과시킨다. 그래서 한 번에 다 옮기지 않아도 된다.
 
 ## 4. 디자인 시스템 (`src/app/styles/` 실측)
 
