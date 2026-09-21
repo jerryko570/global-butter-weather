@@ -79,10 +79,51 @@ https://ghrpcggsjgiiitxjqdsw.supabase.co/auth/v1/callback
 - **사용 설정**을 `ON` 으로. 여기서 할 일은 이것뿐이다
 - **OpenID Connect 는 `OFF` 로 둔다.** Supabase 가 OAuth 로 처리한다
 
-### 4. 동의항목
+### 4. 동의항목 — **안 켜면 로그인 자체가 안 된다** ★
 
-- `profile_nickname` · `profile_image`
-- ⚠️ **`account_email` 은 비즈니스 앱만 쓸 수 있다.** 개인 앱이면 **이메일 없는 손님이 들어온다** — 아래 「알아둘 것」 참조
+`카카오 로그인` → `동의항목` 에서 켠다.
+
+| 항목                                 | 설정                         |
+| ------------------------------------ | ---------------------------- |
+| 닉네임 (`profile_nickname`)          | 필수 동의 또는 선택 동의     |
+| 프로필 사진 (`profile_image`)        | 선택 동의                    |
+| 카카오계정(이메일) (`account_email`) | **비즈니스 앱만 켤 수 있다** |
+
+⚠️ **여기를 건너뛰면 `KOE205` 가 뜬다.**
+
+> 잘못된 요청 (KOE205)
+> Butter Weather 서비스 설정에 오류가 있어, 이용할 수 없습니다.
+
+[공식 문서](https://developers.kakao.com/docs/ko/kakaologin/trouble-shooting)에 따르면 **「앱에 설정하지 않은 동의항목을 포함해 인가 코드를 요청할 때」** 나는 에러다. Supabase 가 닉네임·프로필사진·이메일을 요청하는데 콘솔에서 안 켜두면 카카오가 거절한다. 2026-09-20에 실제로 여기서 막혔다.
+
+### ⚠️ 그런데 닉네임만 켜서는 안 된다 — **이메일도 켜야 한다** ★
+
+`account_email` 은 개인 앱에서 **「권한 없음」**이라 켤 수 없다. 그래서 「닉네임만 켜고 넘어가면 되겠지」 싶은데 **안 된다.**
+
+**Supabase 가 카카오에 `account_email` 을 강제로 보내기 때문이다.**
+
+```
+scope = account_email profile_image profile_nickname
+        ^^^^^^^^^^^^^ 우리가 빼달라고 해도 안 빠진다
+```
+
+`signInWithOAuth` 의 `scopes` 로 `profile_nickname profile_image` 만 주어도 **Supabase 는 기본값에 덧붙일 뿐 빼주지 않는다** (2026-09-20 실측). [supabase/supabase#36878](https://github.com/supabase/supabase/issues/36878) 로 열려 있고 아직 미해결이다.
+
+Supabase 의 **「Allow users without an email」 도 이것을 막지 못한다.** 그건 *사용자를 만들 때*의 규칙이고, 요청은 그 전에 카카오가 거절한다.
+
+### 해결 — 「개인으로 등록」
+
+```
+앱 설정 → 앱 → 일반 → 비즈니스 → 「개인으로 등록」
+```
+
+**사업자등록번호 없이 개인 명의로 비즈 앱이 된다.** 그러면 `account_email` 이 풀리고 동의항목에서 켤 수 있다. 선택 동의로 충분하다.
+
+위 이슈의 결론이 **「이제 문제는 기술이 아니라 문서 부족」**이었다 — 이 경로가 Supabase 문서에 없어서 다들 헤맨다.
+
+이메일까지 받게 되면 **주문 확인 메일을 보낼 수 있다.** 아래 「알아둘 것」의 걱정이 같이 풀린다.
+
+이름 표시는 어차피 `AuthLinks` 가 이름 → 닉네임 → 이메일 순으로 고른다.
 
 ---
 
