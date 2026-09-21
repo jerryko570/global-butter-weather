@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { shippingFee } from '@/lib/shipping'
 import type { OrderLineInput, ShippingInfo } from '@/types/order'
 
 /**
@@ -137,7 +138,12 @@ export async function createOrder(
     }
   })
 
-  const total = items.reduce((sum, i) => sum + i.price_krw * i.quantity, 0)
+  const itemsKrw = items.reduce((sum, i) => sum + i.price_krw * i.quantity, 0)
+
+  // **배송비도 서버가 센다.** 화면이 보여준 값을 받지 않는다 — 가격과
+  // 같은 이유다. 규칙은 lib/shipping.ts 한 군데에만 있다
+  const shippingKrw = shippingFee(itemsKrw)
+  const total = itemsKrw + shippingKrw
 
   // ── 6. 넣는다 ─────────────────────────────────────────────
   const { data: order, error: orderError } = await supabase
@@ -145,6 +151,9 @@ export async function createOrder(
     .insert({
       user_id: user.id,
       status: 'pending',
+      items_krw: itemsKrw,
+      shipping_fee_krw: shippingKrw,
+      // 손님이 내는 총액이다. 상품 합계가 아니다
       total_krw: total,
       shipping_info: shipping,
       // 전자상거래법상 필수라 DB 가 `check (agree_privacy)` 로 막는다.

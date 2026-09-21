@@ -10,6 +10,7 @@ import { useToast } from '@/components/Toast'
 import { imageUrl } from '@/lib/images'
 import { formatKRW } from '@/lib/queries/products'
 import { cartTotalKrw, useCart, useCartLines } from '@/lib/store/cart'
+import { amountUntilFreeShipping, shippingFee } from '@/lib/shipping'
 import { createOrder } from './actions'
 import type { ShippingInfo } from '@/types/order'
 
@@ -68,7 +69,12 @@ export default function CheckoutForm() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const total = cartTotalKrw(lines)
+  // **보여주기 위한 계산이다.** 저장되는 값은 서버가 센다(actions.ts).
+  // 같은 함수를 쓰므로 어긋날 일은 없지만, 다르면 서버가 맞다
+  const itemsKrw = cartTotalKrw(lines)
+  const shippingKrw = shippingFee(itemsKrw)
+  const total = itemsKrw + shippingKrw
+  const untilFree = amountUntilFreeShipping(itemsKrw)
 
   function set(patch: Partial<ShippingInfo>) {
     setShipping((s) => ({ ...s, ...patch }))
@@ -229,15 +235,29 @@ export default function CheckoutForm() {
               ))}
             </div>
 
-            <div className="flex items-baseline justify-between border-t border-gray-200 pt-4">
+            <div className="flex items-baseline justify-between border-t border-gray-200 pt-3">
+              <Label>상품</Label>
+              <p className="text-ink-muted text-caption">
+                {formatKRW(itemsKrw)}
+              </p>
+            </div>
+            <div className="flex items-baseline justify-between py-1">
+              <Label>배송비</Label>
+              <p className="text-ink-muted text-caption">
+                {shippingKrw === 0 ? '무료' : formatKRW(shippingKrw)}
+              </p>
+            </div>
+            <div className="flex items-baseline justify-between border-t border-gray-200 pt-3">
               <Label>Total</Label>
               <p className="text-ink text-title font-medium">
                 {formatKRW(total)}
               </p>
             </div>
-            <p className="text-ink-subtle text-caption mt-2">
-              배송비는 아직 계산에 들어 있지 않습니다.
-            </p>
+            {untilFree > 0 ? (
+              <p className="text-ink-subtle text-caption mt-2">
+                {formatKRW(untilFree)} 더 담으면 배송비가 무료입니다.
+              </p>
+            ) : null}
           </div>
 
           {/* ───── 동의 ───── */}

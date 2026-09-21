@@ -85,7 +85,21 @@ export default async function OrderPage({
               </p>
             </div>
           ))}
-          <div className="flex items-baseline justify-between border-t border-gray-200 pt-4">
+          <div className="flex items-baseline justify-between border-t border-gray-200 pt-3">
+            <Label>상품</Label>
+            <p className="text-ink-muted text-caption">
+              {formatKRW(data.items_krw)}
+            </p>
+          </div>
+          <div className="flex items-baseline justify-between py-1">
+            <Label>배송비</Label>
+            <p className="text-ink-muted text-caption">
+              {data.shipping_fee_krw === 0
+                ? '무료'
+                : formatKRW(data.shipping_fee_krw)}
+            </p>
+          </div>
+          <div className="flex items-baseline justify-between border-t border-gray-200 pt-3">
             <Label>Total</Label>
             <p className="text-ink text-title font-medium">
               {formatKRW(data.total_krw)}
@@ -117,10 +131,16 @@ export default async function OrderPage({
         </div>
       </div>
 
-      <div className="border-b border-gray-200 px-7 py-8 text-center">
+      <div className="flex items-center justify-center gap-8 border-b border-gray-200 px-7 py-8">
+        <Link
+          href="/orders"
+          className="text-ink border-ink hover:text-ink-muted text-caption inline-block border-b pb-0.5 tracking-widest uppercase"
+        >
+          주문 내역
+        </Link>
         <Link
           href="/"
-          className="text-ink border-ink hover:text-ink-muted text-caption inline-block border-b pb-0.5 tracking-widest uppercase"
+          className="text-ink-muted hover:text-ink text-caption inline-block tracking-widest uppercase"
         >
           계속 둘러보기
         </Link>

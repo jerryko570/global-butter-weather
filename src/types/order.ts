@@ -26,6 +26,11 @@ export interface Order {
   order_no: string
   user_id: string
   status: OrderStatus
+  /** 상품 합계. 배송비 판정의 기준 */
+  items_krw: number
+  /** 주문 시점의 배송비. **규칙이 바뀌어도 이 값은 그대로다** */
+  shipping_fee_krw: number
+  /** 손님이 내는 총액 = items_krw + shipping_fee_krw */
   total_krw: number
   currency: string
   shipping_info: ShippingInfo

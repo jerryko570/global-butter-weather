@@ -55,6 +55,12 @@ export default function AuthLinks() {
   if (name) {
     return (
       <>
+        <Link
+          href="/orders"
+          className="text-ink-muted hover:text-ink text-caption"
+        >
+          주문 내역
+        </Link>
         <span className="text-ink text-caption max-w-32 truncate">{name}</span>
         <button
           type="button"
