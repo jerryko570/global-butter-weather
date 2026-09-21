@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Label from '@/components/Label'
 import { formatKRW } from '@/lib/queries/products'
 import { createClient } from '@/lib/supabase/server'
@@ -11,6 +11,10 @@ import type { OrderItem, ShippingInfo } from '@/types/order'
  * **남의 주문은 보이지 않는다.** 거르는 코드가 없는데 그런 이유는 RLS 가
  * 막기 때문이다 — `orders_own` 이 `user_id = auth.uid()` 인 것만 돌려준다
  * (`0005_orders.sql`). 그래서 남의 주문번호를 알아도 404 가 된다.
+ *
+ * 다만 **로그인 안 한 사람은 404 가 아니라 로그인으로 보낸다.** 404 는
+ * 「없는 주문」과 구분이 안 돼서, 자기 주문을 보러 온 사람도 주문이
+ * 사라진 줄 안다.
  *
  * 주소가 주문번호(`260919-0007`)인 것은 손님이 부를 수 있는 값이기
  * 때문이다. uuid 는 전화로 불러줄 수 없다 (schema.md 7-3절).
@@ -32,6 +36,17 @@ export default async function OrderPage({
 }) {
   const { orderNo } = await params
   const supabase = await createClient()
+
+  // **로그인 안 했으면 404 가 아니라 로그인으로 보낸다.** 404 는 「없는
+  // 주문」과 구분이 안 돼서, 자기 주문을 보러 온 사람도 없어진 줄 안다.
+  // 로그인한 사람에게 404 를 주는 것은 그대로다 — 남의 주문이 있는지
+  // 없는지 알려줄 이유가 없다.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) {
+    redirect(`/login?next=${encodeURIComponent(`/orders/${orderNo}`)}`)
+  }
 
   const { data } = await supabase
     .from('orders')

@@ -35,7 +35,15 @@ import type { OrderLineInput, ShippingInfo } from '@/types/order'
 
 export type CreateOrderResult =
   | { ok: true; orderNo: string }
-  | { ok: false; reason: string }
+  | {
+      ok: false
+      reason: string
+      /**
+       * 더 이상 살 수 없는 줄. **화면이 이것으로 이름을 붙여 보여준다** —
+       * 서버는 상품 이름을 모르는 경우가 있다(조회 자체가 안 되는 줄).
+       */
+      goneVariantIds?: string[]
+    }
 
 export async function createOrder(
   lines: OrderLineInput[],
@@ -93,16 +101,23 @@ export async function createOrder(
   }
   const rows = (variants ?? []) as unknown as Row[]
 
-  // 담은 뒤에 상품이 내려갔을 수 있다. 조회되지 않으면 그것이 답이다 —
-  // 감춘 상품은 RLS 가 애초에 돌려주지 않는다
-  if (rows.length !== lines.length) {
+  const byId = new Map(rows.map((r) => [r.id, r]))
+
+  // 담은 뒤에 상품이 내려갔거나 **옵션이 새로 만들어졌을 수 있다.**
+  // 어드민에서 상품을 고치면 옵션을 지우고 다시 넣으므로 id 가 바뀐다
+  // (adminProducts.replaceVariants). 그러면 장바구니의 옛 id 는 가리키는
+  // 데가 없어진다 — 2026-09-22에 실제로 그랬다.
+  //
+  // **어느 줄인지 돌려준다.** 「상품이 있습니다」로만 말하면 손님은
+  // 장바구니를 통째로 비우는 수밖에 없다.
+  const gone = ids.filter((id) => !byId.has(id))
+  if (gone.length > 0) {
     return {
       ok: false,
-      reason: '판매가 끝난 상품이 있습니다. 장바구니를 다시 확인해 주세요.',
+      reason: '더 이상 살 수 없는 상품이 있습니다.',
+      goneVariantIds: gone,
     }
   }
-
-  const byId = new Map(rows.map((r) => [r.id, r]))
 
   // ── 4. 지금 살 수 있는가 ──────────────────────────────────
   for (const line of lines) {

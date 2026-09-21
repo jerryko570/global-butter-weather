@@ -62,12 +62,17 @@ export default function CheckoutForm() {
   const { show } = useToast()
   const lines = useCartLines()
   const clear = useCart((s) => s.clear)
+  const remove = useCart((s) => s.remove)
 
   const [shipping, setShipping] = useState<ShippingInfo>(EMPTY)
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
   const [saving, setSaving] = useState(false)
+  // 주문이 만들어지고 화면이 옮겨가는 사이. **이게 없으면 장바구니를
+  // 비우는 순간 「담긴 것이 없습니다」가 한 번 번쩍인다** (2026-09-22)
+  const [done, setDone] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [gone, setGone] = useState<string[]>([])
 
   // **보여주기 위한 계산이다.** 저장되는 값은 서버가 센다(actions.ts).
   // 같은 함수를 쓰므로 어긋날 일은 없지만, 다르면 서버가 맞다
@@ -99,13 +104,32 @@ export default function CheckoutForm() {
       )
 
       if (!result.ok) {
-        setError(result.reason)
+        // 서버는 **조회되지 않는 줄의 이름을 모른다.** 장바구니가 알고
+        // 있으므로 여기서 붙인다
+        const gone = result.goneVariantIds ?? []
+        const names = lines
+          .filter((l) => gone.includes(l.variantId))
+          .map((l) => `${l.productName} ${l.variantName}`)
+
+        setError(
+          names.length > 0
+            ? [
+                result.reason,
+                '',
+                ...names,
+                '',
+                '아래 「살 수 없는 것 빼기」를 누르시면 정리됩니다.',
+              ].join('\n')
+            : result.reason
+        )
+        setGone(gone)
         show('주문하지 못했습니다', 'fail')
         return
       }
 
       // 주문이 만들어진 뒤에 비운다. 먼저 비우면 실패했을 때 담은 것이
       // 사라진다
+      setDone(true)
       clear()
       router.push(`/orders/${result.orderNo}`)
     } catch {
@@ -113,6 +137,14 @@ export default function CheckoutForm() {
     } finally {
       setSaving(false)
     }
+  }
+
+  if (done) {
+    return (
+      <div className="border-b border-gray-200 px-7 py-24 text-center">
+        <p className="text-ink-muted text-body">주문서를 여는 중…</p>
+      </div>
+    )
   }
 
   if (lines.length === 0) {
@@ -290,9 +322,24 @@ export default function CheckoutForm() {
           </div>
 
           {error ? (
-            <p className="text-caption border border-red-200 bg-red-50 p-3 text-red-600">
-              {error}
-            </p>
+            <div className="border border-red-200 bg-red-50 p-3">
+              <p className="text-caption whitespace-pre-line text-red-600">
+                {error}
+              </p>
+              {gone.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    gone.forEach((id) => remove(id))
+                    setGone([])
+                    setError(null)
+                  }}
+                  className="text-caption mt-3 border border-red-300 px-4 py-2 text-red-600 hover:bg-white"
+                >
+                  살 수 없는 것 빼기
+                </button>
+              ) : null}
+            </div>
           ) : null}
 
           <button
