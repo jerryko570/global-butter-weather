@@ -134,19 +134,15 @@ export default function CartPage() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                disabled
-                className="bg-ink text-cloud text-caption w-full cursor-not-allowed py-3.5 tracking-widest uppercase opacity-40"
+              <Link
+                href="/checkout"
+                className="bg-ink text-cloud text-caption w-full py-3.5 text-center tracking-widest uppercase"
               >
                 주문하기
-              </button>
+              </Link>
               <p className="text-ink-subtle text-caption">
-                주문서와 결제는 아직 준비 중입니다. 담아두시면 그대로 남아
-                있습니다.
-              </p>
-              <p className="text-ink-subtle text-caption">
-                배송비는 주문서에서 계산됩니다.
+                주문서에서 배송지를 입력받습니다.{' '}
+                <strong>결제는 아직 준비 중입니다.</strong>
               </p>
             </div>
           </div>
