@@ -6,6 +6,7 @@ import Label from '@/components/Label'
 import { imageUrl } from '@/lib/images'
 import { formatKRW } from '@/lib/queries/products'
 import { cartTotalKrw, useCart, useCartLines } from '@/lib/store/cart'
+import { amountUntilFreeShipping, shippingFee } from '@/lib/shipping'
 
 /**
  * 장바구니. 주소는 `/cart` 다.
@@ -27,7 +28,10 @@ export default function CartPage() {
   const setQuantity = useCart((s) => s.setQuantity)
   const remove = useCart((s) => s.remove)
 
-  const total = cartTotalKrw(lines)
+  const itemsKrw = cartTotalKrw(lines)
+  const shippingKrw = shippingFee(itemsKrw)
+  const total = itemsKrw + shippingKrw
+  const untilFree = amountUntilFreeShipping(itemsKrw)
 
   return (
     <>
@@ -127,26 +131,39 @@ export default function CartPage() {
           <div className="grid grid-cols-1 border-b border-gray-200 lg:grid-cols-2">
             <div className="hidden lg:block lg:border-r lg:border-gray-200" />
             <div className="flex flex-col gap-4 p-8 lg:p-12">
-              <div className="flex items-baseline justify-between border-b border-gray-200 pb-4">
+              <div className="flex items-baseline justify-between pb-1">
+                <Label>상품</Label>
+                <p className="text-ink-muted text-caption">
+                  {formatKRW(itemsKrw)}
+                </p>
+              </div>
+              <div className="flex items-baseline justify-between pb-3">
+                <Label>배송비</Label>
+                <p className="text-ink-muted text-caption">
+                  {shippingKrw === 0 ? '무료' : formatKRW(shippingKrw)}
+                </p>
+              </div>
+              <div className="flex items-baseline justify-between border-t border-b border-gray-200 py-4">
                 <Label>Total</Label>
                 <p className="text-ink text-title font-medium">
                   {formatKRW(total)}
                 </p>
               </div>
+              {untilFree > 0 ? (
+                <p className="text-ink-subtle text-caption">
+                  {formatKRW(untilFree)} 더 담으면 배송비가 무료입니다.
+                </p>
+              ) : null}
 
-              <button
-                type="button"
-                disabled
-                className="bg-ink text-cloud text-caption w-full cursor-not-allowed py-3.5 tracking-widest uppercase opacity-40"
+              <Link
+                href="/checkout"
+                className="bg-ink text-cloud text-caption w-full py-3.5 text-center tracking-widest uppercase"
               >
                 주문하기
-              </button>
+              </Link>
               <p className="text-ink-subtle text-caption">
-                주문서와 결제는 아직 준비 중입니다. 담아두시면 그대로 남아
-                있습니다.
-              </p>
-              <p className="text-ink-subtle text-caption">
-                배송비는 주문서에서 계산됩니다.
+                주문서에서 배송지를 입력받습니다.{' '}
+                <strong>결제는 아직 준비 중입니다.</strong>
               </p>
             </div>
           </div>
