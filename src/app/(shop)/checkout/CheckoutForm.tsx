@@ -150,26 +150,25 @@ export default function CheckoutForm() {
       })
 
       if (!paid.ok) {
-        // 취소도 여기로 온다. 주문은 pending 으로 남아 있다
+        // 취소도 여기로 온다. **여기서 화면을 옮기지 않는다** —
+        // 대부분은 손님이 결제창을 닫은 경우이고, 그때 필요한 것은
+        // 「무엇이 잘못됐나」와 담아둔 것이지 다른 화면이 아니다
         setError(
           `${paid.reason}
-주문서는 만들어졌습니다 — 주문 내역에서 다시 결제하실 수 있습니다.`
+주문서 ${result.orderNo} 는 만들어져 있습니다 — 주문 내역에서 다시 결제하실 수 있습니다.`
         )
         show('결제가 완료되지 않았습니다', 'fail')
-        setDone(true)
-        clear()
-        router.push(`/orders/${result.orderNo}`)
         return
       }
 
       // **화면 말을 믿지 않는다.** 서버가 포트원에 직접 물어본다
       const confirmed = await confirmPayment(result.orderNo)
       if (!confirmed.ok) {
+        // **여기서도 옮기지 않는다.** 재고가 모자라 거절된 경우
+        // 주문 페이지로 보내면 거기 「결제하기」를 눌러도 또 막힌다.
+        // 고칠 수 있는 곳은 장바구니가 있는 이 화면이다
         setError(confirmed.reason)
         show('주문을 완료하지 못했습니다', 'fail')
-        setDone(true)
-        clear()
-        router.push(`/orders/${result.orderNo}`)
         return
       }
 
@@ -396,8 +395,7 @@ export default function CheckoutForm() {
             {saving ? '결제를 여는 중…' : '결제하기'}
           </button>
           <p className="text-ink-subtle text-caption">
-            아직 결제는 진행되지 않습니다. 주문서만 만들어지고, 결제는 준비되는
-            대로 붙습니다.
+            카드로만 결제하실 수 있습니다. 결제가 끝나면 주문이 확정됩니다.
           </p>
         </div>
       </div>
