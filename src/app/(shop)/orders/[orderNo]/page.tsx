@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import Label from '@/components/Label'
+import RetryPaymentButton from '@/components/RetryPaymentButton'
 import { formatKRW } from '@/lib/queries/products'
 import { createClient } from '@/lib/supabase/server'
 import type { OrderItem, ShippingInfo } from '@/types/order'
@@ -62,20 +63,33 @@ export default async function OrderPage({
   return (
     <>
       <div className="flex items-center justify-between border-b border-gray-200 px-7 py-5">
-        <h1 className="text-ink text-title font-serif">주문 완료</h1>
+        <h1 className="text-ink text-title font-serif">
+          {data.status === 'pending' ? '주문서' : '주문 완료'}
+        </h1>
         <Label>{STATUS_LABEL[data.status] ?? data.status}</Label>
       </div>
 
       <div className="border-b border-gray-200 px-7 py-10 text-center">
         <Label className="mb-3">주문번호</Label>
-        <p className="text-ink text-display font-serif tracking-wider">
+        <p className="text-ink text-display mb-6 font-serif tracking-wider">
           {data.order_no}
         </p>
-        <p className="text-ink-muted text-caption mt-4 leading-relaxed">
-          주문서가 만들어졌습니다. <strong>아직 결제는 되지 않았습니다.</strong>
-          <br />
-          결제가 준비되는 대로 이 번호로 이어서 진행됩니다.
-        </p>
+
+        {data.status === 'pending' ? (
+          <>
+            <p className="text-ink-muted text-caption mb-6 leading-relaxed">
+              주문서가 만들어졌습니다.{' '}
+              <strong>아직 결제가 끝나지 않았습니다.</strong>
+              <br />
+              아래에서 결제하시면 주문이 확정됩니다.
+            </p>
+            <RetryPaymentButton orderNo={data.order_no} shipping={shipping} />
+          </>
+        ) : (
+          <p className="text-ink-muted text-caption leading-relaxed">
+            주문이 확정되었습니다. 준비되는 대로 보내드립니다.
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 border-b border-gray-200 lg:grid-cols-2">
