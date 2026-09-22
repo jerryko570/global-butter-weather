@@ -34,6 +34,8 @@ export type PortOnePayment = {
   status: 'PAID' | 'READY' | 'CANCELLED' | 'FAILED' | string
   amount: { total: number }
   currency: string
+  /** `PaymentMethodCard` · `PaymentMethodEasyPay` 같은 값이 온다 */
+  method?: { type?: string; provider?: string }
 }
 
 function secret(): string {
@@ -73,6 +75,24 @@ export function isPaid(payment: PortOnePayment, expectedKrw: number): boolean {
     payment.currency === 'KRW' &&
     payment.amount.total === expectedKrw
   )
+}
+
+/**
+ * 카드로 결제됐는가. **카드만 받기로 했다 (2026-09-22).**
+ *
+ * 결제창에서 수단을 잠그는 방법이 없다 — `payMethod: 'CARD'` 는 **기본
+ * 선택**일 뿐이고 간편결제 탭이 그대로 열린다. 그래서 **받은 뒤에 서버가
+ * 거른다.**
+ *
+ * 이게 왜 필요한가. 포트원 공용 테스트 상점(`iamporttest_3`)은 PG 쪽은
+ * 가짜지만 **간편결제사는 자기 쪽에서 실거래로 처리한다.** 2026-09-22에
+ * 카카오페이머니로 26,800원이 실제로 빠져나갔다. 테스트인데 돈이 나간다.
+ *
+ * 실연동에서는 **계약한 수단만 결제창에 뜨므로** 카드만 계약하면 이 검사가
+ * 걸릴 일이 없다. 그래도 남겨둔다 — 계약이 늘어나는 날 이 줄이 유일한 방어다.
+ */
+export function isCard(payment: PortOnePayment): boolean {
+  return payment.method?.type === 'PaymentMethodCard'
 }
 
 /**

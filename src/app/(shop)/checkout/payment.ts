@@ -2,7 +2,12 @@
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
-import { cancelPayment, getPayment, isPaid } from '@/lib/payments/portone'
+import {
+  cancelPayment,
+  getPayment,
+  isCard,
+  isPaid,
+} from '@/lib/payments/portone'
 
 /**
  * 결제. **두 걸음이다 — 준비하고, 확정한다.**
@@ -161,6 +166,24 @@ export async function confirmPayment(
       }
     }
     return { ok: false, reason: '결제가 완료되지 않았습니다.' }
+  }
+
+  // ── 2-b. 카드가 아니면 받지 않는다 ─────────────────────────
+  // 결제창을 카드로 잠그는 방법이 없어 **받은 뒤에 거른다** (portone.ts)
+  if (!isCard(payment)) {
+    try {
+      await cancelPayment(order.payment_id, '카드 결제만 받습니다')
+    } catch {
+      return {
+        ok: false,
+        reason:
+          '카드로만 결제할 수 있습니다. 취소가 자동으로 되지 않았습니다 — 문의해 주세요.',
+      }
+    }
+    return {
+      ok: false,
+      reason: '카드로만 결제할 수 있습니다. 결제를 취소했습니다.',
+    }
   }
 
   // ── 3. 재고를 깎고 완료로 ─────────────────────────────────
