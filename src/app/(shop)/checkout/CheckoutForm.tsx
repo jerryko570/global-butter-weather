@@ -12,6 +12,8 @@ import { formatKRW } from '@/lib/queries/products'
 import { cartTotalKrw, useCart, useCartLines } from '@/lib/store/cart'
 import { amountUntilFreeShipping, shippingFee } from '@/lib/shipping'
 import { createOrder } from './actions'
+import { confirmPayment, preparePayment } from './payment'
+import { payWithPortOne } from '@/lib/payments/requestPayment'
 import type { ShippingInfo } from '@/types/order'
 
 /**
@@ -127,6 +129,50 @@ export default function CheckoutForm() {
         return
       }
 
+      // ── 결제 ───────────────────────────────────────────
+      // 주문서(pending)가 만들어졌다. 이제 돈을 받는다.
+      // **실패해도 주문은 남는다** — 주문 내역에서 다시 결제할 수 있다
+      const prepared = await preparePayment(result.orderNo)
+      if (!prepared.ok) {
+        setError(prepared.reason)
+        show('결제를 준비하지 못했습니다', 'fail')
+        return
+      }
+
+      const paid = await payWithPortOne({
+        paymentId: prepared.paymentId,
+        orderName: prepared.orderName,
+        totalKrw: prepared.totalKrw,
+        customer: {
+          fullName: shipping.name,
+          phoneNumber: shipping.phone,
+        },
+      })
+
+      if (!paid.ok) {
+        // 취소도 여기로 온다. 주문은 pending 으로 남아 있다
+        setError(
+          `${paid.reason}
+주문서는 만들어졌습니다 — 주문 내역에서 다시 결제하실 수 있습니다.`
+        )
+        show('결제가 완료되지 않았습니다', 'fail')
+        setDone(true)
+        clear()
+        router.push(`/orders/${result.orderNo}`)
+        return
+      }
+
+      // **화면 말을 믿지 않는다.** 서버가 포트원에 직접 물어본다
+      const confirmed = await confirmPayment(result.orderNo)
+      if (!confirmed.ok) {
+        setError(confirmed.reason)
+        show('주문을 완료하지 못했습니다', 'fail')
+        setDone(true)
+        clear()
+        router.push(`/orders/${result.orderNo}`)
+        return
+      }
+
       // 주문이 만들어진 뒤에 비운다. 먼저 비우면 실패했을 때 담은 것이
       // 사라진다
       setDone(true)
@@ -142,7 +188,7 @@ export default function CheckoutForm() {
   if (done) {
     return (
       <div className="border-b border-gray-200 px-7 py-24 text-center">
-        <p className="text-ink-muted text-body">주문서를 여는 중…</p>
+        <p className="text-ink-muted text-body">주문 내역을 여는 중…</p>
       </div>
     )
   }
@@ -347,7 +393,7 @@ export default function CheckoutForm() {
             disabled={saving}
             className="bg-ink text-cloud text-caption w-full py-3.5 tracking-widest uppercase disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {saving ? '주문서를 만드는 중…' : '주문서 만들기'}
+            {saving ? '결제를 여는 중…' : '결제하기'}
           </button>
           <p className="text-ink-subtle text-caption">
             아직 결제는 진행되지 않습니다. 주문서만 만들어지고, 결제는 준비되는
