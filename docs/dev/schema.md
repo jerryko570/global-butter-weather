@@ -458,6 +458,38 @@ confirmPayment(orderNo)    서버가 포트원에 직접 묻고 재고를 깎는
 
 `service_role` 만 부를 수 있다. **재고를 늘리는 함수**라 더욱 그렇다 — 아무나 부를 수 있으면 재고를 무한히 만들 수 있다.
 
+## 7-6. `security definer` 함수를 닫는 법 ★ (2026-09-23)
+
+**`revoke ... from public` 하나로는 닫히지 않는다.** 실제로 뚫려 있었다.
+
+`mark_order_paid()` 는 RLS 를 지나가는 함수라 「`service_role` 만 부를 수 있다」고 적고 이렇게 썼다.
+
+```sql
+revoke all on function mark_order_paid(...) from public;
+grant execute on function mark_order_paid(...) to service_role;
+```
+
+Supabase 는 새 함수의 실행 권한을 **`anon` 과 `authenticated` 에게 따로 준다**(default privileges). `public` 에서 거둬들여도 **그 둘의 권한은 남는다.**
+
+로그인하지 않은 키로 불러 봤더니 권한 오류가 아니라 **함수 안에서 나온 `ORDER_NOT_PENDING`** 이 돌아왔다. 실행됐다는 뜻이다.
+
+### 무엇을 할 수 있었나
+
+손님은 RLS 로 **자기 주문의 `id` 를 읽을 수 있다.** 그 id 로 `mark_order_paid(id, 'x', 'y')` 를 부르면 **결제하지 않고 주문이 완료된다.** 재고까지 깎인다. `mark_order_cancelled()` 는 반대로 **재고를 늘릴 수 있었다.**
+
+### 앞으로는 이렇게 쓴다
+
+```sql
+revoke execute on function <함수>(<인자>) from public, anon, authenticated;
+grant  execute on function <함수>(<인자>) to service_role;
+```
+
+**역할을 이름으로 적는다.** `0008` 이 기존 함수를 전부 이렇게 닫았다.
+
+`is_admin()` 만 `authenticated` 에게 열려 있다 — 로그인한 사람이 「내가 관리자인가」를 물어야 하고, 읽기만 하고 아무것도 바꾸지 않는다.
+
+> **화면에서 막는 것과 헷갈리지 말 것.** 이 구멍은 화면을 아무리 잘 만들어도 열려 있었다. 손님은 화면을 거치지 않고 DB 에 직접 물을 수 있다 — 브라우저로 나가는 키로 그렇게 할 수 있는 것이 이 구조의 전제다(4절). **그래서 DB 쪽 권한이 유일한 방어다.**
+
 ## 8. 아직 짜지 않은 것
 
 - ~~orders · order_items~~ → **7-3절에 설계했다 (`0005`).**
