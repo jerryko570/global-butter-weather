@@ -1,5 +1,6 @@
 import { Webhook } from '@portone/server-sdk'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { classifyPaidError } from '@/lib/payments/complete'
 import {
   cancelPayment,
   getPayment,
@@ -130,10 +131,19 @@ export async function POST(req: Request) {
         p_payment_id: paymentId,
       })
       if (error) {
-        // 재고가 모자란 경우가 대부분이다. **여기서도 돈을 돌려준다** —
-        // 화면이 없는 경로라고 손님 돈을 들고 있을 수는 없다
-        await cancelSafely(paymentId, '재고 부족')
-        return ok(`완료하지 못해 취소: ${error.message} (${order.order_no})`)
+        const failure = classifyPaidError(error.message ?? '')
+
+        // 브라우저가 먼저 끝냈다. **실패가 아니다** (complete.ts)
+        if (failure.kind === 'already') {
+          return ok(`이미 끝나 있었음 (${order.order_no})`)
+        }
+        // 다시 해도 안 되는 것에만 돈을 돌려준다
+        if (failure.kind === 'stock') {
+          await cancelSafely(paymentId, '재고 부족')
+          return ok(`재고가 모자라 취소 (${order.order_no})`)
+        }
+        // 모르는 실패는 그대로 둔다. 포트원이 다시 보내준다
+        return ok(`완료하지 못함 — 결제는 유지: ${failure.message}`)
       }
       return ok(`결제 완료 (${order.order_no})`)
     }

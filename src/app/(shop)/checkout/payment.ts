@@ -8,6 +8,7 @@ import {
   isCard,
   isPaid,
 } from '@/lib/payments/portone'
+import { classifyPaidError } from '@/lib/payments/complete'
 
 /**
  * 결제. **두 걸음이다 — 준비하고, 확정한다.**
@@ -197,30 +198,39 @@ export async function confirmPayment(
   })
 
   if (error) {
-    // 팔 수 없는 것에 돈을 받아둘 수 없다
-    try {
-      await cancelPayment(order.payment_id, '재고 부족')
-    } catch {
-      // 취소까지 실패하면 사람이 봐야 한다. 손님에게는 아래 문구가 간다
+    const failure = classifyPaidError(error.message ?? '')
+
+    // **이미 끝났다는 말은 실패가 아니다.** 웹훅이 먼저 도착한 경우다
+    // (complete.ts). 여기서 취소를 걸면 멀쩡한 결제가 취소된다
+    if (failure.kind === 'already') {
+      const { data: now } = await supabase
+        .from('orders')
+        .select('status')
+        .eq('id', order.id)
+        .maybeSingle()
+      if (now?.status === 'paid') return { ok: true }
+      return { ok: false, reason: '이미 처리된 주문입니다.' }
     }
 
-    const message = error.message ?? ''
-    if (message.includes('OUT_OF_STOCK')) {
-      const [, detail] = message.split('OUT_OF_STOCK:')
+    // 다시 해도 안 되는 것에만 돈을 돌려준다
+    if (failure.kind === 'stock') {
+      try {
+        await cancelPayment(order.payment_id, '재고 부족')
+      } catch {
+        // 취소까지 실패하면 사람이 봐야 한다. 손님에게는 아래 문구가 간다
+      }
       return {
         ok: false,
-        reason: `${(detail ?? '').trim() || '일부 상품'} 이(가) 방금 품절됐습니다. 결제를 취소했습니다.`,
+        reason: `${failure.detail} 이(가) 방금 품절됐습니다. 결제를 취소했습니다.`,
       }
     }
-    if (message.includes('VARIANT_GONE')) {
-      return {
-        ok: false,
-        reason: '판매가 끝난 상품이 있습니다. 결제를 취소했습니다.',
-      }
-    }
+
+    // **모르는 실패에는 돈을 돌려주지 않는다.** 일시적인 것일 수 있고,
+    // 웹훅이 다시 와서 끝낼 수도 있다
     return {
       ok: false,
-      reason: '주문을 완료하지 못했습니다. 결제를 취소했습니다.',
+      reason:
+        '주문을 완료하지 못했습니다. 결제는 그대로 있습니다 — 주문 내역에서 다시 확인해 주세요.',
     }
   }
 
