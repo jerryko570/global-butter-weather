@@ -52,6 +52,18 @@ export default function AdminNav() {
         <Link href="/admin/products" className="text-ink text-body font-serif">
           버터웨더 관리
         </Link>
+        <Link
+          href="/admin/products"
+          className="text-ink-subtle hover:text-ink text-caption"
+        >
+          상품
+        </Link>
+        <Link
+          href="/admin/orders"
+          className="text-ink-subtle hover:text-ink text-caption"
+        >
+          주문
+        </Link>
         <Link href="/" className="text-ink-subtle hover:text-ink text-caption">
           가게 화면 보기
         </Link>

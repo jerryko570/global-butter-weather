@@ -39,6 +39,10 @@ export interface Order {
   payment_provider: string | null
   payment_id: string | null
   paid_at: string | null
+  /** 취소된 시각. `0007` 에서 붙었다 */
+  cancelled_at: string | null
+  /** 왜 취소했나. 웹훅이면 「결제 취소」, 관리자면 적은 사유 */
+  cancel_reason: string | null
   created_at: string
   updated_at: string
 }
