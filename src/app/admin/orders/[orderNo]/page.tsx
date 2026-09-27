@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Label from '@/components/Label'
 import CancelOrderButton from '@/components/admin/CancelOrderButton'
+import ShipOrderForm from '@/components/admin/ShipOrderForm'
+import { findCarrier } from '@/lib/carriers'
 import { ORDER_STATUS_LABEL, krw } from '@/lib/orders'
 import { createClient } from '@/lib/supabase/server'
 import type { Order, OrderItem } from '@/types/order'
@@ -28,11 +30,8 @@ export default async function AdminOrderPage({
     .maybeSingle()
 
   if (!data) notFound()
-  const order = data as Order & {
-    items: OrderItem[]
-    cancelled_at: string | null
-    cancel_reason: string | null
-  }
+  const order = data as Order & { items: OrderItem[] }
+  const carrier = findCarrier(order.carrier)
 
   const canCancel = order.status === 'pending' || order.status === 'paid'
 
@@ -153,6 +152,35 @@ export default async function AdminOrderPage({
             </div>
           ))}
         </dl>
+      </section>
+
+      {/* ── 배송 ──────────────────────────────────────────── */}
+      <section>
+        <Label className="mb-3">배송</Label>
+        {order.tracking_no ? (
+          <div className="border-t border-gray-200 py-3">
+            <p className="text-ink text-body">
+              {carrier?.name ?? order.carrier}{' '}
+              <span className="tracking-wider">{order.tracking_no}</span>
+            </p>
+            {order.shipped_at ? (
+              <p className="text-ink-subtle text-caption mt-1">
+                {new Date(order.shipped_at).toLocaleString('ko-KR')} 발송
+              </p>
+            ) : null}
+            {carrier ? (
+              <a
+                href={carrier.trackUrl(order.tracking_no)}
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink-muted hover:text-ink text-caption mt-2 inline-block underline"
+              >
+                배송 조회
+              </a>
+            ) : null}
+          </div>
+        ) : null}
+        <ShipOrderForm orderNo={order.order_no} status={order.status} />
       </section>
 
       <CancelOrderButton orderNo={order.order_no} canCancel={canCancel} />

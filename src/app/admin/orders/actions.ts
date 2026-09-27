@@ -96,3 +96,87 @@ export async function cancelOrder(
   revalidatePath('/', 'layout')
   return { ok: true }
 }
+
+/**
+ * 보냈다고 표시한다. **택배사와 송장번호를 같이 받는다.**
+ *
+ * 송장을 코드로 발행하지 않는다 — 발행 API 는 계약 물량이 있어야 열리고,
+ * 우리가 쓰는 GS Postbox 에는 아예 없다 (shipping-providers.md 2절).
+ * 사람이 편의점에서 접수하고 받은 번호를 여기 넣는다.
+ *
+ * **`paid` 에서만 넘어간다.** `.eq('status', 'paid')` 를 조건에 두어,
+ * 취소된 주문이나 이미 보낸 주문을 다시 보낸 것으로 만들지 않는다.
+ */
+export async function markShipped(
+  orderNo: string,
+  carrier: string,
+  trackingNo: string
+): Promise<CancelOrderResult> {
+  const code = carrier.trim()
+  const no = trackingNo.trim().replace(/[\s-]/g, '')
+  if (!code) return { ok: false, reason: '택배사를 골라 주세요.' }
+  if (!no) return { ok: false, reason: '송장번호를 적어 주세요.' }
+  if (!/^\d{9,15}$/.test(no)) {
+    return { ok: false, reason: '송장번호는 숫자 9~15자리입니다.' }
+  }
+
+  const supabase = await createClient()
+  const { data: isAdmin } = await supabase.rpc('is_admin')
+  if (!isAdmin) return { ok: false, reason: '관리자만 할 수 있습니다.' }
+
+  const db = createAdminClient()
+  const { data: updated } = await db
+    .from('orders')
+    .update({
+      status: 'shipped',
+      carrier: code,
+      tracking_no: no,
+      shipped_at: new Date().toISOString(),
+    })
+    .eq('order_no', orderNo)
+    .eq('status', 'paid')
+    .select('id')
+
+  if (!updated || updated.length === 0) {
+    return {
+      ok: false,
+      reason: '결제 완료된 주문만 보낼 수 있습니다. 상태를 확인해 주세요.',
+    }
+  }
+
+  revalidatePath('/admin/orders')
+  revalidatePath(`/admin/orders/${orderNo}`)
+  revalidatePath('/orders')
+  revalidatePath(`/orders/${orderNo}`)
+  return { ok: true }
+}
+
+/**
+ * 배송이 끝났다고 표시한다. **`shipped` 에서만 넘어간다.**
+ *
+ * 손님이 받았는지를 우리가 확인할 길은 없다 — 조회 API 를 붙이면 그때
+ * 자동으로 바꿀 수 있다. 지금은 사람이 누른다.
+ */
+export async function markDone(orderNo: string): Promise<CancelOrderResult> {
+  const supabase = await createClient()
+  const { data: isAdmin } = await supabase.rpc('is_admin')
+  if (!isAdmin) return { ok: false, reason: '관리자만 할 수 있습니다.' }
+
+  const db = createAdminClient()
+  const { data: updated } = await db
+    .from('orders')
+    .update({ status: 'done' })
+    .eq('order_no', orderNo)
+    .eq('status', 'shipped')
+    .select('id')
+
+  if (!updated || updated.length === 0) {
+    return { ok: false, reason: '배송 중인 주문만 완료로 바꿀 수 있습니다.' }
+  }
+
+  revalidatePath('/admin/orders')
+  revalidatePath(`/admin/orders/${orderNo}`)
+  revalidatePath('/orders')
+  revalidatePath(`/orders/${orderNo}`)
+  return { ok: true }
+}
