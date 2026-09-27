@@ -59,14 +59,29 @@ function Field({
   )
 }
 
-export default function CheckoutForm() {
+/**
+ * `lastShipping` 은 **지난 주문의 배송지**다 (`checkout/page.tsx`).
+ * 두 번째 주문부터는 이름·연락처·주소가 이미 채워진 채로 열린다.
+ *
+ * **동의는 채우지 않는다.** 주소는 편의이고 동의는 의사표시다.
+ */
+export default function CheckoutForm({
+  lastShipping,
+}: {
+  lastShipping: ShippingInfo | null
+}) {
   const router = useRouter()
   const { show } = useToast()
   const lines = useCartLines()
   const clear = useCart((s) => s.clear)
   const remove = useCart((s) => s.remove)
 
-  const [shipping, setShipping] = useState<ShippingInfo>(EMPTY)
+  // 옛 주문에 `addressDetail` 이 없을 수 있다. EMPTY 를 바닥에 깔아
+  // 빠진 칸이 `undefined` 로 남지 않게 한다
+  const [shipping, setShipping] = useState<ShippingInfo>(
+    lastShipping ? { ...EMPTY, ...lastShipping } : EMPTY
+  )
+  const [prefilled, setPrefilled] = useState(Boolean(lastShipping))
   const [agreePrivacy, setAgreePrivacy] = useState(false)
   const [agreeMarketing, setAgreeMarketing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -85,6 +100,9 @@ export default function CheckoutForm() {
 
   function set(patch: Partial<ShippingInfo>) {
     setShipping((s) => ({ ...s, ...patch }))
+    // 한 글자라도 고치면 더 이상 「지난 주문의 배송지」가 아니다.
+    // 그대로 두면 화면이 사실이 아닌 말을 하게 된다
+    setPrefilled(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -211,7 +229,30 @@ export default function CheckoutForm() {
       <div className="grid grid-cols-1 border-b border-gray-200 lg:grid-cols-2">
         {/* ───── 배송지 ───── */}
         <div className="flex flex-col gap-6 border-b border-gray-200 p-8 lg:border-r lg:border-b-0 lg:p-12">
-          <h2 className="text-ink text-title font-serif">배송지</h2>
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-ink text-title font-serif">배송지</h2>
+            {/* **채워져 있다는 것을 말해 준다.** 아무 말 없이 값이 들어가
+                있으면 「내가 언제 썼지」가 된다. 그리고 지울 길을 같이 둔다 —
+                선물처럼 다른 곳으로 보내는 경우가 있다 */}
+            {prefilled ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setShipping(EMPTY)
+                  setPrefilled(false)
+                }}
+                className="text-ink-subtle hover:text-ink text-caption underline"
+              >
+                새로 입력
+              </button>
+            ) : null}
+          </div>
+
+          {prefilled ? (
+            <p className="text-ink-subtle text-caption -mt-2">
+              지난 주문의 배송지입니다.
+            </p>
+          ) : null}
 
           <Field label="받는 분 *">
             <input
