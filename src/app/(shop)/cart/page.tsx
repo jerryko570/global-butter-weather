@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Label from '@/components/Label'
@@ -7,6 +8,7 @@ import { imageUrl } from '@/lib/images'
 import { formatKRW } from '@/lib/queries/products'
 import { cartTotalKrw, useCart, useCartLines } from '@/lib/store/cart'
 import { amountUntilFreeShipping, shippingFee } from '@/lib/shipping'
+import { alreadyOrderedVariantIds } from './actions'
 
 /**
  * 장바구니. 주소는 `/cart` 다.
@@ -19,6 +21,16 @@ import { amountUntilFreeShipping, shippingFee } from '@/lib/shipping'
  *
  * **담긴 것은 브라우저에만 있다.** 그래서 이 화면은 client 다.
  *
+ * ---
+ *
+ * ## 이미 산 것이 남아 있을 수 있다 ★ (2026-09-27)
+ *
+ * 결제가 끝나는 길이 셋인데 그중 **결제하고 탭을 닫는 경우**는 브라우저가
+ * 없을 때 끝난다(웹훅). 그때는 비울 방법이 없어서, 다시 왔을 때 **물어본다.**
+ *
+ * **조용히 지우지 않는다.** 같은 물건을 또 살 수 있고 — 선물이면 더 그렇다 —
+ * 말없이 사라지면 담은 것이 없어진 것처럼 보인다. `actions.ts` 참고.
+ *
  * ⚠️ **여기 보이는 가격은 담을 때의 값이다.** 그 뒤에 값이 바뀌었을 수
  * 있다. 영수증의 숫자는 주문할 때 서버가 DB 에서 다시 읽는다
  * (schema.md 7-3절). 이 화면이 계산한 합계를 주문에 쓰지 말 것.
@@ -27,6 +39,31 @@ export default function CartPage() {
   const lines = useCartLines()
   const setQuantity = useCart((s) => s.setQuantity)
   const remove = useCart((s) => s.remove)
+  const [ordered, setOrdered] = useState<string[]>([])
+
+  // 담긴 것이 바뀔 때마다 다시 묻는다. 로그인하지 않았으면 빈 배열이 온다.
+  // **effect 안에서 곧바로 setState 하지 않는다** — 답이 온 뒤에만 고친다
+  useEffect(() => {
+    const ids = lines.map((l) => l.variantId)
+    if (ids.length === 0) return
+    let alive = true
+    alreadyOrderedVariantIds(ids)
+      .then((found) => {
+        if (alive) setOrdered(found)
+      })
+      .catch(() => {
+        // 못 물어봤다고 장바구니를 못 쓰게 할 이유는 없다
+      })
+    return () => {
+      alive = false
+    }
+  }, [lines])
+
+  // **담긴 것에서 지워진 id 는 빼고 센다.** 답을 받아둔 뒤에 손님이
+  // 직접 지웠을 수 있다 — 그때 안내가 남아 있으면 틀린 말이 된다
+  const orderedInCart = ordered.filter((id) =>
+    lines.some((l) => l.variantId === id)
+  )
 
   const itemsKrw = cartTotalKrw(lines)
   const shippingKrw = shippingFee(itemsKrw)
@@ -39,6 +76,23 @@ export default function CartPage() {
         <h1 className="text-ink text-title font-serif">장바구니</h1>
         <Label>{lines.length}개 품목</Label>
       </div>
+
+      {orderedInCart.length > 0 ? (
+        <div className="flex flex-col items-start gap-3 border-b border-gray-200 bg-gray-50 px-7 py-5">
+          <p className="text-ink text-caption">
+            최근에 주문하신 상품이 {orderedInCart.length}개 담겨 있습니다.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              orderedInCart.forEach((id) => remove(id))
+            }}
+            className="text-caption border-ink text-ink border px-4 py-2"
+          >
+            주문한 것 빼기
+          </button>
+        </div>
+      ) : null}
 
       {lines.length === 0 ? (
         <div className="border-b border-gray-200 px-7 py-24 text-center">
