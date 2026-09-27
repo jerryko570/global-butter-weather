@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/Toast'
+import { useCart } from '@/lib/store/cart'
 import { payWithPortOne } from '@/lib/payments/requestPayment'
 import { confirmPayment, preparePayment } from '@/app/(shop)/checkout/payment'
 import type { ShippingInfo } from '@/types/order'
@@ -15,6 +16,9 @@ import type { ShippingInfo } from '@/types/order'
  *
  * `preparePayment` 가 **번호를 새로 발급한다.** 포트원은 한 번 쓴 번호를
  * 다시 받아주지 않는다.
+ *
+ * ⚠️ **여기서도 장바구니를 비운다.** 주문서에서 결제할 때만 비우고 있어서,
+ * 이 길로 끝낸 손님은 **산 물건이 장바구니에 그대로 남았다** (2026-09-27).
  */
 export default function RetryPaymentButton({
   orderNo,
@@ -25,6 +29,7 @@ export default function RetryPaymentButton({
 }) {
   const router = useRouter()
   const { show } = useToast()
+  const clear = useCart((s) => s.clear)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -58,6 +63,8 @@ export default function RetryPaymentButton({
         return
       }
 
+      // 주문서에서 결제한 것과 같은 일이 끝났다. 담긴 것도 같이 비운다
+      clear()
       show('결제가 완료되었습니다')
       router.refresh()
     } catch {
