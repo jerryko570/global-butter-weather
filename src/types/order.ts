@@ -43,6 +43,11 @@ export interface Order {
   cancelled_at: string | null
   /** 왜 취소했나. 웹훅이면 「결제 취소」, 관리자면 적은 사유 */
   cancel_reason: string | null
+  /** 택배사 코드. `lib/carriers.ts` 의 `code` 와 맞춘다 (`0009`) */
+  carrier: string | null
+  /** 송장번호. 사람이 어드민에서 넣는다 */
+  tracking_no: string | null
+  shipped_at: string | null
   created_at: string
   updated_at: string
 }

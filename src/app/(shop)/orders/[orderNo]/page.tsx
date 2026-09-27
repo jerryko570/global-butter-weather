@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import Label from '@/components/Label'
 import RetryPaymentButton from '@/components/RetryPaymentButton'
+import { findCarrier } from '@/lib/carriers'
 import { formatKRW } from '@/lib/queries/products'
 import { createClient } from '@/lib/supabase/server'
 import type { OrderItem, ShippingInfo } from '@/types/order'
@@ -85,6 +86,44 @@ export default async function OrderPage({
             </p>
             <RetryPaymentButton orderNo={data.order_no} shipping={shipping} />
           </>
+        ) : data.status === 'shipped' || data.status === 'done' ? (
+          // 보낸 뒤에는 **송장번호가 이 화면에서 제일 필요한 정보다.**
+          // 「준비되는 대로 보내드립니다」를 계속 보여주면 거짓말이 된다
+          (() => {
+            const carrier = findCarrier(data.carrier)
+            return (
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-ink-muted text-caption leading-relaxed">
+                  {data.status === 'done'
+                    ? '배송이 끝났습니다.'
+                    : '보내드렸습니다.'}
+                </p>
+                {data.tracking_no ? (
+                  <>
+                    <p className="text-ink text-body">
+                      {carrier?.name ?? data.carrier}{' '}
+                      <span className="tracking-wider">{data.tracking_no}</span>
+                    </p>
+                    {carrier ? (
+                      <a
+                        href={carrier.trackUrl(data.tracking_no)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-caption border-ink text-ink border px-6 py-2.5 tracking-widest uppercase"
+                      >
+                        배송 조회
+                      </a>
+                    ) : null}
+                    {carrier?.needsManualInput ? (
+                      <p className="text-ink-subtle text-caption">
+                        조회 화면에서 위 번호를 넣어 주세요.
+                      </p>
+                    ) : null}
+                  </>
+                ) : null}
+              </div>
+            )
+          })()
         ) : (
           <p className="text-ink-muted text-caption leading-relaxed">
             주문이 확정되었습니다. 준비되는 대로 보내드립니다.
