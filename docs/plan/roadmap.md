@@ -199,6 +199,7 @@
 | `feature/checkout-form` ✅       | 배송지(카카오 우편번호) · 주문 상품 · 동의  |
 | `feature/create-order` ✅        | **가격·배송비를 서버가 다시 읽어 박제한다** |
 | `feature/orders-list` ✅         | `/orders` — 내 주문만 보인다 (RLS)          |
+| `feature/remember-shipping` ✅   | 두 번째 주문부터 배송지가 미리 채워진다     |
 | **`feature/payment`** ✅         | **포트원 + 토스.** 테스트 채널로 검증 완료  |
 | **`feature/payment-webhook`** ✅ | 브라우저가 없어도 주문이 맞춰진다           |
 
