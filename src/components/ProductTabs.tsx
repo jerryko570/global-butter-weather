@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { imageUrl } from '@/lib/images'
+import { FREE_SHIPPING_OVER_KRW, SHIPPING_FEE_KRW } from '@/lib/shipping'
 
 /**
  * 상세 아래의 탭. **`Detail` 과 `Shipping & Returns` 둘이다.**
@@ -28,7 +29,12 @@ const SHIPPING = [
     title: '배송 안내',
     rows: [
       ['배송 방법', '택배'],
-      ['배송비', '3,000원 (50,000원 이상 무료)'],
+      // **여기에 숫자를 적지 않는다.** 규칙은 `lib/shipping.ts` 한 군데에
+      // 있고, 손님이 보는 안내와 실제로 매기는 값이 어긋나면 그대로 분쟁이다
+      [
+        '배송비',
+        `${SHIPPING_FEE_KRW.toLocaleString('ko-KR')}원 (${FREE_SHIPPING_OVER_KRW.toLocaleString('ko-KR')}원 이상 무료)`,
+      ],
       ['배송 기간', '결제 확인 후 2~5일 이내 출고'],
     ],
   },
