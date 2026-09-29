@@ -555,6 +555,42 @@ GS Postbox 는 조회가 팝업 스크립트라 번호를 주소에 실을 수 �
 
 조회 **API** 는 아직 붙이지 않았다. 스윗트래커의 스마트택배 같은 것이 있고 계약 없이 쓸 수 있지만 키 발급이 필요하다.
 
+## 7-8. 마이그레이션은 다시 실행돼도 된다 ★ (2026-09-29)
+
+**모든 `.sql` 은 몇 번을 돌려도 같은 결과가 나와야 한다.** 취향이 아니라 제약이다.
+
+### 왜 — 빨간 ✗ 가 한 달 가까이 켜져 있었다
+
+Supabase GitHub 연동이 `main` 에 머지될 때마다 `supabase/migrations/` 를 **처음부터** 돌린다. 우리는 SQL Editor 에 손으로 붙여넣어 적용해 왔으므로 **Supabase 쪽 기록은 비어 있었고**, 매번 `0001` 부터 돌다가 멈췄다.
+
+```
+ERROR: type "product_category" already exists (SQLSTATE 42710)
+```
+
+PR **#57 무렵부터 계속 실패**했는데 **아무것도 막지 않아서** 눈에 띄지 않았다. 머지도 배포도 정상이었다. ⚠️ **막지 않는 실패는 오래 산다** — 진짜 문제가 생겨도 「원래 빨간 것」으로 보인다.
+
+### 쓰는 법
+
+| 무엇                     | 어떻게                                                                                      |
+| ------------------------ | ------------------------------------------------------------------------------------------- |
+| `create table`           | `if not exists`                                                                             |
+| `create index`           | `if not exists`                                                                             |
+| `create function`        | `create or replace`                                                                         |
+| `create view`            | `create or replace`                                                                         |
+| `create policy`          | 앞에 `drop policy if exists`                                                                |
+| `create trigger`         | 앞에 `drop trigger if exists`                                                               |
+| `insert`                 | `on conflict ... do nothing`                                                                |
+| **`create type`**        | **`if not exists` 가 없다** — `do $$ ... exception when duplicate_object then null; end $$` |
+| `alter table add column` | `if not exists`                                                                             |
+
+**`create type` 이 이번의 발목이었다.** enum 에는 `if not exists` 문법이 없어서 그냥 쓰면 두 번째 실행에서 반드시 깨진다.
+
+### 이제 머지하면 자동으로 적용된다
+
+`0001`~`0003` 을 고쳐 전부 다시 실행할 수 있게 했으므로, 연동이 처음부터 돌아도 끝까지 간다. **그 뒤로는 새 마이그레이션만 적용된다.**
+
+즉 **「SQL Editor 에 붙여넣고 실행」 단계가 없어진다.** 대신 **머지가 곧 프로덕션 DB 변경**이 되므로, PR 에서 `.sql` 을 더 신중히 봐야 한다.
+
 ## 8. 아직 짜지 않은 것
 
 - ~~orders · order_items~~ → **7-3절에 설계했다 (`0005`).**

@@ -129,6 +129,12 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 >
 > `secret` 키(`sb_secret_*`)는 **저장소에 두지 않는다.** RLS 를 우회하므로 Vercel 환경변수에만 넣는다.
 
+**마이그레이션은 머지하면 자동으로 적용된다 (2026-09-29부터).** Supabase GitHub 연동이 `main` 의 `supabase/migrations/` 를 적용한다. 그전까지는 손으로 SQL Editor 에 붙여넣었다.
+
+> ⚠️ **모든 `.sql` 은 다시 실행돼도 되게 쓴다.** 연동이 처음부터 돌리기 때문이다. `create type` 은 `if not exists` 가 없어 **DO 블록**으로 감싼다 — 이것 때문에 빨간 ✗ 가 한 달 가까이 켜져 있었다. 형식은 [schema.md 7-8절](docs/dev/schema.md).
+>
+> **머지가 곧 프로덕션 DB 변경이다.** PR 에서 `.sql` 을 더 신중히 볼 것.
+
 스키마는 파일로 있다.
 
 | 무엇             | 어디                                                               |

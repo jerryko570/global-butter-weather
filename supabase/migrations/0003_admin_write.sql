@@ -28,6 +28,8 @@ insert into admin_emails (email) values
 on conflict (email) do nothing;
 
 -- ── 판정 함수 ───────────────────────────────────────────────
+-- ⚠️ **다시 실행해도 되게 썼다 (2026-09-29).** 근거는 `0001` 머리말.
+--
 -- security definer 라 admin_emails 의 RLS 를 지나서 읽는다. 이게 없으면
 -- 위에서 표를 잠근 탓에 정책이 늘 거짓이 된다.
 --
@@ -52,12 +54,14 @@ grant execute on function is_admin() to authenticated;
 -- ── 상품 ────────────────────────────────────────────────────
 -- 정책은 OR 로 합쳐진다. 손님은 products_read_public 으로 공개된 것만
 -- 보고, 관리자는 아래 정책으로 감춘 것까지 보고 쓴다.
+drop policy if exists products_admin_all on products;
 create policy products_admin_all on products
   for all
   to authenticated
   using (is_admin())
   with check (is_admin());
 
+drop policy if exists product_variants_admin_all on product_variants;
 create policy product_variants_admin_all on product_variants
   for all
   to authenticated
@@ -67,17 +71,20 @@ create policy product_variants_admin_all on product_variants
 -- ── 사진 ────────────────────────────────────────────────────
 -- 읽기는 0002 의 product_images_read_public 이 이미 누구에게나 열어 두었다.
 -- 여기서는 올리고 지우는 것만 관리자에게 연다.
+drop policy if exists product_images_admin_write on storage.objects;
 create policy product_images_admin_write on storage.objects
   for insert
   to authenticated
   with check (bucket_id = 'product-images' and is_admin());
 
+drop policy if exists product_images_admin_update on storage.objects;
 create policy product_images_admin_update on storage.objects
   for update
   to authenticated
   using (bucket_id = 'product-images' and is_admin())
   with check (bucket_id = 'product-images' and is_admin());
 
+drop policy if exists product_images_admin_delete on storage.objects;
 create policy product_images_admin_delete on storage.objects
   for delete
   to authenticated
