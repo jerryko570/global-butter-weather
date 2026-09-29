@@ -6,20 +6,34 @@
 --
 -- 옛 쪽은 테이블을 대시보드에서 손으로 만들어 재현할 방법이 없었다.
 -- 여기서는 파일로 남긴다 — 프로젝트를 다시 만들어도 이 파일로 복원된다.
+--
+-- ⚠️ **다시 실행해도 되게 썼다 (2026-09-29).** 처음에는 한 번만 돌리는
+-- 전제로 썼는데, Supabase GitHub 연동이 main 에 머지될 때마다 처음부터
+-- 다시 돌리다가 `type "product_category" already exists` 에서 멈췄다.
+-- 우리가 SQL Editor 에 손으로 붙여넣어 적용해 왔기 때문에 Supabase 쪽
+-- 기록은 비어 있었다.
+--
+-- **enum 은 `if not exists` 를 쓸 수 없어** DO 블록으로 감싼다.
 
 -- ── 카테고리 ────────────────────────────────────────────────
 -- 2026-09-16 확정. **소재가 아니라 형태로 나눈다** (foundation.md 8절 1번).
 -- 「기타」는 두지 않는다. 형태가 다른 것이 나오면 그때 값을 늘린다.
 -- enum 인 이유는 값을 늘릴 때 반드시 마이그레이션을 거치게 하려는 것이다.
-create type product_category as enum ('keyring', 'bracelet', 'necklace');
+do $$ begin
+  create type product_category as enum ('keyring', 'bracelet', 'necklace');
+exception when duplicate_object then null;
+end $$;
 
 -- 판매 상태. **노출 여부(is_active)와 다른 축이다.**
 -- 품절이어도 보여줘야 하고, 준비 중이면 팔 수 있어도 감춰야 한다.
-create type product_status as enum ('active', 'sold_out');
+do $$ begin
+  create type product_status as enum ('active', 'sold_out');
+exception when duplicate_object then null;
+end $$;
 
 -- ── products — 「물건」 ──────────────────────────────────────
 -- 가격과 재고가 여기 없다. 그것은 파는 단위(variant)의 성질이다.
-create table products (
+create table if not exists products (
   id          uuid primary key default gen_random_uuid(),
   slug        text not null unique,
 
@@ -53,7 +67,7 @@ create table products (
 -- 구조로 둔다 — 아래 products_public 뷰가 그런 상품을 걸러낸다.
 -- 옵션이 하나뿐인 물건도 variant 를 하나 만든다(예: 이름 '기본').
 -- 가격과 재고가 한 군데에만 있게 하려는 것이다.
-create table product_variants (
+create table if not exists product_variants (
   id          uuid primary key default gen_random_uuid(),
   product_id  uuid not null references products(id) on delete cascade,
 
@@ -76,15 +90,15 @@ create table product_variants (
   unique (product_id, name)
 );
 
-create index product_variants_product_idx
+create index if not exists product_variants_product_idx
   on product_variants (product_id, position);
 
 -- 목록은 「공개된 것을 최신순으로」가 기본이고 카테고리로 거른다.
-create index products_public_idx
+create index if not exists products_public_idx
   on products (is_active, category, created_at desc);
 
 -- ── updated_at 자동 갱신 ────────────────────────────────────
-create function set_updated_at() returns trigger
+create or replace function set_updated_at() returns trigger
   language plpgsql as $$
 begin
   new.updated_at = now();
@@ -92,10 +106,12 @@ begin
 end;
 $$;
 
+drop trigger if exists products_updated_at on products;
 create trigger products_updated_at
   before update on products
   for each row execute function set_updated_at();
 
+drop trigger if exists product_variants_updated_at on product_variants;
 create trigger product_variants_updated_at
   before update on product_variants
   for each row execute function set_updated_at();
@@ -106,11 +122,13 @@ alter table products enable row level security;
 alter table product_variants enable row level security;
 
 -- 읽기 — 누구나. 단 **공개된 것만.** is_active=false 는 밖에서 안 보인다.
+drop policy if exists products_read_public on products;
 create policy products_read_public on products
   for select using (is_active = true);
 
 -- variant 도 마찬가지이되, **딸린 상품이 공개된 경우에만** 보인다.
 -- 이게 없으면 감춘 상품의 가격이 variant 를 통해 새어 나간다.
+drop policy if exists product_variants_read_public on product_variants;
 create policy product_variants_read_public on product_variants
   for select using (
     is_active = true
@@ -130,7 +148,7 @@ create policy product_variants_read_public on product_variants
 --
 -- security_invoker=true — 뷰가 아니라 **조회하는 사람**의 권한으로
 -- 아래 테이블을 읽는다. 없으면 RLS 를 우회해 감춘 상품이 새어 나간다.
-create view products_public
+create or replace view products_public
   with (security_invoker = true)
 as
 select

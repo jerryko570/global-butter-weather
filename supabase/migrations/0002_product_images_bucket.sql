@@ -3,6 +3,8 @@
 -- 지금 사진은 레포 안(public/photos/)에 있다. 그 방식은 **사진을 한 장
 -- 추가할 때마다 코드를 고쳐 배포해야 한다.** 상품이 늘면 못 버틴다.
 -- 대시보드에서 올리고 바로 쓰는 쪽으로 옮긴다.
+--
+-- ⚠️ **다시 실행해도 되게 썼다 (2026-09-29).** 근거는 `0001` 머리말.
 
 -- ── 버킷 ────────────────────────────────────────────────────
 -- public = true. 상품 사진은 감출 것이 아니고, 공개 버킷이어야
@@ -15,6 +17,7 @@ on conflict (id) do nothing;
 -- ── 정책 ────────────────────────────────────────────────────
 -- 읽기 — 누구나. 공개 버킷이라 공개 주소는 RLS 를 타지 않지만,
 -- 목록 조회(API)에도 열어두어 두 경로가 어긋나지 않게 한다.
+drop policy if exists product_images_read_public on storage.objects;
 create policy product_images_read_public on storage.objects
   for select
   using (bucket_id = 'product-images');
