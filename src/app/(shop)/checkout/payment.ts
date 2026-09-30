@@ -53,7 +53,12 @@ export async function preparePayment(
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return { ok: false, reason: '로그인이 필요합니다.' }
+  if (!user)
+    return {
+      ok: false,
+      reason:
+        '로그인이 풀렸습니다. 다시 로그인하시면 주문 내역에서 이어서 결제하실 수 있습니다.',
+    }
 
   // RLS 가 남의 주문을 막는다. 여기서 user_id 를 다시 비교하지 않는 이유다
   const { data: order } = await supabase
@@ -62,9 +67,16 @@ export async function preparePayment(
     .eq('order_no', orderNo)
     .maybeSingle()
 
-  if (!order) return { ok: false, reason: '주문을 찾지 못했습니다.' }
+  if (!order)
+    return {
+      ok: false,
+      reason: '주문을 찾지 못했습니다. 주문 내역에서 확인해 주세요.',
+    }
   if (order.status !== 'pending') {
-    return { ok: false, reason: '이미 처리된 주문입니다.' }
+    return {
+      ok: false,
+      reason: '이미 끝난 주문입니다. 주문 내역에서 확인해 주세요.',
+    }
   }
 
   const paymentId = crypto.randomUUID()
@@ -82,7 +94,10 @@ export async function preparePayment(
     .select('id')
 
   if (!updated || updated.length === 0) {
-    return { ok: false, reason: '결제를 준비하지 못했습니다.' }
+    return {
+      ok: false,
+      reason: '결제를 준비하지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
+    }
   }
 
   // 결제창에 보일 이름. 「플라워가든 비즈 키링 외 2건」
@@ -119,7 +134,12 @@ export async function confirmPayment(
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return { ok: false, reason: '로그인이 필요합니다.' }
+  if (!user)
+    return {
+      ok: false,
+      reason:
+        '로그인이 풀렸습니다. 다시 로그인하시면 주문 내역에서 이어서 결제하실 수 있습니다.',
+    }
 
   const { data: order } = await supabase
     .from('orders')
@@ -127,13 +147,20 @@ export async function confirmPayment(
     .eq('order_no', orderNo)
     .maybeSingle()
 
-  if (!order) return { ok: false, reason: '주문을 찾지 못했습니다.' }
+  if (!order)
+    return {
+      ok: false,
+      reason: '주문을 찾지 못했습니다. 주문 내역에서 확인해 주세요.',
+    }
   if (order.status === 'paid') return { ok: true } // 두 번 불려도 괜찮다
   if (order.status !== 'pending') {
-    return { ok: false, reason: '이미 처리된 주문입니다.' }
+    return {
+      ok: false,
+      reason: '이미 끝난 주문입니다. 주문 내역에서 확인해 주세요.',
+    }
   }
   if (!order.payment_id) {
-    return { ok: false, reason: '결제 정보가 없습니다.' }
+    return { ok: false, reason: '결제를 처음부터 다시 시작해 주세요.' }
   }
 
   // ── 1·2. 포트원에 직접 묻는다 ─────────────────────────────
@@ -158,7 +185,7 @@ export async function confirmPayment(
         return {
           ok: false,
           reason:
-            '결제 금액이 주문 금액과 다릅니다. 취소가 자동으로 되지 않았습니다 — 문의해 주세요.',
+            '결제 금액이 주문 금액과 다릅니다. 취소가 자동으로 되지 않았습니다 — 인스타그램 @butterweather_ 로 알려주세요.',
         }
       }
       return {
@@ -166,7 +193,10 @@ export async function confirmPayment(
         reason: '결제 금액이 주문 금액과 다릅니다. 결제를 취소했습니다.',
       }
     }
-    return { ok: false, reason: '결제가 완료되지 않았습니다.' }
+    return {
+      ok: false,
+      reason: '결제가 끝나지 않았습니다. 다시 결제해 주세요.',
+    }
   }
 
   // ── 2-b. 카드가 아니면 받지 않는다 ─────────────────────────
@@ -178,7 +208,7 @@ export async function confirmPayment(
       return {
         ok: false,
         reason:
-          '카드로만 결제할 수 있습니다. 취소가 자동으로 되지 않았습니다 — 문의해 주세요.',
+          '카드로만 결제할 수 있습니다. 취소가 자동으로 되지 않았습니다 — 인스타그램 @butterweather_ 로 알려주세요.',
       }
     }
     return {
@@ -209,7 +239,10 @@ export async function confirmPayment(
         .eq('id', order.id)
         .maybeSingle()
       if (now?.status === 'paid') return { ok: true }
-      return { ok: false, reason: '이미 처리된 주문입니다.' }
+      return {
+        ok: false,
+        reason: '이미 끝난 주문입니다. 주문 내역에서 확인해 주세요.',
+      }
     }
 
     // 다시 해도 안 되는 것에만 돈을 돌려준다

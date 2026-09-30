@@ -58,7 +58,11 @@ export async function createOrder(
   } = await supabase.auth.getUser()
 
   if (!user) {
-    return { ok: false, reason: '로그인이 필요합니다.' }
+    return {
+      ok: false,
+      reason:
+        '로그인이 풀렸습니다. 다시 로그인하시면 담아둔 것은 그대로 있습니다.',
+    }
   }
 
   // ── 2. 보낸 것이 말이 되는가 ──────────────────────────────
@@ -66,7 +70,7 @@ export async function createOrder(
     return { ok: false, reason: '담긴 것이 없습니다.' }
   }
   if (lines.some((l) => !Number.isInteger(l.quantity) || l.quantity < 1)) {
-    return { ok: false, reason: '수량이 올바르지 않습니다.' }
+    return { ok: false, reason: '수량은 1개부터 999개까지 넣을 수 있습니다.' }
   }
   // 같은 옵션이 두 줄로 오면 합계가 어긋난다. 화면이 막지만 여기서도 본다
   const ids = lines.map((l) => l.variantId)
@@ -88,7 +92,10 @@ export async function createOrder(
     .in('id', ids)
 
   if (readError) {
-    return { ok: false, reason: '상품을 확인하지 못했습니다.' }
+    return {
+      ok: false,
+      reason: '상품 정보를 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
+    }
   }
 
   type Row = {
@@ -180,7 +187,10 @@ export async function createOrder(
     .single()
 
   if (orderError || !order) {
-    return { ok: false, reason: '주문서를 만들지 못했습니다.' }
+    return {
+      ok: false,
+      reason: '주문서를 만들지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
+    }
   }
 
   const { error: itemsError } = await supabase
@@ -192,7 +202,10 @@ export async function createOrder(
     // **트랜잭션이 아니라서 지우는 것도 실패할 수 있다** — 그때는 pending
     // 으로 남지만, 결제가 안 됐으므로 손님에게 청구되지 않는다
     await supabase.from('orders').delete().eq('id', order.id)
-    return { ok: false, reason: '주문 상품을 저장하지 못했습니다.' }
+    return {
+      ok: false,
+      reason: '주문서를 만들지 못했습니다. 잠시 뒤 다시 시도해 주세요.',
+    }
   }
 
   return { ok: true, orderNo: order.order_no as string }

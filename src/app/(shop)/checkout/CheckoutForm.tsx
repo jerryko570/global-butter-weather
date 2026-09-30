@@ -207,7 +207,9 @@ export default function CheckoutForm({
       if (!direct) clear()
       router.push(`/orders/${result.orderNo}`)
     } catch {
-      setError('주문하지 못했습니다. 잠시 뒤 다시 시도해 주세요.')
+      setError(
+        '주문하지 못했습니다. 잠시 뒤 다시 시도해 주세요. 담아둔 것은 그대로 있습니다.'
+      )
     } finally {
       setSaving(false)
     }
