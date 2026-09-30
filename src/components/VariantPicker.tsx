@@ -116,7 +116,7 @@ export default function VariantPicker({
       {/* 옵션이 하나뿐이면 고를 것이 없다 */}
       {variants.length > 1 ? (
         <div>
-          <Label className="mb-3">Option</Label>
+          <Label className="mb-3">옵션</Label>
           <div className="flex flex-wrap gap-2">
             {variants.map((v, i) => {
               const out = v.stock === 0
@@ -174,7 +174,7 @@ export default function VariantPicker({
 
       {/* 합계 */}
       <div className="flex items-baseline justify-between border-t border-gray-200 pt-4">
-        <Label>Total</Label>
+        <Label>합계</Label>
         <p className="text-ink text-title font-medium">
           {formatKRW(variant.price_krw * quantity)}
         </p>

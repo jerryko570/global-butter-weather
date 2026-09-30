@@ -168,7 +168,7 @@ export default async function OrderPage({
             </p>
           </div>
           <div className="flex items-baseline justify-between border-t border-gray-200 pt-3">
-            <Label>Total</Label>
+            <Label>합계</Label>
             <p className="text-ink text-title font-medium">
               {formatKRW(data.total_krw)}
             </p>

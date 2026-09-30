@@ -21,7 +21,7 @@ export default function CartLink() {
       href="/cart"
       className="text-ink-muted hover:text-ink text-caption tracking-wide uppercase"
     >
-      Cart ({count})
+      장바구니 ({count})
     </Link>
   )
 }

@@ -39,7 +39,7 @@ export default function Sidebar() {
       </div>
 
       <div className="border-b border-gray-200 px-6 py-6">
-        <Label className="mb-3">Shop</Label>
+        <Label className="mb-3">상품</Label>
         <nav className="flex flex-col gap-1">
           {CATEGORIES.map((c) => (
             <a key={c.label} href="#" className="group flex items-center gap-3">
@@ -64,7 +64,7 @@ export default function Sidebar() {
         </nav>
 
         <div className="mt-6 flex items-center gap-2">
-          <Label>Language</Label>
+          <Label>언어</Label>
           <span className="text-ink text-caption">KR</span>
           <span className="text-ink-subtle text-caption">·</span>
           <span className="text-ink-subtle hover:text-ink text-caption">
