@@ -68,7 +68,9 @@ export default function RetryPaymentButton({
       show('결제가 완료되었습니다')
       router.refresh()
     } catch {
-      setError('결제하지 못했습니다. 잠시 뒤 다시 시도해 주세요.')
+      setError(
+        '결제하지 못했습니다. 잠시 뒤 다시 시도해 주세요. 주문은 그대로 남아 있습니다.'
+      )
     } finally {
       setBusy(false)
     }
