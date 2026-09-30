@@ -175,6 +175,8 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 - **타이포는 역할 이름 여섯 개다** — `text-display`(38) `text-title`(22) `text-wordmark`(15) `text-body`(13) `text-caption`(11) `text-label`(10). Tailwind 기본 스케일(`text-sm`)을 쓰지 않는다.
 - **serif는 브랜드의 목소리에만 ★** — 제목·지표·워드마크·태그라인만 serif이고 본문·라벨은 sans다. 계승한 디자인의 핵심 성격이라 본문에 serif를 쓰면 다른 브랜드가 된다. ⚠️ **어떤 serif인지는 아직 미정**이라 기기마다 다르게 보인다 (tokens.md 3-3절).
 
+**손님에게 하는 말은 [docs/design/writing.md](docs/design/writing.md)** 에 규약이 있다. 화면 문구를 짜기 전에 읽을 것. 핵심은 하나다 — **작은 대문자 라벨은 영문 조형이라 번역하지 않고, 그 밖의 말은 언어를 따라간다.** `uppercase` 가 라틴 문자에만 걸리기 때문이다.
+
 > **어떤 token을 언제 쓰는지**는 값 목록만으로 정해지지 않는다. 실제 사용 규약은 **[docs/design/tokens.md](docs/design/tokens.md)** 에 있다. component를 새로 짜기 전에 반드시 읽을 것.
 
 ## 5. Git · PR 규칙
