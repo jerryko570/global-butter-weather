@@ -216,8 +216,7 @@ export default function CartPage() {
                 주문하기
               </Link>
               <p className="text-ink-subtle text-caption">
-                주문서에서 배송지를 입력받습니다.{' '}
-                <strong>결제는 아직 준비 중입니다.</strong>
+                주문서에서 배송지를 입력받습니다.
               </p>
             </div>
           </div>

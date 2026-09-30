@@ -37,9 +37,7 @@ export default function Footer() {
       </div>
 
       <div className="flex items-center justify-between border-t border-gray-200 px-7 py-4">
-        <p className="text-ink-subtle text-caption">
-          © 2026 Butter Weather — 사업자 정보는 아직 채우지 않았습니다
-        </p>
+        <p className="text-ink-subtle text-caption">© 2026 Butter Weather</p>
         <div className="flex items-center gap-4">
           <span className="text-ink text-caption">KR</span>
           <span className="text-ink-subtle hover:text-ink text-caption">
