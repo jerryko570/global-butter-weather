@@ -21,14 +21,20 @@ import type { ProductDetail, ProductVariant } from '@/types/product'
  * 처음 고르는 것은 **재고가 있는 첫 옵션**이다. 품절인 것이 먼저 잡혀
  * 살 수 없는 화면으로 열리지 않게 한다.
  *
- * **`Add to Cart` 는 실제로 담는다.** 담는 것은 브라우저 안의 일이라
+ * **「장바구니 담기」는 실제로 담는다.** 담는 것은 브라우저 안의 일이라
  * 로그인도 서버도 필요 없다 (`lib/store/cart.ts`).
  *
- * ⚠️ **`Buy It Now` 는 아직 눌리지 않는다.** 주문서와 결제가 I3.3 이다.
- * 자리만 잡아두고 안내를 함께 둔다 — 눌러도 아무 일이 없는 버튼보다 왜
- * 안 되는지 보이는 편이 낫다 (2026-09-19 이나래 확인).
- *
  * 옛 사이트는 장바구니 없이 **바로 결제**였다. 이번에는 둘 다 둔다.
+ *
+ * ---
+ *
+ * ## 버튼은 한국어다 (2026-09-30 이나래 확정) ★
+ *
+ * `Add to Cart` · `Buy It Now` · `Sold Out` 이었다. **버튼은 「말」이므로
+ * 언어를 따라간다** — 규약은 [writing.md](../../docs/design/writing.md) 1절.
+ *
+ * `uppercase` 는 **그대로 둔다.** 한글에는 아무 효과가 없지만 죽은 값이
+ * 아니다 — EN 버전이 열리면 같은 자리에 영문이 들어오고 그때 필요하다.
  */
 export default function VariantPicker({
   product,
@@ -181,7 +187,7 @@ export default function VariantPicker({
           disabled={soldOut}
           className="text-ink hover:border-ink text-caption w-full border border-gray-300 py-3.5 tracking-widest uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Add to Cart
+          장바구니 담기
         </button>
         <button
           type="button"
@@ -189,7 +195,7 @@ export default function VariantPicker({
           disabled={soldOut}
           className="bg-ink text-cloud text-caption w-full py-3.5 tracking-widest uppercase disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {soldOut ? 'Sold Out' : 'Buy It Now'}
+          {soldOut ? '품절' : '바로 구매'}
         </button>
       </div>
     </div>
