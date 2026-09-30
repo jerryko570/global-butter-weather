@@ -44,11 +44,16 @@ import type { ProductListItem } from '@/types/product'
  */
 export const revalidate = 60
 
-/** DB 값 → 화면 라벨. 칸 안의 대문자 라벨에 쓴다. */
+/**
+ * DB 값 → 화면 라벨.
+ *
+ * ⚠️ **Sidebar 와 같은 말이어야 한다.** 전에는 여기가 `KEYRING`, Sidebar 가
+ * 「키링」이었다 — **같은 것을 두 이름으로 부르고 있었다** (2026-09-30).
+ */
 const CATEGORY_LABEL: Record<string, string> = {
-  keyring: 'KEYRING',
-  bracelet: 'BRACELET',
-  necklace: 'NECKLACE',
+  keyring: '키링',
+  bracelet: '팔찌',
+  necklace: '목걸이',
 }
 
 /**

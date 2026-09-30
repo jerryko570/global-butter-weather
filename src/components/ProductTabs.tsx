@@ -64,8 +64,8 @@ export default function ProductTabs({
       <div className="flex items-center justify-center gap-10 border-b border-gray-200">
         {(
           [
-            { key: 'detail', label: 'Detail' },
-            { key: 'shipping', label: 'Shipping & Returns' },
+            { key: 'detail', label: '상세' },
+            { key: 'shipping', label: '배송·교환' },
           ] as { key: Tab; label: string }[]
         ).map((t) => (
           <button

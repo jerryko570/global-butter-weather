@@ -198,7 +198,7 @@ export default function CartPage() {
                 </p>
               </div>
               <div className="flex items-baseline justify-between border-t border-b border-gray-200 py-4">
-                <Label>Total</Label>
+                <Label>합계</Label>
                 <p className="text-ink text-title font-medium">
                   {formatKRW(total)}
                 </p>

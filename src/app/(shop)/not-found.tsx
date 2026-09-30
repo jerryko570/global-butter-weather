@@ -11,7 +11,7 @@ import Label from '@/components/Label'
 export default function NotFound() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-7 py-20 text-center">
-      <Label className="mb-5">Not Found</Label>
+      <Label className="mb-5">찾을 수 없음</Label>
       <h1 className="text-ink text-title mb-4 font-serif">
         찾으시는 상품이 없습니다.
       </h1>
