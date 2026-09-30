@@ -14,6 +14,7 @@ import { amountUntilFreeShipping, shippingFee } from '@/lib/shipping'
 import { createOrder } from './actions'
 import { confirmPayment, preparePayment } from './payment'
 import { payWithPortOne } from '@/lib/payments/requestPayment'
+import type { CartLine } from '@/lib/store/cart'
 import type { ShippingInfo } from '@/types/order'
 
 /**
@@ -64,17 +65,27 @@ function Field({
  * 두 번째 주문부터는 이름·연락처·주소가 이미 채워진 채로 열린다.
  *
  * **동의는 채우지 않는다.** 주소는 편의이고 동의는 의사표시다.
+ *
+ * `directLine` 이 있으면 **바로구매다** — 장바구니가 아니라 그 한 줄만
+ * 주문한다. 주소로 들어온 값을 서버가 읽어 넘겨준 것이다.
  */
 export default function CheckoutForm({
   lastShipping,
+  directLine = null,
 }: {
   lastShipping: ShippingInfo | null
+  directLine?: CartLine | null
 }) {
   const router = useRouter()
   const { show } = useToast()
-  const lines = useCartLines()
+  const cartLines = useCartLines()
   const clear = useCart((s) => s.clear)
   const remove = useCart((s) => s.remove)
+
+  // **바로구매면 장바구니를 보지 않는다.** 담아둔 것이 같이 결제되면
+  // 「바로구매」라는 말이 거짓이 된다
+  const direct = directLine !== null
+  const lines = direct ? [directLine] : cartLines
 
   // 옛 주문에 `addressDetail` 이 없을 수 있다. EMPTY 를 바닥에 깔아
   // 빠진 칸이 `undefined` 로 남지 않게 한다
@@ -191,9 +202,9 @@ export default function CheckoutForm({
       }
 
       // 주문이 만들어진 뒤에 비운다. 먼저 비우면 실패했을 때 담은 것이
-      // 사라진다
+      // 사라진다. **바로구매는 담은 적이 없으므로 비우지 않는다**
       setDone(true)
-      clear()
+      if (!direct) clear()
       router.push(`/orders/${result.orderNo}`)
     } catch {
       setError('주문하지 못했습니다. 잠시 뒤 다시 시도해 주세요.')
@@ -210,7 +221,7 @@ export default function CheckoutForm({
     )
   }
 
-  if (lines.length === 0) {
+  if (!direct && lines.length === 0) {
     return (
       <div className="border-b border-gray-200 px-7 py-24 text-center">
         <p className="text-ink-muted text-body mb-8">담긴 것이 없습니다.</p>
@@ -412,7 +423,7 @@ export default function CheckoutForm({
               <p className="text-caption whitespace-pre-line text-red-600">
                 {error}
               </p>
-              {gone.length > 0 ? (
+              {!direct && gone.length > 0 ? (
                 <button
                   type="button"
                   onClick={() => {

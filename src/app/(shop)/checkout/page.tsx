@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import CheckoutForm from './CheckoutForm'
 import { createClient } from '@/lib/supabase/server'
+import type { CartLine } from '@/lib/store/cart'
 import type { ShippingInfo } from '@/types/order'
 
 /**
@@ -30,10 +31,28 @@ import type { ShippingInfo } from '@/types/order'
  * ⚠️ **동의는 가져오지 않는다.** 개인정보 수집·이용 동의는 주문마다 받아야
  * 하는 것이라(전자상거래법) 미리 체크해 두면 안 된다. 주소는 편의이고
  * 동의는 의사표시다 — 둘을 같이 기억하면 안 된다.
+ *
+ * ---
+ *
+ * ## 바로구매는 장바구니를 거치지 않는다 ★ (2026-09-30)
+ *
+ * `?buy=<variantId>&qty=<n>` 로 들어오면 **그 한 줄만** 주문한다.
+ *
+ * **상품 정보를 서버에서 읽는다.** 화면이 들고 오게 하면 이름·가격이
+ * 또 하나의 사본이 되고, 사본은 반드시 어긋난다. 여기서 읽은 값도
+ * **보여주기 위한 것일 뿐** — 영수증의 숫자는 `createOrder` 가 다시 읽는다.
+ *
+ * 없는 옵션이거나 감춘 상품이면 **장바구니로 되돌린다.** 주소를 손으로
+ * 고쳐 들어올 수 있기 때문이다.
  */
 export const dynamic = 'force-dynamic'
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ buy?: string; qty?: string }>
+}) {
+  const { buy, qty } = await searchParams
   const supabase = await createClient()
   const {
     data: { user },
@@ -52,6 +71,53 @@ export default async function CheckoutPage() {
     .limit(1)
     .maybeSingle()
 
+  // ── 바로구매 ───────────────────────────────────────────────
+  let directLine: CartLine | null = null
+  if (buy) {
+    const { data: v } = await supabase
+      .from('product_variants')
+      .select(
+        'id, name, price_krw, stock, is_active, product:products(id, slug, name, images, is_active)'
+      )
+      .eq('id', buy)
+      .maybeSingle()
+
+    const product = v?.product as
+      | {
+          id: string
+          slug: string
+          name: string
+          images: string[]
+          is_active: boolean
+        }
+      | undefined
+
+    // 감췄거나 내린 것은 주소를 알아도 살 수 없다
+    if (!v || !v.is_active || !product?.is_active) {
+      redirect('/cart')
+    }
+
+    // 수량은 손으로 고칠 수 있다. **재고 안으로 가둔다** — 진짜 확인은
+    // 결제할 때 서버가 다시 한다
+    const asked = Number.parseInt(qty ?? '1', 10)
+    const quantity = Math.min(
+      Math.max(Number.isFinite(asked) ? asked : 1, 1),
+      Math.max(v.stock, 1)
+    )
+
+    directLine = {
+      variantId: v.id,
+      productId: product.id,
+      slug: product.slug,
+      productName: product.name,
+      variantName: v.name,
+      priceKrw: v.price_krw,
+      image: product.images[0] ?? null,
+      quantity,
+      stock: v.stock,
+    }
+  }
+
   return (
     <>
       <div className="flex items-center justify-between border-b border-gray-200 px-7 py-5">
@@ -59,6 +125,7 @@ export default async function CheckoutPage() {
       </div>
       <CheckoutForm
         lastShipping={(last?.shipping_info as ShippingInfo | undefined) ?? null}
+        directLine={directLine}
       />
     </>
   )
