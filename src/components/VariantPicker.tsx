@@ -56,7 +56,8 @@ export default function VariantPicker({
     setQuantity(1)
   }
 
-  function addToCart() {
+  /** 담기만 한다. 담고 나서 어디로 갈지는 부르는 쪽이 정한다 */
+  function put() {
     add(
       {
         variantId: variant.id,
@@ -72,10 +73,30 @@ export default function VariantPicker({
       },
       quantity
     )
+  }
+
+  function addToCart() {
+    put()
     show(`장바구니에 담았습니다 — ${variant.name} ${quantity}개`)
     // 담고 나서 화면을 옮기지 않는다. 다른 옵션도 담을 수 있어야 한다.
     // 대신 위쪽 Cart 숫자가 바로 올라간다
     router.refresh()
+  }
+
+  /**
+   * 바로구매. **담고 주문서로 바로 간다.**
+   *
+   * 결제를 붙이기 전에 잠가뒀던 것을 2026-09-30에 풀었다. 그동안 사려면
+   * 담기 → 장바구니 → 주문하기를 거쳐야 했다 — **뎁스는 리스크다**
+   * (CLAUDE.md 8절).
+   *
+   * ⚠️ **장바구니에 담아둔 것이 있으면 같이 주문된다.** 「이것만」을
+   * 따로 만들려면 장바구니와 별개의 길을 하나 더 내야 하는데, 주문서에
+   * 상품 목록이 그대로 보이므로 속는 일은 없다고 봤다.
+   */
+  function buyNow() {
+    put()
+    router.push('/checkout')
   }
 
   return (
@@ -164,14 +185,12 @@ export default function VariantPicker({
         </button>
         <button
           type="button"
-          disabled
-          className="bg-ink text-cloud text-caption w-full cursor-not-allowed py-3.5 tracking-widest uppercase opacity-40"
+          onClick={buyNow}
+          disabled={soldOut}
+          className="bg-ink text-cloud text-caption w-full py-3.5 tracking-widest uppercase disabled:cursor-not-allowed disabled:opacity-40"
         >
           {soldOut ? 'Sold Out' : 'Buy It Now'}
         </button>
-        <p className="text-ink-subtle text-caption">
-          결제는 아직 준비 중입니다. 장바구니에는 담을 수 있습니다.
-        </p>
       </div>
     </div>
   )
