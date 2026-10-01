@@ -449,7 +449,7 @@ export default function CheckoutForm({
             {saving ? '결제를 여는 중…' : '결제하기'}
           </button>
           <p className="text-ink-subtle text-caption">
-            카드로만 결제하실 수 있습니다. 결제가 끝나면 주문이 확정됩니다.
+            카드로만 결제하실 수 있습니다. 결제가 완료되면 주문이 확정됩니다.
           </p>
         </div>
       </div>

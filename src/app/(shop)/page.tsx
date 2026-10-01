@@ -169,9 +169,7 @@ export default async function Home() {
 
       {preview.length === 0 ? (
         <div className="border-b border-gray-200 px-7 py-20 text-center">
-          <p className="text-ink-muted text-body">
-            아직 등록된 상품이 없습니다.
-          </p>
+          <p className="text-ink-muted text-body">아직 상품이 없습니다.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 border-b border-gray-200 lg:grid-cols-4">
