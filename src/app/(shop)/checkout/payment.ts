@@ -195,7 +195,7 @@ export async function confirmPayment(
     }
     return {
       ok: false,
-      reason: '결제가 끝나지 않았습니다. 다시 결제해 주세요.',
+      reason: '결제가 완료되지 않았습니다. 다시 결제해 주세요.',
     }
   }
 

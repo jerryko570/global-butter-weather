@@ -80,7 +80,7 @@ export default async function OrderPage({
           <>
             <p className="text-ink-muted text-caption mb-6 leading-relaxed">
               주문서가 만들어졌습니다.{' '}
-              <strong>아직 결제가 끝나지 않았습니다.</strong>
+              <strong>아직 결제가 완료되지 않았습니다.</strong>
               <br />
               아래에서 결제하시면 주문이 확정됩니다.
             </p>
