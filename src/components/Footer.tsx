@@ -1,4 +1,5 @@
 import Label from '@/components/Label'
+import { businessRows } from '@/lib/business'
 
 /** ⚠️ 링크는 아직 아무 데도 가지 않는다. 화면이 생기는 대로 잇는다. */
 const FOOTER_COLS = [
@@ -11,6 +12,8 @@ const FOOTER_COLS = [
 ]
 
 export default function Footer() {
+  const rows = businessRows()
+
   return (
     <footer>
       <div className="grid grid-cols-1 border-t border-gray-200 sm:grid-cols-3">
@@ -35,6 +38,23 @@ export default function Footer() {
           </div>
         ))}
       </div>
+
+      {/* ── 사업자 정보 ──────────────────────────────────────
+          **전자상거래법이 요구하는 표기다.** 결제 심사도 여기를 본다
+          (lib/business.ts). 비어 있으면 통째로 그리지 않는다 — 빈 값에
+          라벨만 띄우면 「상호: 」 같은 것이 손님에게 보인다 */}
+      {rows.length > 0 ? (
+        <div className="border-t border-gray-200 px-7 py-5">
+          <dl className="text-ink-subtle text-caption flex flex-wrap gap-x-5 gap-y-1.5">
+            {rows.map(([k, v]) => (
+              <div key={k} className="flex gap-1.5">
+                <dt className="text-ink-subtle">{k}</dt>
+                <dd className="text-ink-muted">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      ) : null}
 
       <div className="flex items-center justify-between border-t border-gray-200 px-7 py-4">
         <p className="text-ink-subtle text-caption">© 2026 Butter Weather</p>
