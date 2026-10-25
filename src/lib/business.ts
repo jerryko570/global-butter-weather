@@ -75,6 +75,12 @@ export function privacyOfficer(): { name: string; email: string } {
  */
 export const PRIVACY_EFFECTIVE_DATE = '2026-10-25'
 
+/**
+ * 이용약관 시행일. **방침과 따로 둔다** — 둘은 다른 문서이고 각각
+ * 고쳐질 수 있다.
+ */
+export const TERMS_EFFECTIVE_DATE = '2026-10-25'
+
 export const BUSINESS: BusinessInfo = {
   name: '버터웨더',
   owner: '이나래',

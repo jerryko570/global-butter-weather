@@ -71,6 +71,12 @@ export default function Footer() {
           {/* **공개가 의무다** (개인정보보호법 제30조). 찾을 수 있는
               자리에 둔다 — 위 열을 늘리면 grid-cols-3 이 깨진다 */}
           <Link
+            href="/terms"
+            className="text-ink-muted hover:text-ink text-caption underline"
+          >
+            이용약관
+          </Link>
+          <Link
             href="/privacy"
             className="text-ink-muted hover:text-ink text-caption underline"
           >
