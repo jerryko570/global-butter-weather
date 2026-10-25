@@ -46,6 +46,12 @@ export interface BusinessInfo {
 }
 
 /**
+ * ⚠️ **아직 비어 있다.** 실연동 전에 채워야 한다 (2026-10-02).
+ *
+ * 값은 이나래가 가지고 있다 — 사업자등록증과 통신판매업 신고증에 있는
+ * 그대로 적는다. **다르게 적으면 심사에서 걸린다.**
+ */
+/**
  * 개인정보 보호책임자. **지정이 의무다** (개인정보보호법 제31조).
  *
  * **작은 가게는 대표자가 겸하는 것이 보통이라** 따로 적지 않으면
@@ -69,19 +75,15 @@ export function privacyOfficer(): { name: string; email: string } {
  */
 export const PRIVACY_EFFECTIVE_DATE = '2026-10-25'
 
-/**
- * ⚠️ **아직 비어 있다.** 실연동 전에 채워야 한다 (2026-10-02).
- *
- * 값은 이나래가 가지고 있다 — 사업자등록증과 통신판매업 신고증에 있는
- * 그대로 적는다. **다르게 적으면 심사에서 걸린다.**
- */
 export const BUSINESS: BusinessInfo = {
-  name: '',
-  owner: '',
+  name: '버터웨더',
+  owner: '이나래',
   registrationNo: '247-41-01130',
+  // ⚠️ 아직 못 받았다. 통신판매업 신고증의 번호 그대로
   mailOrderNo: '',
-  address: '',
-  phone: '',
+  address: '인천광역시 부평구 부일로29번길 15, 202호',
+  phone: '010-7105-0536',
+  // ⚠️ 아직 못 받았다
   email: '',
 }
 
