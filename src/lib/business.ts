@@ -79,12 +79,10 @@ export const BUSINESS: BusinessInfo = {
   name: '버터웨더',
   owner: '이나래',
   registrationNo: '247-41-01130',
-  // ⚠️ 아직 못 받았다. 통신판매업 신고증의 번호 그대로
-  mailOrderNo: '',
+  mailOrderNo: '2026-인천부평-0458',
   address: '인천광역시 부평구 부일로29번길 15, 202호',
   phone: '010-7105-0536',
-  // ⚠️ 아직 못 받았다
-  email: '',
+  email: 'butterweather@gmail.com',
 }
 
 /** 채워진 줄만 돌려준다. 비어 있으면 빈 배열이다 */

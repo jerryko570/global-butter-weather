@@ -1,8 +1,11 @@
 import Link from 'next/link'
 import Label from '@/components/Label'
-import { businessRows } from '@/lib/business'
+import { BUSINESS, businessRows } from '@/lib/business'
 
-/** ⚠️ 링크는 아직 아무 데도 가지 않는다. 화면이 생기는 대로 잇는다. */
+/**
+ * ⚠️ **대부분의 link 는 아직 아무 데도 가지 않는다.** 화면이 생기는 대로
+ * 잇는다. 갈 곳이 있는 것만 `HREFS` 에 적는다.
+ */
 const FOOTER_COLS = [
   { title: '상품', links: ['신상품', '키링', '팔찌', '목걸이'] },
   { title: '주문', links: ['배송 안내', '교환·반품', '자주 묻는 질문'] },
@@ -11,6 +14,11 @@ const FOOTER_COLS = [
     links: ['소개', 'Instagram', '네이버 스마트스토어', '문의'],
   },
 ]
+
+/** 갈 곳이 생긴 것만. 나머지는 `#` 이다 */
+const HREFS: Record<string, string> = {
+  문의: `mailto:${BUSINESS.email}`,
+}
 
 export default function Footer() {
   const rows = businessRows()
@@ -28,7 +36,7 @@ export default function Footer() {
               {col.links.map((l) => (
                 <li key={l}>
                   <a
-                    href="#"
+                    href={HREFS[l] ?? '#'}
                     className="text-ink-muted hover:text-ink text-body"
                   >
                     {l}

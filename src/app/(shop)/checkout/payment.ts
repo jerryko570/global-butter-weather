@@ -2,6 +2,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { BUSINESS } from '@/lib/business'
 import {
   cancelPayment,
   getPayment,
@@ -184,8 +185,7 @@ export async function confirmPayment(
       } catch {
         return {
           ok: false,
-          reason:
-            '결제 금액이 주문 금액과 다릅니다. 취소가 자동으로 되지 않았습니다 — 인스타그램 @butterweather_ 로 알려주세요.',
+          reason: `결제 금액이 주문 금액과 다릅니다. 취소가 자동으로 되지 않았습니다 — ${BUSINESS.email} 로 알려주세요.`,
         }
       }
       return {
@@ -207,8 +207,7 @@ export async function confirmPayment(
     } catch {
       return {
         ok: false,
-        reason:
-          '카드로만 결제할 수 있습니다. 취소가 자동으로 되지 않았습니다 — 인스타그램 @butterweather_ 로 알려주세요.',
+        reason: `카드로만 결제할 수 있습니다. 취소가 자동으로 되지 않았습니다 — ${BUSINESS.email} 로 알려주세요.`,
       }
     }
     return {
