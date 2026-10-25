@@ -60,7 +60,7 @@ Claude Code가 매 작업마다 참고하는 기준 문서. **코드가 바뀌�
 - ~~외부 접점~~ → **정해졌다.** 인스타그램 `@butterweather_`와 네이버 스마트스토어를 **새로 열지 않고 멈춘 그대로 이어간다.**
 - ~~기존 조형 언어와 취향 좌표의 정합~~ → **정리됐다.** 틀과 알맹이로 나눈다(5-8절). 갈등은 스타일이 아니라 배율의 문제였고, 5-9절에서 그 배율이 **「한 작품 안의 소재·크기 통일」**로 더 정확해졌다.
 - ~~**결제 수단**~~ → **정해졌다 (2026-09-22). 포트원 + 토스페이먼츠 채널, 카드만 받는다.** 옛 사이트도 포트원이었고 그 아래가 KG이니시스였다 — 느렸던 원인이 그쪽일 가능성이 커서 **층은 두고 아래만 토스로 바꿨다.** 설계는 [docs/dev/schema.md 7-4절](docs/dev/schema.md)
-- **DB 스키마 전체** — Supabase 프로젝트가 아직 없다 (아래 3-2)
+- ~~**DB 스키마 전체**~~ → **서 있다.** 상품·주문·배송·탈퇴까지 `0001`~`0010` (아래 3-2)
 - **카탈로그의 시간 축**(캐리오버 vs 컬렉션) — 물건이 정해진 뒤에 결정한다
 
 위 항목이 필요한 작업은 **먼저 사용자에게 확인**한다.
@@ -70,41 +70,37 @@ Claude Code가 매 작업마다 참고하는 기준 문서. **코드가 바뀌�
 
 ## 2. 지금 레포 상태 (실측)
 
-**M0 app shell이 서 있다.** 화면이 뜨고 다크모드가 돌아간다. 아직 배포는 안 됐다(I0.3).
+**M3까지 끝났다 (2026-10-25).** 상품을 보고, 담고, 카드로 결제하고, 관리자가 송장을 넣는 데까지 돈다.
 
 ```
-src/app/layout.tsx             # 전역 layout. font·다크모드 스크립트·Header
-src/app/page.tsx               # 임시 첫 화면 (M1에서 다시 짠다)
-src/app/globals.css            # Tailwind v4 진입점 + 다크모드 variant
-src/app/styles/theme.css       # design token 진입점 (아래 셋을 import)
-src/app/styles/colors.css      # 색 + 다크모드 반전
-src/app/styles/typography.css  # 서체·글자 크기
-src/app/styles/layout.css      # 화면 폭·높이, 모션
-src/components/Header.tsx      # 전역 header (로고 자리는 비어 있음)
-src/components/ThemeToggle.tsx # 다크모드 수동 토글
-src/components/Button.tsx      # primary·secondary·ghost
-src/lib/cn.ts                  # clsx + tailwind-merge
+src/app/(shop)/                # 손님 화면 — 첫 화면·상세·cart·checkout·orders·account·terms·privacy
+src/app/(auth)/login/          # 손님 로그인 (구글·카카오 OAuth)
+src/app/admin/                 # 관리자 — 상품 등록·수정, 주문·취소·송장
+src/app/api/payments/webhook/  # 포트원 웹훅
+src/app/auth/callback/         # OAuth 콜백
+src/app/styles/                # design token — colors·typography·layout (theme.css 가 import)
+src/components/                # Sidebar·Footer·Button·ProductGallery 등. admin/ 은 관리자 전용
+src/lib/                       # supabase client·payments·shipping·business·store(zustand)
+supabase/migrations/           # 0001~0010
 public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (pattern 6 · motif 10)
+public/fonts/                  # Pretendard·나눔명조 자체 호스팅
 ```
 
 **`public/illustrations/`는 이나래가 그린 원본이다.** 좌표를 반올림하거나 색을 바꾸는 등 파일 자체를 고치지 말 것. 목록과 쓰는 법은 [foundation.md 5-11절](docs/brand/foundation.md).
 
 **일러스트는 통째로 놓는다 ★** — 각 SVG의 첫 path가 배경 사각형인데 **빼지 않는다.** 배경까지가 한 장의 그림이라 모티프만 떼어 다른 바탕에 올리지 않는다. 크기·위치를 정하고 확대해 잘라내는 것까지가 할 수 있는 일이다.
 
-**확대할 때 선까지 확대하지 말 것 ★** — 이나래의 그림은 모티프가 커져도 **윤곽선 굵기가 `2.6`으로 일정하다** (foundation.md 5-10절 규칙 7). 파생물을 만들 때 통째로 `scale()`하면 선이 같이 굵어져 다른 그림이 된다.
-
 **확대할 때 선까지 확대하지 말 것 ★** — 이나래의 그림은 모티프가 커져도 **윤곽선 굵기가 `2.6`으로 일정하다**(foundation.md 5-10절 규칙 7). 통째로 `scale()`하면 선이 같이 굵어져 다른 그림처럼 보인다. 원본 SVG를 화면에 놓을 때는 확대·축소해도 되지만(래스터가 아니라 벡터라 선도 비례한다는 점을 알고 쓸 것), **새로 만드는 파생물에서는 선 굵기를 고정한다.**
 
-레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅(commit-msg·pre-commit·pre-push), commitlint, GitHub template·workflow, `pr.sh`, design token, Pretendard.
+레포에 있는 것: 툴링 설정(eslint·prettier·tsconfig·postcss), husky 훅(commit-msg·pre-commit·pre-push), commitlint, GitHub template·workflow, `pr.sh`, design token, Pretendard·나눔명조.
 
-**배포됨** — https://global-butter-weather.vercel.app · `main`에 머지되면 자동 배포되고 PR마다 프리뷰 URL이 붙는다.
+**배포됨** — https://global-butter-weather.vercel.app · `main`에 머지되면 자동 배포되고 PR마다 프리뷰 URL이 붙는다. 함수는 서울(`icn1`)에서 돈다(`vercel.json`).
 
-다음은 **M1 첫 화면**이다. 로드맵은 [docs/plan/roadmap.md](docs/plan/roadmap.md).
+다음 작업은 9절. 로드맵은 [docs/plan/roadmap.md](docs/plan/roadmap.md).
 
 ### 정리 대상 (알고는 있되 지나가며 건드리지 말 것)
 
 - `package-json-addition.json`은 이미 `package.json`에 반영된 잔재 파일이다.
-- `package-lock.json`의 `name`이 `butter-weather-shop`으로 남아 있다 (`npm install` 시 자동 수정됨).
 
 ## 3. 기술 스택 (`package.json` 실측)
 
@@ -123,7 +119,7 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 
 프로젝트를 만들었다 (`ghrpcggsjgiiitxjqdsw`, 이나래 계정). `.env.local`·`next.config.ts` 이미지 호스트·client 까지 연결돼 있다.
 
-**마이그레이션 둘 다 실행됐다** — `0001`(2026-09-16), `0002`(2026-09-19). 실측으로 `products` · `product_variants` · `products_public` 과 `product-images` 버킷이 서 있고, publishable 키의 `insert` 는 막힌다.
+**마이그레이션은 `0001`~`0010` 이 적용돼 있다** — 상품·사진 버킷(`0001`~`0004`), 주문·배송비·취소(`0005`~`0008`), 송장(`0009`), 탈퇴(`0010`). publishable 키의 `insert` 는 막힌다.
 
 > **API 키는 `publishable`(`sb_publishable_*`)을 쓴다.** `anon` 키는 2026년 말에 제거된다. 둘 다 브라우저로 나가는 값이라 비밀이 아니고 — **데이터를 지키는 것은 키가 아니라 RLS 다.**
 >
@@ -145,7 +141,7 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 
 **옛 레포의 `products` 테이블을 계승한다.** 디자인과 같은 이유다 — 이미 한 번 장사에 쓰인 모양이라 새로 상상하는 것보다 낫다. 다만 옛 쪽은 대시보드에서 손으로 만들어 재현할 수 없었고, 여기서는 `.sql`로 남긴다.
 
-기억해 둘 것 셋.
+기억해 둘 것 넷.
 
 - **가격과 재고는 `products`가 아니라 `product_variants`에 있다 ★** — 옵션마다 값이 다르기 때문이다. 옵션이 하나뿐인 물건도 variant 를 하나 만든다. **두 군데에 두면 반드시 어긋난다**
 - **카테고리는 형태다** — `keyring` · `bracelet` · `necklace`. 소재가 아니다. `etc`를 두지 않는다
@@ -173,7 +169,7 @@ public/illustrations/          # 이나래 일러스트 원본 SVG 16개 (patter
 - Tailwind 유틸로 노출돼 있다 — `bg-butter`, `text-ink`, `bg-cloud`, `text-ink-muted` 등.
 - layout token: `--container-max: 1280px`, `--header-height: 64px`
 - **타이포는 역할 이름 여섯 개다** — `text-display`(38) `text-title`(22) `text-wordmark`(15) `text-body`(13) `text-caption`(11) `text-label`(10). Tailwind 기본 스케일(`text-sm`)을 쓰지 않는다.
-- **serif는 브랜드의 목소리에만 ★** — 제목·지표·워드마크·태그라인만 serif이고 본문·라벨은 sans다. 계승한 디자인의 핵심 성격이라 본문에 serif를 쓰면 다른 브랜드가 된다. ⚠️ **어떤 serif인지는 아직 미정**이라 기기마다 다르게 보인다 (tokens.md 3-3절).
+- **serif는 브랜드의 목소리에만 ★** — 제목·지표·워드마크·태그라인만 serif이고 본문·라벨은 sans다. 계승한 디자인의 핵심 성격이라 본문에 serif를 쓰면 다른 브랜드가 된다. serif는 **나눔명조**다 (2026-09-16, 굵기 400 하나, 자체 호스팅 — tokens.md 3-3절).
 
 **손님에게 하는 말은 [docs/design/writing.md](docs/design/writing.md)** 에 규약이 있다. 화면 문구를 짜기 전에 읽을 것. 핵심은 하나다 — **화면의 말은 그 화면의 언어를 따른다.** 영문으로 남는 것은 워드마크·언어 토글·고유명사뿐이다. `uppercase` 클래스는 지우지 않는다 — 한글에는 효과가 없지만 EN 버전에서 살아난다.
 
@@ -386,7 +382,7 @@ feat: 상품 목록 추가          ← 이모지 없이도 통과
 
 ### 검색 노출은 막혀 있다
 
-`src/app/robots.ts`가 모든 크롤러를 막는다. 지금 첫 화면은 M1에서 다시 짤 임시본이라 검색에 잡히면 안 된다. **M1에서 첫 화면이 서면 이 파일을 풀고 sitemap을 붙인다.**
+`src/app/robots.ts`가 모든 크롤러를 막는다. M1 때 임시 화면을 숨기려고 막았고, 첫 화면이 선 지금도 풀지 않았다. **문을 여는 시점에 이 파일을 풀고 sitemap을 붙인다** (roadmap M3 「아직 안 만든 것」).
 
 ### 환경변수는 Type 과 재배포를 같이 본다 ⚠️
 
@@ -414,7 +410,6 @@ Vercel 환경변수에는 **Config** 와 **Secret** 두 타입이 있다. **`NEX
   - **예외 — 이나래가 요청하면 파생 창작을 한다 (2026-09-13).** 이때도 새로 지어내는 것은 **배치 하나뿐이다.** 형태는 이나래의 SVG에서 path를 꺼내 쓰고, 색은 5-10절 실측 팔레트 안에서만 쓰고, 선 굵기·밀도는 원본에서 재서 맞춘다. 결과물은 `public/illustrations/derived/`에 두어 원본과 섞지 않는다. **첫 시도(`pattern-rain`)는 버려졌다** — 계열표의 빈 칸을 찾아 채우는 것은 분류의 논리이지 감각의 판단이 아니었다. foundation.md **5-12절**.
 - **화면은 쨍해도 되고 상품은 차분하다 ★** — 쨍한 색은 **아이덴티티 층**이고, 상품은 그 색 중 몇을 차용한 **차분한 층**이다 (foundation.md 5-13절). 화면은 아이덴티티 층이므로 일러스트가 면을 차지해도 된다. 다만 **화면 전체를 덮지는 않는다** — 사진과 여백이 함께 있어야 상품 층이 존재한다.
 - **karactor를 직독직해하지 않는다 ★** — 좌우 50:50 분할은 karactor의 **결과**이지 원리가 아니다. 가져올 원리는 둘이다 — **① UI는 면을 갖지 않고 「틈」에 산다 ② 한 화면은 한 장면이다** (foundation.md 5-6절 UI 배치 실측).
-  - **예외 — 이나래가 요청하면 파생 창작을 한다 (2026-09-13).** 이때도 새로 지어내는 것은 **배치 하나뿐이다.** 형태는 이나래의 SVG에서 path를 꺼내 쓰고, 색은 5-10절 실측 팔레트 안에서만 쓰고, 선 굵기·밀도는 원본에서 재서 맞춘다. 결과물은 `public/illustrations/derived/`에 두어 원본과 섞지 않는다. 방법과 근거는 foundation.md **5-12절**.
 - **가격은 정수로 다룬다** (원 단위). 다국가는 통화별 컬럼을 나눈다.
 - RLS는 대충 넘기지 않는다. 쓰기 권한은 반드시 제한한다.
 - 커밋 전 `npm run lint`·타입 에러 확인. husky가 staged 파일에 eslint·prettier를 자동 적용한다.
