@@ -54,7 +54,7 @@ export interface BusinessInfo {
 export const BUSINESS: BusinessInfo = {
   name: '',
   owner: '',
-  registrationNo: '',
+  registrationNo: '247-41-01130',
   mailOrderNo: '',
   address: '',
   phone: '',
