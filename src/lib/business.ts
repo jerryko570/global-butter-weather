@@ -46,6 +46,30 @@ export interface BusinessInfo {
 }
 
 /**
+ * 개인정보 보호책임자. **지정이 의무다** (개인정보보호법 제31조).
+ *
+ * **작은 가게는 대표자가 겸하는 것이 보통이라** 따로 적지 않으면
+ * 대표자와 이메일을 그대로 쓴다. 다른 사람을 두면 여기를 채운다.
+ */
+export const PRIVACY_OFFICER = {
+  name: '',
+  email: '',
+} as const
+
+export function privacyOfficer(): { name: string; email: string } {
+  return {
+    name: PRIVACY_OFFICER.name || BUSINESS.owner,
+    email: PRIVACY_OFFICER.email || BUSINESS.email,
+  }
+}
+
+/**
+ * 개인정보처리방침 시행일. **내용을 고치면 이 날짜도 고친다** —
+ * 언제부터의 방침인지가 방침의 일부다.
+ */
+export const PRIVACY_EFFECTIVE_DATE = '2026-10-25'
+
+/**
  * ⚠️ **아직 비어 있다.** 실연동 전에 채워야 한다 (2026-10-02).
  *
  * 값은 이나래가 가지고 있다 — 사업자등록증과 통신판매업 신고증에 있는

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Label from '@/components/Label'
 import { businessRows } from '@/lib/business'
 
@@ -57,7 +58,17 @@ export default function Footer() {
       ) : null}
 
       <div className="flex items-center justify-between border-t border-gray-200 px-7 py-4">
-        <p className="text-ink-subtle text-caption">© 2026 Butter Weather</p>
+        <div className="flex items-center gap-4">
+          <p className="text-ink-subtle text-caption">© 2026 Butter Weather</p>
+          {/* **공개가 의무다** (개인정보보호법 제30조). 찾을 수 있는
+              자리에 둔다 — 위 열을 늘리면 grid-cols-3 이 깨진다 */}
+          <Link
+            href="/privacy"
+            className="text-ink-muted hover:text-ink text-caption underline"
+          >
+            개인정보처리방침
+          </Link>
+        </div>
         <div className="flex items-center gap-4">
           <span className="text-ink text-caption">KR</span>
           <span className="text-ink-subtle hover:text-ink text-caption">
