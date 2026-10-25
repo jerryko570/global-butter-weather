@@ -52,12 +52,14 @@ export interface BusinessInfo {
  * 그대로 적는다. **다르게 적으면 심사에서 걸린다.**
  */
 export const BUSINESS: BusinessInfo = {
-  name: '',
-  owner: '',
+  name: '버터웨더',
+  owner: '이나래',
   registrationNo: '247-41-01130',
+  // ⚠️ 아직 못 받았다. 통신판매업 신고증의 번호 그대로
   mailOrderNo: '',
-  address: '',
-  phone: '',
+  address: '인천광역시 부평구 부일로29번길 15, 202호',
+  phone: '010-7105-0536',
+  // ⚠️ 아직 못 받았다
   email: '',
 }
 
