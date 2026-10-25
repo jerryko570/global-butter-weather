@@ -72,6 +72,12 @@ export default function AuthLinks() {
         >
           주문 내역
         </Link>
+        <Link
+          href="/account"
+          className="text-ink-muted hover:text-ink text-caption"
+        >
+          내 정보
+        </Link>
         <span className="text-ink text-caption max-w-32 truncate">{name}</span>
         <button
           type="button"
