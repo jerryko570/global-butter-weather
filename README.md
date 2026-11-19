@@ -1,6 +1,8 @@
 # global-butter-weather
 
-`butter-weather-shop`의 해외 확장판 — 다국가 대응 편집샵 🌤️
+이나래의 감각을 파는 브랜드, 버터웨더의 쇼핑몰 🌤️ — https://global-butter-weather.vercel.app
+
+> 폴더 이름이 `butter-weather` 여도 이 저장소다. 이름이 비슷한 `jerryko570/butter-weather-shop` 은 **옛 레포**다 — 코드는 가져오지 않고 디자인과 `products` 모양만 계승한다(CLAUDE.md 1절).
 
 프로젝트 기준 문서는 [CLAUDE.md](CLAUDE.md)를 본다.
 
@@ -9,15 +11,36 @@
 - `main` 브랜치는 **보호됨** → 직접 push 금지, 반드시 PR로 반영
 - 작업은 항상 브랜치를 파서 진행: `feature/작업내용`
 - 작업 시작 전 `git pull`로 최신 상태 유지
-- PR은 상대방 **리뷰 승인 1개** 후 머지
+- PR은 반드시 만들되 **승인 없이 머지**한다 (2026-09-22부터. CLAUDE.md 5절)
 
-## 시작하기
+## 시작하기 — 새 기기에서
+
+코드·문서·작업 기록은 전부 GitHub 에 있다. **저장소 밖에 있는 것은 `.env.local` 하나뿐이다.**
+
+**1. 도구** — Node 24 · `git` · [`gh`](https://cli.github.com/)
 
 ```bash
+gh auth login                 # pr.sh 가 gh 로 PR 을 만든다
 git clone https://github.com/jerryko570/global-butter-weather.git
 cd global-butter-weather
-git checkout -b feature/my-work
+npm install                   # husky 훅도 여기서 깔린다
 ```
+
+**2. `.env.local`** — 키 일곱 개. 목록과 각각 어디서 받는지는 [`.env.example`](.env.example)에 있다.
+
+- **쓰던 기기의 `.env.local` 을 그대로 옮기는 게 가장 빠르다.** USB·비밀번호 관리자처럼 남지 않는 길로 옮긴다. **git·Slack·메일로 보내지 않는다** — `SUPABASE_SECRET_KEY` 는 RLS 를 지나는 키다
+- 옮길 수 없으면 각 대시보드에서 다시 받는다. Vercel 에 **Secret** 으로 넣은 셋(`SUPABASE_SECRET_KEY` · `PORTONE_API_SECRET` · `PORTONE_WEBHOOK_SECRET`)은 저장 후 값을 볼 수 없어 `vercel env pull` 로도 안 나온다 — Supabase·포트원 대시보드에서 받는다
+
+**3. 확인**
+
+```bash
+npm run dev                   # http://localhost:3000 에 상품이 보이면 Supabase 연결 OK
+npm run lint
+```
+
+**4. 이어서 하기** — 지금 어디까지 왔는지는 [CLAUDE.md](CLAUDE.md) 9절과 [roadmap](docs/plan/roadmap.md)의 「아직 안 만든 것」. Claude Code 는 CLAUDE.md 를 저절로 읽으므로 따로 설명하지 않아도 맥락을 잇는다.
+
+작업은 브랜치를 파서 `./pr.sh` 로 PR 을 만든다 (CLAUDE.md 5절).
 
 ## 알림 (Slack)
 
