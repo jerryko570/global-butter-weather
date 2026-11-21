@@ -26,10 +26,17 @@ cd global-butter-weather
 npm install                   # husky 훅도 여기서 깔린다
 ```
 
+- **brew 로 받은 `node@24` 는 깔기만 해서는 `node` 가 안 잡힌다** — 다른 버전과 부딪히지 않게 brew 가 경로에 걸지 않는다. 한 번 걸어 둔다:
+  ```bash
+  echo 'export PATH="/opt/homebrew/opt/node@24/bin:$PATH"' >> ~/.zshrc && source ~/.zshrc
+  ```
+- **npm 11 은 패키지의 설치 스크립트를 허락 없이 돌리지 않는다.** `npm install` 끝에 `sharp` · `core-js` · `unrs-resolver` 경고가 나와도 `npm run dev` 는 뜬다. 이미지 최적화가 깨지면 `npm install-scripts approve sharp` 뒤 `npm install` 을 다시 한다
+
 **2. `.env.local`** — 키 일곱 개. 목록과 각각 어디서 받는지는 [`.env.example`](.env.example)에 있다.
 
 - **쓰던 기기의 `.env.local` 을 그대로 옮기는 게 가장 빠르다.** USB·비밀번호 관리자처럼 남지 않는 길로 옮긴다. **git·Slack·메일로 보내지 않는다** — `SUPABASE_SECRET_KEY` 는 RLS 를 지나는 키다
 - 옮길 수 없으면 각 대시보드에서 다시 받는다. Vercel 에 **Secret** 으로 넣은 셋(`SUPABASE_SECRET_KEY` · `PORTONE_API_SECRET` · `PORTONE_WEBHOOK_SECRET`)은 저장 후 값을 볼 수 없어 `vercel env pull` 로도 안 나온다 — Supabase·포트원 대시보드에서 받는다
+- **이름은 정확히 `.env.local`, 자리는 `package.json` 옆이다.** 옮기는 길에 앞의 `.` 이 빠지거나 `.txt` 가 붙기 쉽다(`env.local.txt`) — 그러면 `npm run dev` 의 `Environments:` 줄에 `.env.local` 이 안 뜬다. Finder 는 `.` 으로 시작하는 파일을 숨기므로 `Cmd + Shift + .` 으로 보이게 하고 확인한다
 
 **3. 확인**
 
