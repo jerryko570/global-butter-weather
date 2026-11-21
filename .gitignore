@@ -41,3 +41,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# next dev 가 만드는 AI 도구용 안내문 (next 16.4~). 지워도 다시 생긴다
+# 이 레포의 기준 문서는 CLAUDE.md 다
+AGENTS.md
